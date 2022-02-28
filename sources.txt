@@ -1,0 +1,5 @@
+https://github.com/BillyKlebitz/FT_Containers/wiki/
+
+https://stackoverflow.com/questions/3582608/how-to-correctly-implement-custom-iterators-and-const-iterators
+
+https://stackoverflow.com/questions/4622330/operator-overloading-member-function-vs-non-member-function
