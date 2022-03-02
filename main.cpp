@@ -12,15 +12,26 @@
 
 #include "stack.hpp"
 #include <iostream>
+#include "iterator_traits.hpp"
+#include "reverse_iterator.hpp"
+#include "vector.hpp"
 
 int main()
 {
-	ft::stack<int> test;
+	/*
+	ft::vector<int> pouet;
 
-	std::cout << test.empty() << std::endl;
-	test.push(10);
-	std::cout << test.empty() << std::endl;
-	test.pop();
-	std::cout << test.empty() << std::endl;
+	pouet.push_back(1);
+	pouet.push_back(10);
+	pouet.push_back(25);
 
+	typedef ft::vector<int>::iterator iter_type;
+
+	ft::reverse_iterator<iter_type> rbegin = pouet.rbegin();
+	ft::reverse_iterator<iter_type> rend = pouet.rend();
+
+	while (rbegin != rend)
+		std::cout << *rbegin++ << " ";
+	std::cout << std::endl;
+	*/
 }

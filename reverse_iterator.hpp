@@ -22,14 +22,14 @@ namespace ft
 	class reverse_iterator
 	{
 		private:
-			iterator_type _it;
+			Iterator _it; /* Cannot use iterator_type since it's declared after */
 		public:
-			typedef Iterator											iterator_type;
-			typedef ft::iterator_traits<Iterator>::iterator_category	iterator_category;
-			typedef ft::iterator_traits<Iterator>::value_type			value_type;
-			typedef ft::iterator_traits<Iterator>::difference_type		difference_type;
-			typedef ft::iterator_traits<Iterator>::pointer				pointer;
-			typedef ft::iterator_traits<Iterator>::reference			reference;
+			typedef Iterator													iterator_type;
+			typedef typename ft::iterator_traits<Iterator>::iterator_category	iterator_category;
+			typedef typename ft::iterator_traits<Iterator>::value_type			value_type;
+			typedef typename ft::iterator_traits<Iterator>::difference_type		difference_type;
+			typedef typename ft::iterator_traits<Iterator>::pointer				pointer;
+			typedef typename ft::iterator_traits<Iterator>::reference			reference;
 
 			/* Default constructor */
 			reverse_iterator() : _it() { };
@@ -44,14 +44,15 @@ namespace ft
 			template <class Iter>
 			reverse_iterator (const reverse_iterator<Iter>& rev_it) : _it(rev_it.base()) { }
 
-			iterator_type	base() const { return (iterator_type); }
+			/* Since reverse_iterators basically have an offset of -1 compared to the original iterator, if we call base on ft::vector<int>::rbegin(), it would point to ft::vector<int>::end(), and call on rend() would point to begin() */
+			iterator_type	base() const { return(this->_it); }
 
 			/* Internally, the function decreases a copy of its base iterator and returns the result of dereferencing it. */
 			reference operator*() const
 			{
 				iterator_type temp = this->_it;
 				--this->_it;
-				return (*it);	
+				return (temp);	
 			}
 
 			/* Internally, the function applies the binary operator- on the base iterator and returns a reverse iterator constructed with the resulting iterator value. */

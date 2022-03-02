@@ -11,3 +11,9 @@ when saying the container must implement the iterator_traits, it should just con
 
 Since "myContainer::iterator" is always a typedef of some other iterator (forward / bidirectional / random etc.) it could also be a typedef of just int* (pointer of int) and the caller (an algorithm for instance) doesn't know and doesn't have to know it, this is the reason why
 there is a pointer specialization in iterator_traits, because as said above, even if it's not a real iterator, it would still work
+
+SNIFAE:
+https://www.youtube.com/watch?v=mNxAqLVIaW0
+
+Basically if a template does not match (substitution failure) other ones will be tried out before throwing an error
+It's an error only if there isn't any other matching templates, see snifae_example.cpp

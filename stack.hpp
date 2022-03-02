@@ -13,12 +13,13 @@
 #ifndef STACK_HPP
 # define STACK_HPP
 
-#include <vector.hpp>
+//#include "vector.hpp"
 
+#include <vector>
 namespace ft
 {
 
-	template < class T, class Container = ft::vector<T> >
+	template < class T, class Container = std::vector<T> >
 	class stack
 	{
 		protected:
