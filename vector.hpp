@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 28-02-2022 11:41 by                                             */
+/*   Updated: 02-03-2022 10:35 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 namespace ft
 {
+
 	// > > instead of >> because otherwise C++ might think it's a bitshift
 	template< class T, class Allocator = std::allocator<T> >
 	class vector
@@ -28,4 +29,5 @@ namespace ft
 			
 			
 	};
+	
 }

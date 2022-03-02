@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 28-02-2022 16:19 by                                             */
+/*   Updated: 02-03-2022 10:35 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 
 namespace ft
 {
+
 	template < class T, class Container = ft::vector<T> >
 	class stack
 	{
@@ -64,8 +65,6 @@ namespace ft
 
 			friend bool operator>= (const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return(lhs.c >= rhs.c); }
 	};
-
-
 	
 }
 
