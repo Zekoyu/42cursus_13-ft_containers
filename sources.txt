@@ -3,3 +3,11 @@ https://github.com/BillyKlebitz/FT_Containers/wiki/
 https://stackoverflow.com/questions/3582608/how-to-correctly-implement-custom-iterators-and-const-iterators
 
 https://stackoverflow.com/questions/4622330/operator-overloading-member-function-vs-non-member-function
+
+
+std::iterator_traits<Iterator> are just a way to access any needed types (value type, pointer type, reference type, difference type) from a given iterator without knowing the data structure it belongs to neither the template parameter (eg. int vector, float vector etc., just use std::iterator_traits<myVector>::value_type)
+specializations are in the case where there is no iterators but only a plain pointer (eg int* / T*), where the value_type is put as int/T, pointer as int*/T*, and so on
+when saying the container must implement the iterator_traits, it should just contain the necessary typedefs (value_type, difference_type etc. which should be accessible by using myContainer::value_type ...)
+
+Since "myContainer::iterator" is always a typedef of some other iterator (forward / bidirectional / random etc.) it could also be a typedef of just int* (pointer of int) and the caller (an algorithm for instance) doesn't know and doesn't have to know it, this is the reason why
+there is a pointer specialization in iterator_traits, because as said above, even if it's not a real iterator, it would still work
