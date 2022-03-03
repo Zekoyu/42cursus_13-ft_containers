@@ -37,3 +37,9 @@ int main()
 }
 
 if we call somePouet with Test1 it would use the first one, but with Test2 it could use both, here the compiler issues an error "Call is ambiguous"
+
+SNIFAE:
+https://www.youtube.com/watch?v=mNxAqLVIaW0
+
+Basically if a template does not match (substitution failure) other ones will be tried out before throwing an error
+It's an error only if there isn't any other matching templates, see snifae_example.cpp
