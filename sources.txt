@@ -11,3 +11,29 @@ when saying the container must implement the iterator_traits, it should just con
 
 Since "myContainer::iterator" is always a typedef of some other iterator (forward / bidirectional / random etc.) it could also be a typedef of just int* (pointer of int) and the caller (an algorithm for instance) doesn't know and doesn't have to know it, this is the reason why
 there is a pointer specialization in iterator_traits, because as said above, even if it's not a real iterator, it would still work
+
+If multiple templates could fit like this:
+
+template <typename T>
+void	somePouet(typename T::value someValue) {}
+
+template <typename T>
+void	somePouet(typename T::otherValue someOtherValue) {}
+
+struct Test1
+{
+	typedef int	value;
+};
+
+struct Test2
+{
+	typedef int	value;
+	typedef int	otherValue;
+};
+
+int main()
+{
+	somePouet<Test2>(0);
+}
+
+if we call somePouet with Test1 it would use the first one, but with Test2 it could use both, here the compiler issues an error "Call is ambiguous"

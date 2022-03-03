@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 02-03-2022 10:35 by                                             */
+/*   Updated: 03-03-2022 13:37 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,13 @@ namespace ft
 		public:
 			typedef T								value_type;
 			typedef Allocator						allocator_type;
-			typedef allocator_type::reference		reference;
-			typedef allocator_type::const_reference	const_reference;
-			typedef allocator_type::pointer			pointer;
-			typedef allocator_type::const_pointer	const_pointer;
+			/* All of these could be used with value_type for the default allocator, but maybe not custom ones */
+			typedef allocator_type::reference		reference; /* Same as value_type& */
+			typedef allocator_type::const_reference	const_reference; /* Same as const value_type& */
+			typedef allocator_type::pointer			pointer; /* Same as value_type* */
+			typedef allocator_type::const_pointer	const_pointer; /* Same as const value_type* */
 			
+			class RandomAccessIterator
 			
 	};
 	
