@@ -24,4 +24,5 @@ int main()
 {
 	pouet<Example>(123);
 	pouet<int>(10); /* Substitution failure in first one (T::value_type) , but not an error */
+	
 }
