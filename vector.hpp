@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 03-03-2022 13:37 by                                             */
+/*   Updated: 03-03-2022 15:46 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ namespace ft
 			typedef allocator_type::pointer			pointer; /* Same as value_type* */
 			typedef allocator_type::const_pointer	const_pointer; /* Same as const value_type* */
 			
-			class RandomAccessIterator
+			//class RandomAccessIterator
 			
 	};
 	
