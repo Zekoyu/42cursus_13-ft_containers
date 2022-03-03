@@ -130,7 +130,16 @@ namespace ft
 	};
 
 
-	template <typename T>
-	class
-
+	/* Iterator class is a template used to simplify custom iterator creation by defining required types for iterators,
+	   the custom iterator should just inherit from ft::iterator and provide at least Category and T. Then there is no need to redefine value_type etc.*/
+	template <class Category, class T, class Distance = std::ptrdiff_t, class Pointer = T*, class Reference = T&>
+	struct Iterator
+	{
+		typedef Category	iterator_category;
+		typedef T			value_type;
+		typedef Distance	difference_type;
+		typedef Pointer		pointer;
+		typedef Reference	reference;
+	};
+	
 }
