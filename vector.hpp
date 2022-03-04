@@ -160,17 +160,17 @@ namespace ft
 		public:
 			vector() : _ptr(0), _size(0), _capacity(0) { }
 
-			iterator		begin() { return(RandIterator(_ptr)); }
-			const_iterator	begin() const { return(RandIterator(_ptr)); }
+			iterator		begin() { return (RandIterator(_ptr)); }
+			const_iterator	begin() const { return (RandIterator(_ptr)); }
 
-			iterator		end() { return(RandIterator(_ptr + _size)); }
-			const_iterator	end() const { return(RandIterator(_ptr + _size)); }
+			iterator		end() { return (RandIterator(_ptr + _size)); }
+			const_iterator	end() const { return (RandIterator(_ptr + _size)); }
 
-			reverse_iterator		rbegin() { return(ft::reverse_iterator<iterator>(this->end())); } /* Returns reverse iterator starting from vector.end() */
-			const_reverse_iterator	rbegin() const { return(ft::reverse_iterator<const_iterator>(this->end())); } /* Same but const */
+			reverse_iterator		rbegin() { return (ft::reverse_iterator<iterator>(this->end())); } /* Returns reverse iterator starting from vector.end() */
+			const_reverse_iterator	rbegin() const { return (ft::reverse_iterator<const_iterator>(this->end())); } /* Same but const */
 
-			reverse_iterator		rend() { return(ft::reverse_iterator<iterator>(this->begin())); } /* Same but starting at vector.begin() */
-			const_reverse_iterator	rend() const { return(ft::reverse_iterator<const_iterator>(this->begin())); }  /* Again same but const */
+			reverse_iterator		rend() { return (ft::reverse_iterator<iterator>(this->begin())); } /* Same but starting at vector.begin() */
+			const_reverse_iterator	rend() const { return (ft::reverse_iterator<const_iterator>(this->begin())); }  /* Again same but const */
 	
 			size_type	size() const { return (this->_size); }
 			/* This value typically reflects the theoretical limit on the size of the container, at most std::numeric_limits<difference_type>::max()
@@ -189,9 +189,9 @@ namespace ft
 					{
 						pointer tmp = this->_alloc.allocate(n);
 						for (size_type i = 0; i < this->_size; ++i) /* Move content */
-							this->_alloc.construct(tmp[i], this->_ptr[i]);
+							this->_alloc.construct(tmp + i, this->_ptr + i);
 						for (size_type i = this->_size; i < n; ++i) /* Append new content */
-							tmp[i] = val;
+							this->_alloc.construct(tmp + i, val);
 						this->_alloc.deallocate(this->_ptr, this->_capacity);
 						this->_ptr = tmp;
 						this->_capacity = n;
@@ -200,7 +200,7 @@ namespace ft
 					else /* Append without realloc */
 					{
 						for (size_type i = this->_size; i < n; ++i)
-							this->_ptr[i] = val;
+							this->_ptr + i = val;
 					}
 				}
 				else
@@ -208,7 +208,7 @@ namespace ft
 					this->_size = n;
 					/* If n is smaller than the current container size, the content is reduced to its first n elements, removing those beyond (and destroying them). */
 					for (size_type i = n; i < this->capacity; ++i)
-						this->_alloc.destroy(this->_ptr[i]);
+						this->_alloc.destroy(this->_ptr + i);
 				}
 				this->_size = n;
 			}
@@ -223,17 +223,17 @@ namespace ft
 				{
 					pointer tmp = this->_alloc.allocate(n);
 					for (size_type i = 0; i < this->_size; ++i) /* Move content */
-						tmp[i] = this->_ptr[i];
+						this->_alloc.construct(tmp + i, this->_ptr + i);
 					for (size_type i = this->_size; i < n; ++i) /* Append new content */
-						tmp[i] = val;
+						this->_alloc.construct(tmp + i, val);
 					this->_alloc.deallocate(this->_ptr, this->_capacity);
 					this->_ptr = tmp;
 					this->_capacity = n;
 				}
 			}
 
-			reference		operator[] (size_type n) { return (this->_ptr[n]); }
-			const_reference	operator[] (size_type n) const { return (this->_ptr[n]); }
+			reference		operator[] (size_type n) { return (this->_ptr + n); }
+			const_reference	operator[] (size_type n) const { return (this->_ptr + n); }
 
 			reference		at(size_type n)
 			{
@@ -249,19 +249,19 @@ namespace ft
 				return (this->operator[](n)); /* same as (*this)[n] */
 			}
 
-		    reference		front() { return (this->_ptr[0]); }
-			const_reference	front() const { return (this->_ptr[0]); }
+		    reference		front() { return (*this->_ptr); }
+			const_reference	front() const { return (*this->_ptr); }
 
-			reference		back() { return (this->_ptr[this->_size - 1]); }
-			const_reference	back() const { return (this->_ptr[this->_size - 1]); }
+			reference		back() { return (this->_ptr + this->_size - 1); }
+			const_reference	back() const { return (this->_ptr + this->_size - 1); }
 
 			void	assign(size_type n, const value_type& val)
 			{
 				this->reserve(n);
 				for (size_type i = 0; i < n; ++i)
 				{
-					this->_alloc.destroy(this->_ptr[i]);
-					this->_alloc.construct(this->_ptr[i], val)
+					this->_alloc.destroy(this->_ptr + i);
+					this->_alloc.construct(this->_ptr + i, val)
 				}
 			}
 
@@ -274,20 +274,84 @@ namespace ft
 				size_type i = 0;
 				while (first != last)
 				{
-					this->_alloc.destroy(this->_ptr[i]);
-					this->_alloc.construct(this->_ptr[i], *first);
+					this->_alloc.destroy(this->_ptr + i);
+					this->_alloc.construct(this->_ptr + i, *first);
 					++first;
 				}
 			}
 
+			/* If the array is not enough to hold value, double it's size */
 			void	push_back(const value_type& val)
 			{
 				if (this->_size + 1 > this->_capacity)
 					this->reserve(this->capacity * 2);
-				(*this)[this->_size++ - 1] = val; /* Push value and incrment size */
+				this->_alloc.construct(this->_ptr + this->size - 1, val);
+				++this->size;
 			}
 
-			void	pop_back() { --this->_size; }
+			void	pop_back()
+			{
+				this->_alloc.destroy(this->_ptr + this->size - 1);
+				--this->_size;
+			}
+
+			/* Returns an iterator pointing to first new elt to check iterator invalidion (partial or total), if return value == position, everything before position is still valid,
+			   otherwise not, if it's != all iterators are invalidated */
+			iterator	insert(iterator position, const value_type& val)
+			{
+				size_type index = std::distance(this->begin(), position);
+
+				if (this->_size + 1 > this->_capacity)
+					this->reserve(this->_capacity * 2);
+				
+				for (size_type i = this->_size - 1; i >= index; --i) /* Move everything and destroy the value at index */
+				{
+					this->_alloc.construct(this->_ptr + i + 1, this->_ptr + i);
+					this->_alloc.destroy(this->_ptr + i);
+				}
+				this->_alloc.construct(this->_ptr + index), val);
+				++this->_size;
+				return (RandIterator(this->_ptr + index));
+			}
+
+			void	insert(iterator position, size_type n, const value_type& val)
+			{
+				size_type index = std::distance(this->begin(), position);
+
+				while (this->_size + n > this->_capacity) /* while instead of if in case we want to add many many values */
+					this->reserve(this->_capacity * 2);
+				for (size_type i = this->_size - 1; i >= (index + n); --i) /* Move everything and destroy the value at index */
+				{
+					this->_alloc.construct(this->_ptr + i + n, this->_ptr + i); /* Same as above except instead of moving 1 we move n to the right */
+					this->_alloc.destroy(this->_ptr + i);
+				}
+				while (n--) /* Add n times */
+				{
+					this->_alloc.construct(this->_ptr + index++), val);
+					++this->_size;
+				}
+			}
+
+			/* Same as above using range instead of fixed value / size */
+			template <class InputIterator>
+  			void insert(iterator position, InputIterator first, InputIterator last)
+			{
+				size_type n = std::distance(first, last);
+				size_type index = std::distance(this->begin(), position);
+				
+				while (this->_size + n > this->_capacity)
+					this->reserve(this->_capacity * 2);
+				for (size_type i = this->_size - 1; i >= (index + n); --i)
+				{
+					this->_alloc.construct(this->_ptr + i + n, this->_ptr + i);
+					this->_alloc.destroy(this->_ptr + i);
+				}
+				while (first != last)
+				{
+					this->_alloc.construct(this->_ptr + index++), *first);
+					++first;
+				}
+			}
 
 	};
 	
