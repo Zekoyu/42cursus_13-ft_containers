@@ -156,6 +156,7 @@ namespace ft
 			size_type		_capacity;
 			allocator_type	_alloc;
 
+
 		public:
 			vector() : _ptr(0), _size(0), _capacity(0) { }
 
@@ -186,20 +187,28 @@ namespace ft
 				{
 					if (n > this->_capacity) /* Realloc of size n */
 					{
-						this->capacity = n;
-						pointer tmp = /* need to use allocator */ value_type[n];
-						for (size_type i = 0; i < this->_size; i++) /* Move content */
-							tmp[i] = this->_ptr[i];
-						for (size_type i = this->_size; i < n; i++) /* Append new content */
+						pointer tmp = this->_alloc.allocate(n);
+						for (size_type i = 0; i < this->_size; ++i) /* Move content */
+							this->_alloc.construct(tmp[i], this->_ptr[i]);
+						for (size_type i = this->_size; i < n; ++i) /* Append new content */
 							tmp[i] = val;
-						/* use alloactor */ this->_ptr;
+						this->_alloc.deallocate(this->_ptr, this->_capacity);
 						this->_ptr = tmp;
+						this->_capacity = n;
+						this->_size = n;
 					}
 					else /* Append without realloc */
 					{
-						for (size_type i = this->_size; i < n; i++)
+						for (size_type i = this->_size; i < n; ++i)
 							this->_ptr[i] = val;
 					}
+				}
+				else
+				{
+					this->_size = n;
+					/* If n is smaller than the current container size, the content is reduced to its first n elements, removing those beyond (and destroying them). */
+					for (size_type i = n; i < this->capacity; ++i)
+						this->_alloc.destroy(this->_ptr[i]);
 				}
 				this->_size = n;
 			}
@@ -212,12 +221,12 @@ namespace ft
 			{
 				if (n > this->_capacity)
 				{
-					pointer tmp = /* need to use allocator */ value_type[n];
-					for (size_type i = 0; i < this->_size; i++) /* Move content */
+					pointer tmp = this->_alloc.allocate(n);
+					for (size_type i = 0; i < this->_size; ++i) /* Move content */
 						tmp[i] = this->_ptr[i];
-					for (size_type i = this->_size; i < n; i++) /* Append new content */
+					for (size_type i = this->_size; i < n; ++i) /* Append new content */
 						tmp[i] = val;
-					/* use allocator */ this->_ptr;
+					this->_alloc.deallocate(this->_ptr, this->_capacity);
 					this->_ptr = tmp;
 					this->_capacity = n;
 				}
@@ -249,8 +258,11 @@ namespace ft
 			void	assign(size_type n, const value_type& val)
 			{
 				this->reserve(n);
-				for (size_type i = 0; i < n; i++)
-					(*this)[i] = val;
+				for (size_type i = 0; i < n; ++i)
+				{
+					this->_alloc.destroy(this->_ptr[i]);
+					this->_alloc.construct(this->_ptr[i], val)
+				}
 			}
 
 			/* The range used is [first,last), which includes all the elements between first and last, 
@@ -262,8 +274,9 @@ namespace ft
 				size_type i = 0;
 				while (first != last)
 				{
-					(*this)[i] = *first;
-					first++;
+					this->_alloc.destroy(this->_ptr[i]);
+					this->_alloc.construct(this->_ptr[i], *first);
+					++first;
 				}
 			}
 
