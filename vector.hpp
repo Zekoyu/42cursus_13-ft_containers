@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 04-03-2022 16:20 by                                             */
+/*   Updated: 04-03-2022 17:25 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,9 +151,10 @@ namespace ft
 			typedef ptrdiff_t						difference_type;
 		
 		private:
-			pointer		_ptr;
-			size_type	_size;
-			size_type	_capacity;
+			pointer			_ptr;
+			size_type		_size;
+			size_type		_capacity;
+			allocator_type	_alloc;
 
 		public:
 			vector() : _ptr(0), _size(0), _capacity(0) { }
@@ -172,24 +173,26 @@ namespace ft
 	
 			size_type	size() const { return (this->_size); }
 			/* This value typically reflects the theoretical limit on the size of the container, at most std::numeric_limits<difference_type>::max()
-			   At runtime, the size of the container may be limited to a value smaller than max_size() by the amount of RAM available. */
-			size_type	max_size() const { return (std::numeric_limits<difference_type>::max()); }
+			   At runtime, the size of the container may be limited to a value smaller than max_size() by the amount of RAM available.
+			   Can also use Allocator.max_size since vector is contiguous memory */
+			size_type	max_size() const { return (_alloc.max_size()); }
 
 			/* Truncate if n < size; append otherwise, if n > capacity, realloc */
 			void resize(size_type n, value_type val = value_type())
 			{
-				if (n < this->_size) /* Just truncate */
-					this->_size = n;
-				else if (n > this->_size)
+				if (n > this->max_size())
+					throw (std::length_error("resize: value requested too big"));
+				if (n > this->_size)
 				{
 					if (n > this->_capacity) /* Realloc of size n */
 					{
-						pointer tmp = new value_type[n];
+						this->capacity = n;
+						pointer tmp = /* need to use allocator */ value_type[n];
 						for (size_type i = 0; i < this->_size; i++) /* Move content */
 							tmp[i] = this->_ptr[i];
 						for (size_type i = this->_size; i < n; i++) /* Append new content */
 							tmp[i] = val;
-						delete[] this->_ptr;
+						/* use alloactor */ this->_ptr;
 						this->_ptr = tmp;
 					}
 					else /* Append without realloc */
@@ -198,6 +201,7 @@ namespace ft
 							this->_ptr[i] = val;
 					}
 				}
+				this->_size = n;
 			}
 
 			size_type capacity() const { return (this->_capacity); }
@@ -208,13 +212,14 @@ namespace ft
 			{
 				if (n > this->_capacity)
 				{
-					pointer tmp = new value_type[n];
+					pointer tmp = /* need to use allocator */ value_type[n];
 					for (size_type i = 0; i < this->_size; i++) /* Move content */
 						tmp[i] = this->_ptr[i];
 					for (size_type i = this->_size; i < n; i++) /* Append new content */
 						tmp[i] = val;
-					delete[] this->_ptr;
+					/* use allocator */ this->_ptr;
 					this->_ptr = tmp;
+					this->_capacity = n;
 				}
 			}
 
@@ -241,7 +246,35 @@ namespace ft
 			reference		back() { return (this->_ptr[this->_size - 1]); }
 			const_reference	back() const { return (this->_ptr[this->_size - 1]); }
 
-			
+			void	assign(size_type n, const value_type& val)
+			{
+				this->reserve(n);
+				for (size_type i = 0; i < n; i++)
+					(*this)[i] = val;
+			}
+
+			/* The range used is [first,last), which includes all the elements between first and last, 
+			   including the element pointed by first but not the element pointed by last */
+			template <class InputIterator>
+			void	assign(InputIterator first, InputIterator last)
+			{
+				this->reserve(std::distance(first, last) - 1); /* size needed */
+				size_type i = 0;
+				while (first != last)
+				{
+					(*this)[i] = *first;
+					first++;
+				}
+			}
+
+			void	push_back(const value_type& val)
+			{
+				if (this->_size + 1 > this->_capacity)
+					this->reserve(this->capacity * 2);
+				(*this)[this->_size++ - 1] = val; /* Push value and incrment size */
+			}
+
+			void	pop_back() { --this->_size; }
 
 	};
 	
