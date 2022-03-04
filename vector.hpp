@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 03-03-2022 15:46 by                                             */
+/*   Updated: 04-03-2022 16:20 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,125 @@
 
 namespace ft
 {
+	/* InIterator, OutIterator, ForIterator, BiIterator, RandIterator
+		These are generic type names used for (respectively) input iterators, output iterators, forward iterators, bidirectional iterators, and random access iterators.
+		For example, vector<int>::iterator is a RandIterator, while list<string>::iterator is a BiIterator. */
+	template <typename Vector>
+	class RandIterator : public ft::iterator<ft::random_access_iterator_tag, Vector::value_type> /* Only define 2 types since the 3 other default values are those we want */
+	{
+		public:
+			typedef Vector::value_type		value_type;
+			typedef Vector::reference		reference;
+			typedef Vector::pointer			pointer;
+			typedef Vector::difference_type	difference_type;
+			
+			RandIterator(pointer ptr) : _ptr(ptr) { }
+
+			RandIterator&	operator++() /* prefix */
+			{
+				++this->_ptr;
+				return (*this);
+			}
+
+			RandIterator&	operator++(int) /* postfix */
+			{
+				RandIterator tmp = *this;
+				++(*this); /* so that if we want to change code, only change the prefix one */
+				return (tmp);
+			}
+
+			RandIterator&	operator--() /* prefix */
+			{
+				--this->_ptr;
+				return (*this);
+			}
+
+			RandIterator&	operator--(int) /* postfix */
+			{
+				RandIterator tmp = *this;
+				--(*this);
+				return (tmp);
+			}
+
+			/* Returns a reference to the type held, same as T& */
+			reference	operator[](size_type index)
+			{
+				return (*(this->_ptr[index]));
+			}
+
+			/* Calling Foo->x becomes the same as Foo.operator->()->x  or *(Foo.operator->()x)
+				The compiler calls the operator -> as many times as needed to get a raw pointer, then dereferences it */
+			pointer	operator->()
+			{
+				return (this->_ptr);
+			}
+
+			reference	operator*()
+			{
+				return (*this->_ptr); /* operator* has lower precedence than ->/. and associativity is from right to left, so no need for parentheses even if we used *this->value.someOtherValue->data */
+			}
+
+			bool	operator==(const RandIterator& r)
+			{
+				return (this->_ptr == r._ptr);
+			}
+
+			bool	operator!=(const RandIterator& r)
+			{
+				return (!(*this == r));
+			}
+
+			RandIterator&	operator+(difference_type n)
+			{
+				RandIterator tmp = *this;
+				this->_ptr += n;
+				return (tmp);
+			}
+
+			RandIterator&	operator+(const RandIterator& r)
+			{
+				RandIterator tmp = *this;
+				this->_ptr += r._ptr;
+				return (tmp);
+			}
+
+			RandIterator&	operator+=(difference_type n)
+			{
+				this->_ptr += n;
+				return (*this);
+			}
+
+			RandIterator&	operator-(difference_type n)
+			{
+				RandIterator tmp = *this;
+				this->_ptr -= n;
+				return (tmp);
+			}
+
+			RandIterator&	operator-(const RandIterator& r)
+			{
+				RandIterator tmp = *this;
+				this->_ptr -= r._ptr;
+				return (tmp);
+			}
+
+			RandIterator&	operator-=(difference_type n)
+			{
+				this->_ptr -= n;
+				return (*this);
+			}				
+
+		private:
+			pointer	_ptr;
+	};
 
 	// > > instead of >> because otherwise C++ might think it's a bitshift
 	template< class T, class Allocator = std::allocator<T> >
 	class vector
 	{
+		/* IMO typedefs first, then pivate members, then public */
 		public:
+			public:
 			typedef T								value_type;
 			typedef Allocator						allocator_type;
 			/* All of these could be used with value_type for the default allocator, but maybe not custom ones */
@@ -28,74 +141,108 @@ namespace ft
 			typedef allocator_type::const_reference	const_reference; /* Same as const value_type& */
 			typedef allocator_type::pointer			pointer; /* Same as value_type* */
 			typedef allocator_type::const_pointer	const_pointer; /* Same as const value_type* */
+
+			typedef RandIterator< vector<T, Allocator> >		iterator;
+			typedef RandIterator< vector<const T, Allocator> >	const_iterator;
+			typedef ft::reverse_iterator<iterator>				reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
+
 			typedef size_t							size_type; /* Enough to hold any positive integral type (integer) */
-			
-			/* InIterator, OutIterator, ForIterator, BiIterator, RandIterator
-			   These are generic type names used for (respectively) input iterators, output iterators, forward iterators, bidirectional iterators, and random access iterators.
-			   For example, vector<int>::iterator is a RandIterator, while list<string>::iterator is a BiIterator. */
-			class RandIterator : public ft::iterator<ft::random_access_iterator_tag, T> /* Only define 2 types since the 3 other default values are those we want */
+			typedef ptrdiff_t						difference_type;
+		
+		private:
+			pointer		_ptr;
+			size_type	_size;
+			size_type	_capacity;
+
+		public:
+			vector() : _ptr(0), _size(0), _capacity(0) { }
+
+			iterator		begin() { return(RandIterator(_ptr)); }
+			const_iterator	begin() const { return(RandIterator(_ptr)); }
+
+			iterator		end() { return(RandIterator(_ptr + _size)); }
+			const_iterator	end() const { return(RandIterator(_ptr + _size)); }
+
+			reverse_iterator		rbegin() { return(ft::reverse_iterator<iterator>(this->end())); } /* Returns reverse iterator starting from vector.end() */
+			const_reverse_iterator	rbegin() const { return(ft::reverse_iterator<const_iterator>(this->end())); } /* Same but const */
+
+			reverse_iterator		rend() { return(ft::reverse_iterator<iterator>(this->begin())); } /* Same but starting at vector.begin() */
+			const_reverse_iterator	rend() const { return(ft::reverse_iterator<const_iterator>(this->begin())); }  /* Again same but const */
+	
+			size_type	size() const { return (this->_size); }
+			/* This value typically reflects the theoretical limit on the size of the container, at most std::numeric_limits<difference_type>::max()
+			   At runtime, the size of the container may be limited to a value smaller than max_size() by the amount of RAM available. */
+			size_type	max_size() const { return (std::numeric_limits<difference_type>::max()); }
+
+			/* Truncate if n < size; append otherwise, if n > capacity, realloc */
+			void resize(size_type n, value_type val = value_type())
 			{
-				public:
-					RandIterator(pointer ptr) : _ptr(ptr) { }
-
-					RandIterator&	operator++() /* prefix */
+				if (n < this->_size) /* Just truncate */
+					this->_size = n;
+				else if (n > this->_size)
+				{
+					if (n > this->_capacity) /* Realloc of size n */
 					{
-						++this->_ptr;
-						return (*this);
+						pointer tmp = new value_type[n];
+						for (size_type i = 0; i < this->_size; i++) /* Move content */
+							tmp[i] = this->_ptr[i];
+						for (size_type i = this->_size; i < n; i++) /* Append new content */
+							tmp[i] = val;
+						delete[] this->_ptr;
+						this->_ptr = tmp;
 					}
-
-					RandIterator&	operator++(int) /* postfix */
+					else /* Append without realloc */
 					{
-						RandIterator tmp = *this;
-						++(*this); /* so that if we want to change code, only change the prefix one */
-						return (tmp);
+						for (size_type i = this->_size; i < n; i++)
+							this->_ptr[i] = val;
 					}
-
-					RandIterator&	operator--() /* prefix */
-					{
-						--this->_ptr;
-						return (*this);
-					}
-
-					RandIterator&	operator--(int) /* postfix */
-					{
-						RandIterator tmp = *this;
-						--(*this);
-						return (tmp);
-					}
-
-					/* Returns a reference to the type held, same as T& */
-					RandIterator::reference	operator[](size_type index)
-					{
-						return (*(this->_ptr[index]));
-					}
-
-					/* Calling Foo->x becomes the same as Foo.operator->()->x  or *(Foo.operator->()x)
-					   The compiler calls the operator -> as many times as needed to get a raw pointer, then dereferences it */
-					RandIterator::pointer	operator->()
-					{
-						return (this->_ptr);
-					}
-
-					RandIterator::reference	operator*()
-					{
-						return (*this->_ptr); /* operator* has lower precedence than ->/. and associativity is from right to left, so no need for parentheses even if we used *this->value.someOtherValue->data */
-					}
-
-					bool	operator==(const RandIterator& r)
-					{
-						return (this->_ptr == r._ptr);
-					}
-
-					bool	operator!=(const RandIterator& r)
-					{
-						return (!(*this == r));
-					}
-					
-				private:
-					pointer	_ptr;
+				}
 			}
+
+			size_type capacity() const { return (this->_capacity); }
+
+			bool	empty() const { return (this->_size == 0); }
+
+			void	reserve(size_type n)
+			{
+				if (n > this->_capacity)
+				{
+					pointer tmp = new value_type[n];
+					for (size_type i = 0; i < this->_size; i++) /* Move content */
+						tmp[i] = this->_ptr[i];
+					for (size_type i = this->_size; i < n; i++) /* Append new content */
+						tmp[i] = val;
+					delete[] this->_ptr;
+					this->_ptr = tmp;
+				}
+			}
+
+			reference		operator[] (size_type n) { return (this->_ptr[n]); }
+			const_reference	operator[] (size_type n) const { return (this->_ptr[n]); }
+
+			reference		at(size_type n)
+			{
+				if (n >= this->_size)
+					throw (std::out_of_range("index is out of range"));
+				return ((*this)[n]); /* this->operator[](n) */
+			}
+
+			const_reference	at(size_type n) const
+			{
+				if (n >= this->_size)
+					throw (std::out_of_range("index is out of range"));
+				return (this->operator[](n)); /* same as (*this)[n] */
+			}
+
+		    reference		front() { return (this->_ptr[0]); }
+			const_reference	front() const { return (this->_ptr[0]); }
+
+			reference		back() { return (this->_ptr[this->_size - 1]); }
+			const_reference	back() const { return (this->_ptr[this->_size - 1]); }
+
 			
+
 	};
 	
 }
