@@ -10,19 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "iterator_traits.hpp"
+#ifndef ITERATORS_HPP
+# define ITERATORS_HPP
+
+#include <cstddef>
 
 namespace ft
 {
-	
-	/*
-		Iterator tags are used to determine of which type is a given operator.
-
-		They are mostly used for optimization purposes, for instance if we have
-		different implementations of a function depending on the iterator type, instead
-		of checking for the type at runtype (if is_random_access_iterator(it))
-		we can check it at compile time using iterator_traits<it>::iterator_category
-	*/
+	/*******************************************************
+	 *                    Iterator tags                    *
+	 *******************************************************/
 
 	/* Defines an input iterator (Reads forward) */
 	struct input_iterator_tag { };
@@ -38,20 +35,75 @@ namespace ft
 
 	/* Define a random access iterator (Read/Writes anywhere (random access like an array)) */
 	struct random_access_iterator_tag : public bidirectional_iterator_tag { };
+	
+
+
+	/*******************************************************
+	 *                   Iterator traits                   *
+	 *******************************************************/
+
+	/* Iterator traits of another iterator are value taken from it */
+	template <class Iterator>
+	struct iterator_traits /* struct so that it's public by default */
+	{
+		typedef typename Iterator::difference_type		difference_type; /* Difference between 2 iterators (used by std::distance, typically int for iterators, ptrdiff_t for pointers) */
+		typedef typename Iterator::value_type			value_type;
+		typedef typename Iterator::pointer				pointer;
+		typedef typename Iterator::reference			reference;
+		typedef typename Iterator::iterator_category	iterator_category;
+	};
+
+	/* Iterator traits of a pointer are just the value pointer to by this pointer (for classes with no iterators but just raw pointer) */
+	template <class T>
+	struct iterator_traits<T*> /* Specialization of iterator_traits with any pointer type (same as iterator_traits<char> for specializing char for instance) */
+	{
+		typedef ptrdiff_t	difference_type; /* Literally the distance type (result of substraction) between 2 pointer */
+		typedef T			value_type;
+		typedef T*			pointer;
+		typedef T&			refeerence;
+		typedef ft::random_access_iterator_tag	iterator_category; /* Since it's a pointer, it should be pointing to contiguous memory, so can be accessed at random */
+	};
+
+	/* Same specialization for pointers to const */
+	template <class T>
+	struct iterator_traits<const T*>
+	{
+		typedef ptrdiff_t	difference_type;
+		typedef T			value_type;
+		typedef T*			pointer;
+		typedef T&			refeerence;
+		typedef ft::random_access_iterator_tag	iterator_category;
+	};
+
+
+	/*******************************************************
+	 *                  Reverse iterator                   *
+	 *******************************************************/
+
+	/*
+		Iterator tags are used to determine of which type is a given operator.
+
+		They are mostly used for optimization purposes, for instance if we have
+		different implementations of a function depending on the iterator type, instead
+		of checking for the type at runtype (if is_random_access_iterator(it))
+		we can check it at compile time using iterator_traits<it>::iterator_category
+	*/
 
 	template <class Iterator>
 	class reverse_iterator
 	{
+		public:
+			typedef Iterator													iterator_type;
+			typedef typename ft::iterator_traits<Iterator>::iterator_category	iterator_category;
+			typedef typename ft::iterator_traits<Iterator>::value_type			value_type;
+			typedef typename ft::iterator_traits<Iterator>::difference_type		difference_type;
+			typedef typename ft::iterator_traits<Iterator>::pointer				pointer;
+			typedef typename ft::iterator_traits<Iterator>::reference			reference;
+
 		private:
 			iterator_type _it;
-		public:
-			typedef Iterator											iterator_type;
-			typedef ft::iterator_traits<Iterator>::iterator_category	iterator_category;
-			typedef ft::iterator_traits<Iterator>::value_type			value_type;
-			typedef ft::iterator_traits<Iterator>::difference_type		difference_type;
-			typedef ft::iterator_traits<Iterator>::pointer				pointer;
-			typedef ft::iterator_traits<Iterator>::reference			reference;
 
+		public:
 			/* Default constructor */
 			reverse_iterator() : _it() { };
 
@@ -65,14 +117,14 @@ namespace ft
 			template <class Iter>
 			reverse_iterator (const reverse_iterator<Iter>& rev_it) : _it(rev_it.base()) { }
 
-			iterator_type	base() const { return (iterator_type); }
+			iterator_type	base() const { return (this->_it); }
 
 			/* Internally, the function decreases a copy of its base iterator and returns the result of dereferencing it. */
 			reference operator*() const
 			{
-				iterator_type temp = this->_it;
-				--this->_it;
-				return (*it);	
+				iterator_type tmp = this->_it;
+				--tmp;
+				return (*tmp);	
 			}
 
 			/* Internally, the function applies the binary operator- on the base iterator and returns a reverse iterator constructed with the resulting iterator value. */
@@ -111,12 +163,12 @@ namespace ft
 
 			reverse_iterator  operator--(int)
 			{
-				reverse_iterator temp = *this;
+				reverse_iterator tmp = *this;
 				--(*this);
-				return (temp);
+				return (tmp);
 			}
 
-			reverse_iterator& operator-= (difference_type n)
+			reverse_iterator& operator-=(difference_type n)
 			{
 				this->_it += n;
 				return (*this);
@@ -126,9 +178,21 @@ namespace ft
 			pointer operator->() const { return &(operator*()); }
 
 			/* Internally, the function accesses the proper element of its base iterator, returning the same as: base()[-n-1]. */
-			reference operator[] (difference_type n) const { return (this->base()[-n-1]); }
+			reference operator[](difference_type n) const { return (this->base()[-n-1]); }
+
+			template< class Iterator1, class Iterator2 >
+			friend bool operator==(const ft::reverse_iterator<Iterator1>& lhs, const ft::reverse_iterator<Iterator2>& rhs)
+			{ return (lhs._it == rhs._it); }
+
+			template< class Iterator1, class Iterator2 >
+			friend bool operator!=(const ft::reverse_iterator<Iterator1>& lhs, const ft::reverse_iterator<Iterator2>& rhs)
+			{ return (lhs._it != rhs._it); }
 	};
 
+
+	/*******************************************************
+	 *              Iterator template / base               *
+	 *******************************************************/
 
 	/* Iterator class is a template used to simplify custom iterator creation by defining required types for iterators,
 	   the custom iterator should just inherit from ft::iterator and provide at least Category and T. Then there is no need to redefine value_type etc.*/
@@ -143,3 +207,4 @@ namespace ft
 	};
 
 }
+#endif

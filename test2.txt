@@ -1,0 +1,54 @@
+Vector max potential size: 2305843009213693951
+Capacity=0, Size=0
+Empty ? 1
+
+Pushing 1, 2 and 3
+Capacity=4, Size=3
+Empty ? 0
+Vector content: 1 2 3 
+Reverse vector content: 3 2 1 
+
+Resizing vector to 10
+Capacity=10, Size=10
+Vector content: 1 2 3 0 0 0 0 0 0 0 
+
+Reserving 123
+Capacity=123, Size=10
+Vector content: 1 2 3 0 0 0 0 0 0 0 
+
+Printing first and second element using operator[]
+First: 1, second: 2
+
+Using at on element at index 1 and 9999
+Index 1: 
+2
+
+Index 9999:
+Caught exception: vector::_M_range_check: __n (which is 9999) >= this->size() (which is 10)
+
+Accessing front and back
+Front: 1, back: 0
+
+Testing 2 versions of assign
+Assigning 5 times 321
+Vector content: 321 321 321 321 321 
+Capacity=123, Size=5
+Assigning vector(100, 100, 100) begin and end
+Vector content: 100 100 100 
+Capacity=123, Size=3
+
+Pop back 2 times
+Vector content: 100 
+Capacity=123, Size=1
+
+Testing 3 versions of insert
+Inserting -42 at begin
+Vector content: -42 100 
+Capacity=123, Size=2
+Inserting 3 times 99 at end
+Vector content: -42 100 99 99 99 
+Capacity=123, Size=5
+Inserting vector(1, 2, 3) begin and end at begin + 1
+Vector content: -42 1 2 3 100 99 99 99 
+Capacity=123, Size=8
+
