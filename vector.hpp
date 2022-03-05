@@ -422,7 +422,7 @@ namespace ft
 				}
 			}
 
-			iterator	erase(iterator position)
+			iterator erase(iterator position)
 			{
 				size_type index = this->distance(this->begin(), position);
 				
@@ -436,7 +436,7 @@ namespace ft
 				return (iterator(this->_ptr + index)); /* Since we removed element at index, returning ptr + index returns the one following the deleted element */
 			}
 
-			iterator	erase(iterator first, iterator last)
+			iterator erase(iterator first, iterator last)
 			{
 				size_type n = this->distance(first, last);
 				size_type index = this->distance(this->begin(), first);
@@ -451,7 +451,40 @@ namespace ft
 				return (iterator(this->_ptr + index)); /* Since we removed element at index, returning ptr + index returns the one following the deleted element */
 			}
 
+			void swap(vector& x)
+			{
+				pointer		tmp_ptr = this->_ptr;
+				size_type	tmp_size = this->_size;
+				size_type	tmp_capacity = this->_capacity;
+
+				this->_ptr = x._ptr;
+				this->_size = x._size;
+				this->_capacity = x._capacity;
+
+				x._ptr = tmp_ptr;
+				x._size = tmp_size;
+				x._capacity = tmp_capacity;
+			}
+
+			void clear()
+			{
+				for (size_type i = 0; i < this->_size; ++i)
+					this->_alloc.destroy(this->_ptr + i);
+				this->_size = 0;
+			}
+
+			allocator_type get_allocator()
+			{
+				return (allocator_type());
+			}
+
 	};
+
+	template <class T, class Alloc>
+	void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+	{
+		x.swap(y);
+	}
 	
 }
 

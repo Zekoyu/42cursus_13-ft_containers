@@ -19,6 +19,7 @@
 #include "vector.hpp"
 
 #define VECTOR_TYPE	int
+#define LIB			ft
 
 template <typename Vector>
 void	print_vector(Vector v)
@@ -152,10 +153,64 @@ void	test_vector(Vector v)
 	print_vector(v);
 	std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl << std::endl;
 
-	
-}
+	std::cout << "Swapping vector with vector(1, 2, 3) using vector.swap(x)" << std::endl;
+	{
+		Vector v2;
 
-#define LIB		ft
+		v2.push_back(1);
+		v2.push_back(2);
+		v2.push_back(3);
+
+		std::cout << "Before swap" << std::endl;
+		print_vector(v);
+		std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl;
+		std::cout << "V2" << std::endl;
+		print_vector(v2);
+		std::cout << "Capacity=" << v2.capacity() << ", Size=" << v2.size() << std::endl << std::endl;
+		v.swap(v2);
+		std::cout << "After swap" << std::endl;
+		print_vector(v);
+		std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl;
+		std::cout << "V2" << std::endl;
+		print_vector(v2);
+		std::cout << "Capacity=" << v2.capacity() << ", Size=" << v2.size() << std::endl << std::endl;
+		v.swap(v2);
+	}
+
+	std::cout << "Swapping vector with vector(1, 2, 3) using non-member function ::swap(x, y)" << std::endl;
+	{
+		Vector v2;
+
+		v2.push_back(1);
+		v2.push_back(2);
+		v2.push_back(3);
+
+		std::cout << "Before swap" << std::endl;
+		print_vector(v);
+		std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl;
+		std::cout << "V2" << std::endl;
+		print_vector(v2);
+		std::cout << "Capacity=" << v2.capacity() << ", Size=" << v2.size() << std::endl << std::endl;
+		LIB::swap(v, v2);
+		std::cout << "After swap" << std::endl;
+		print_vector(v);
+		std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl;
+		std::cout << "V2" << std::endl;
+		print_vector(v2);
+		std::cout << "Capacity=" << v2.capacity() << ", Size=" << v2.size() << std::endl << std::endl;
+	}
+
+	std::cout << "Clearing vector" << std::endl;
+	std::cout << "Before clear:" << std::endl;
+	print_vector(v);
+	std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl << std::endl;
+	v.clear();
+	std::cout << "After clear:" << std::endl;
+	print_vector(v);
+	std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl << std::endl;
+
+	v.get_allocator();
+}
 
 int main()
 {
