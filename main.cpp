@@ -200,6 +200,50 @@ void	test_vector(Vector v)
 		std::cout << "Capacity=" << v2.capacity() << ", Size=" << v2.size() << std::endl << std::endl;
 	}
 
+	std::cout << "Testing all 6 relational operators (==, !=, >, >=, <, <=)" << std::endl;
+	{
+		Vector same = v;
+		Vector smaller;
+		Vector bigger;
+
+		smaller = v;
+		smaller.erase(smaller.begin());
+		bigger = v;
+		bigger.push_back(-1);
+	
+		std::cout << "Vector:" << std::endl;
+		print_vector(v);
+		std::cout << std::endl << "V1:" << std::endl;
+		print_vector(same);
+		std::cout << std::endl << "V2:" << std::endl;
+		print_vector(smaller);
+		std::cout << std::endl << "V3:" << std::endl;
+		print_vector(bigger);
+		std::cout << std::endl;
+
+		std::cout << "Vector == V1 ? " << std::boolalpha << (v == same) << std::endl;
+		std::cout << "Vector != V1 ? " << std::boolalpha << (v != same) << std::endl;
+		std::cout << "Vector < V1 ? " << std::boolalpha << (v < same) << std::endl;
+		std::cout << "Vector <= V1 ? " << std::boolalpha << (v <= same) << std::endl;
+		std::cout << "Vector > V1 ? " << std::boolalpha << (v > same) << std::endl;
+		std::cout << "Vector >= V1 ? " << std::boolalpha << (v >= same) << std::endl;
+		std::cout << std::endl;
+		std::cout << "Vector == V2 ? " << std::boolalpha << (v == smaller) << std::endl;
+		std::cout << "Vector != V2 ? " << std::boolalpha << (v != smaller) << std::endl;
+		std::cout << "Vector < V2 ? " << std::boolalpha << (v < smaller) << std::endl;
+		std::cout << "Vector <= V2 ? " << std::boolalpha << (v <= smaller) << std::endl;
+		std::cout << "Vector > V2 ? " << std::boolalpha << (v > smaller) << std::endl;
+		std::cout << "Vector >= V2 ? " << std::boolalpha << (v >= smaller) << std::endl;
+		std::cout << std::endl;
+		std::cout << "Vector == V3 ? " << std::boolalpha << (v == bigger) << std::endl;
+		std::cout << "Vector != V3 ? " << std::boolalpha << (v != bigger) << std::endl;
+		std::cout << "Vector < V3 ? " << std::boolalpha << (v < bigger) << std::endl;
+		std::cout << "Vector <= V3 ? " << std::boolalpha << (v <= bigger) << std::endl;
+		std::cout << "Vector > V3 ? " << std::boolalpha << (v > bigger) << std::endl;
+		std::cout << "Vector >= V3 ? " << std::boolalpha << (v >= bigger) << std::endl;
+		std::cout << std::endl;
+	}
+
 	std::cout << "Clearing vector" << std::endl;
 	std::cout << "Before clear:" << std::endl;
 	print_vector(v);
@@ -209,7 +253,7 @@ void	test_vector(Vector v)
 	print_vector(v);
 	std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl << std::endl;
 
-	v.get_allocator();
+	//v.get_allocator();
 }
 
 int main()

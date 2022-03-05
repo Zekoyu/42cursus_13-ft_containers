@@ -15,6 +15,7 @@
 
 #include "iterators.hpp"
 #include "enable_if.hpp"
+#include "comparisons.hpp"
 
 #include <memory>
 #include <stdexcept>
@@ -204,10 +205,10 @@ namespace ft
 			vector() : _ptr(0), _size(0), _capacity(0) { }
 
 			iterator		begin() { return (iterator(this->_ptr)); }
-			const_iterator	begin() const { return (iterator(this->_ptr)); }
+			const_iterator	begin() const { return (const_iterator(this->_ptr)); }
 
 			iterator		end() { return (iterator(this->_ptr + _size)); }
-			const_iterator	end() const { return (iterator(this->_ptr + _size)); }
+			const_iterator	end() const { return (const_iterator(this->_ptr + _size)); }
 
 			reverse_iterator		rbegin() { return (ft::reverse_iterator<iterator>(this->end())); } /* Returns reverse iterator starting from vector.end() */
 			const_reverse_iterator	rbegin() const { return (ft::reverse_iterator<const_iterator>(this->end())); } /* Same but const */
@@ -274,8 +275,18 @@ namespace ft
 				
 			}
 
-			reference		operator[] (size_type n) { return (*(this->_ptr + n)); }
-			const_reference	operator[] (size_type n) const { return (*(this->_ptr + n)); }
+			reference		operator[](size_type n) { return (*(this->_ptr + n)); }
+			const_reference	operator[](size_type n) const { return (*(this->_ptr + n)); }
+
+			vector&	operator=(const vector& x)
+			{
+				this->clear();
+				this->resize(x._capacity); /* If this.capacity is bigger than x, do not downgrade */
+				for (size_type i = 0; i < x._size; ++i)
+					this->_alloc.construct(this->_ptr + i, x._ptr[i]);
+				this->_size = x._size;
+				return (*this); /* Forget the return, get and "illegal hardware exception" :) */
+			}
 
 			reference		at(size_type n)
 			{
@@ -481,11 +492,49 @@ namespace ft
 	};
 
 	template <class T, class Alloc>
-	void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+	void swap(vector<T,Alloc>& x, vector<T,Alloc>& y)
 	{
 		x.swap(y);
 	}
-	
+
+	/* We are not forced to write template arguments since compiler template
+	   deduction does it automatically */
+	template <class T, class Alloc>
+	bool operator==(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (ft::equal(lhs.begin(), rhs.end(), rhs.begin()));
+	}
+
+	template <class T, class Alloc>
+	bool operator!=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (!(lhs == rhs));
+	}
+
+	template <class T, class Alloc>
+	bool operator<(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (ft::lexicographical_compare(lhs.begin(), rhs.end(), rhs.begin(), rhs.end()));
+	}
+
+	template <class T, class Alloc>
+	bool operator<=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (lhs < rhs || lhs == rhs);
+	}
+
+	template <class T, class Alloc>
+	bool operator>(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (!(lhs <= rhs)); /* Either <= or > */
+	}
+
+	template <class T, class Alloc>
+	bool operator>=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (!(lhs < rhs)); /* Either < or >= */
+	}
+
 }
 
 #endif
