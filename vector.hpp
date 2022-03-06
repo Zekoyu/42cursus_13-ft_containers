@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 06-03-2022 21:17 by                                             */
+/*   Updated: 06-03-2022 22:57 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,9 @@ namespace ft
 			typedef ft::reverse_iterator<iterator>				reverse_iterator;
 			typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
 
-			typedef size_t							size_type; /* Enough to hold any positive integral type (integer) */
-			typedef ptrdiff_t						difference_type;
+			/* Identical to iterator_traits<iterator>::size_type/difference_type */
+			typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
+			typedef size_t													size_type; /* Can hold any positive value of difference_type*/
 		
 		private:
 			pointer			_ptr;
@@ -399,8 +400,9 @@ namespace ft
 					typedef typename iterator::value_type		value_type;
 					typedef typename iterator::reference		reference;
 					typedef typename iterator::pointer			pointer;
-					typedef typename iterator::difference_type	difference_type;
-					typedef typename Vector::size_type			size_type;
+
+					typedef ptrdiff_t	difference_type;
+					typedef size_t		size_type;
 
 					VectIterator(pointer ptr) : _ptr(ptr) { }
 
