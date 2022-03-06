@@ -1,3 +1,4 @@
+POUET
 Vector max potential size: 2305843009213693951
 Capacity=0, Size=0
 Empty ? 1
@@ -59,7 +60,7 @@ Erasing from begin + 1 to end - 2
 Vector content: -42 99 99 
 Capacity=123, Size=3
 
-Swapping vector with vector(1, 2, 3)
+Swapping vector with vector(1, 2, 3) using vector.swap(x)
 Before swap
 Vector content: -42 99 99 
 Capacity=123, Size=3
@@ -73,6 +74,75 @@ Capacity=4, Size=3
 V2
 Vector content: -42 99 99 
 Capacity=123, Size=3
+
+Swapping vector with vector(1, 2, 3) using non-member function ::swap(x, y)
+Before swap
+Vector content: -42 99 99 
+Capacity=123, Size=3
+V2
+Vector content: 1 2 3 
+Capacity=4, Size=3
+
+After swap
+Vector content: 1 2 3 
+Capacity=4, Size=3
+V2
+Vector content: -42 99 99 
+Capacity=123, Size=3
+
+Testing all 6 relational operators (==, !=, >, >=, <, <=)
+Vector:
+Vector content: 1 2 3 
+
+V1:
+Capacity=3, Size=3
+Vector content: 1 2 3 
+
+V2:
+Capacity=3, Size=2
+Vector content: 2 3 
+
+V3:
+Capacity=6, Size=4
+Vector content: 1 2 3 -1 
+
+Vector == V1 ? true
+Vector != V1 ? false
+Vector < V1 ? false
+Vector <= V1 ? true
+Vector > V1 ? false
+Vector >= V1 ? true
+
+Vector == V2 ? false
+Vector != V2 ? true
+Vector < V2 ? true
+Vector <= V2 ? true
+Vector > V2 ? false
+Vector >= V2 ? false
+
+Vector == V3 ? false
+Vector != V3 ? true
+Vector < V3 ? true
+Vector <= V3 ? true
+Vector > V3 ? false
+Vector >= V3 ? false
+
+Testing all 4 constructors:
+Default constructor:
+Vector content: 
+Capacity=0, Size=0
+
+Fill constructor (5, 100):
+Vector content: 100 100 100 100 100 
+Capacity=5, Size=5
+
+Range constructor: (100, 100, 100, 100, 100)
+Vector content: 100 100 100 100 100 
+Capacity=5, Size=5
+
+Copy constructor: (100, 100, 100, 100, 100)
+Vector content: 100 100 100 100 100 
+Capacity=5, Size=5
 
 Clearing vector
 Before clear:

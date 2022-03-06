@@ -202,7 +202,43 @@ namespace ft
 
 
 		public:
-			vector() : _ptr(0), _size(0), _capacity(0) { }
+			/* Default constructor */
+			vector(const allocator_type& alloc = allocator_type()) : _ptr(0), _size(0), _capacity(0) { }
+
+			/* Fill constructor */
+			/* The compiler is allow to make one implicit conversion to resolve parameters to a function, here we don't allow it.
+			   Eg. foo(Bar) with Bar(int) existing, we can call foo(42) with an int since compiler knows there is a Bar(int) it will do Bar(42) implicitely. */
+			explicit vector(size_type n, const value_type& val = value_type(),
+							 const allocator_type& alloc = allocator_type()) : _ptr(0), _size(0), _capacity(0)
+			{
+				this->assign(n, val);
+			}
+
+			/* Range constructor */
+			template <class InputIterator>
+        	vector(InputIterator first, InputIterator last,
+				   const allocator_type& alloc = allocator_type()) : _ptr(0), _size(0), _capacity(0)
+			{
+				this->assign(first, last);
+			}
+
+			/* Copy constructor */
+			vector(const vector& x) : _ptr(0), _size(0), _capacity(0)
+			{
+				this->resize(x._size); /* First resize to initialize capacity and size */				
+				
+				for (size_type i = 0; i < x._size; ++i)
+				{
+					this->_alloc.construct(this->_ptr + i, x._ptr[i]);
+				}
+				this->_size = x._size;
+			}
+
+			~vector()
+			{
+				this->clear();
+				this->_alloc.deallocate(this->_ptr, this->_capacity);
+			}
 
 			iterator		begin() { return (iterator(this->_ptr)); }
 			const_iterator	begin() const { return (const_iterator(this->_ptr)); }
@@ -280,8 +316,10 @@ namespace ft
 
 			vector&	operator=(const vector& x)
 			{
+				/* If x capacity is 150 but size is 7, at least on linux, new capacity will be 7 */
+				this->resize(x._size); /* If this.capacity is bigger than x, do not downgrade */
 				this->clear();
-				this->resize(x._capacity); /* If this.capacity is bigger than x, do not downgrade */
+				
 				for (size_type i = 0; i < x._size; ++i)
 					this->_alloc.construct(this->_ptr + i, x._ptr[i]);
 				this->_size = x._size;
@@ -477,6 +515,7 @@ namespace ft
 				x._capacity = tmp_capacity;
 			}
 
+			/* deallocate does not destroy elements, see std::allocator::deallocate cplusplus.com */
 			void clear()
 			{
 				for (size_type i = 0; i < this->_size; ++i)
@@ -502,7 +541,9 @@ namespace ft
 	template <class T, class Alloc>
 	bool operator==(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-		return (ft::equal(lhs.begin(), rhs.end(), rhs.begin()));
+		if (lhs.size() != rhs.size())
+			return (false);
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 	}
 
 	template <class T, class Alloc>
@@ -514,7 +555,7 @@ namespace ft
 	template <class T, class Alloc>
 	bool operator<(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-		return (ft::lexicographical_compare(lhs.begin(), rhs.end(), rhs.begin(), rhs.end()));
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 	}
 
 	template <class T, class Alloc>

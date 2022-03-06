@@ -18,6 +18,7 @@
 #include <iostream>
 #include "vector.hpp"
 
+
 #define VECTOR_TYPE	int
 #define LIB			ft
 
@@ -58,6 +59,7 @@ void	test_vector(Vector v)
 	typedef typename Vector::iterator iterator;
 	typedef typename Vector::value_type value_type;
 
+	std::cout << "POUET\n";
 	std::cout << "Vector max potential size: " << v.max_size() << std::endl;
 	std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl;
 	std::cout << "Empty ? " << v.empty() << std::endl << std::endl;
@@ -214,10 +216,13 @@ void	test_vector(Vector v)
 		std::cout << "Vector:" << std::endl;
 		print_vector(v);
 		std::cout << std::endl << "V1:" << std::endl;
+		std::cout << "Capacity=" << same.capacity() << ", Size=" << same.size() << std::endl;
 		print_vector(same);
 		std::cout << std::endl << "V2:" << std::endl;
+		std::cout << "Capacity=" << smaller.capacity() << ", Size=" << smaller.size() << std::endl;
 		print_vector(smaller);
 		std::cout << std::endl << "V3:" << std::endl;
+		std::cout << "Capacity=" << bigger.capacity() << ", Size=" << bigger.size() << std::endl;
 		print_vector(bigger);
 		std::cout << std::endl;
 
@@ -244,6 +249,31 @@ void	test_vector(Vector v)
 		std::cout << std::endl;
 	}
 
+	 std::cout << "Testing all 4 constructors:" << std::endl;
+	{
+		std::cout << "Default constructor:" << std::endl;
+
+		Vector v1;
+		print_vector(v1);
+		std::cout << "Capacity=" << v1.capacity() << ", Size=" << v1.size() << std::endl << std::endl;
+	}
+	{
+		std::cout << "Fill constructor (5, 100):" << std::endl;
+		Vector v1(5, 100);
+		print_vector(v1);
+		std::cout << "Capacity=" << v1.capacity() << ", Size=" << v1.size() << std::endl << std::endl;
+
+		std::cout << "Range constructor: (100, 100, 100, 100, 100)" << std::endl;
+		Vector v2(v1.begin(), v1.end());
+		print_vector(v2);
+		std::cout << "Capacity=" << v2.capacity() << ", Size=" << v2.size() << std::endl << std::endl;
+		 
+		std::cout << "Copy constructor: (100, 100, 100, 100, 100)" << std::endl;
+		Vector v3(v2);
+		print_vector(v3);
+		std::cout << "Capacity=" << v3.capacity() << ", Size=" << v3.size() << std::endl << std::endl;
+	}
+
 	std::cout << "Clearing vector" << std::endl;
 	std::cout << "Before clear:" << std::endl;
 	print_vector(v);
@@ -264,21 +294,4 @@ int main()
 	vector	v;
 
 	test_vector<vector>(v);
-	
-	/*
-	reverse_iterator<RandIterator<vector<int, std::allocator<int> > > >
-	reverse_iterator<RandIterator<vector<int, std::allocator<int> > > >
-	*/
-	//pouet.push_back(10);
-	//pouet.push_back(25);
-
-	// typedef ft::vector<int>::iterator iter_type;
-
-	// ft::reverse_iterator<iter_type> rbegin = pouet.rbegin();
-	// ft::reverse_iterator<iter_type> rend = pouet.rend();
-
-	// while (rbegin != rend)
-	// 	std::cout << *rbegin++ << " ";
-	// std::cout << std::endl;
-	
 }
