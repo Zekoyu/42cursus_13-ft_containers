@@ -160,7 +160,7 @@ namespace ft
 	};
 
 	// > > instead of >> because otherwise C++ might think it's a bitshift
-	template< class T, class Allocator = std::allocator<T> >
+	template <class T, class Allocator = std::allocator<T> >
 	class vector
 	{
 		/* IMO typedefs first, then pivate members, then public */
@@ -190,7 +190,7 @@ namespace ft
 
 			/* Like std::distance but worse.
 			   Actual point is because the std version does not work with ft::<any_iterator>_tag */
-			template<typename InputIterator>
+			template <typename InputIterator>
 			typename ft::iterator_traits<InputIterator>::difference_type
 			distance(InputIterator first, InputIterator last)
 			{

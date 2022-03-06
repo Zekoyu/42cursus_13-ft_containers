@@ -81,6 +81,18 @@ namespace ft
 		return (!(lhs < rhs));
 	}
 
+	/* make_pair allow for implicit conversion, eg.
+	   pair<int, int> pouet;
+
+	   pouet = pair(123, 'A'); // ERROR
+	   pouet = make_pair(123, 'A') // Implicit conversion from char to int, OK
+	*/
+	template <class T1, class T2>
+	ft::pair<T1, T2> make_pair(T1 x, T2 y)
+	{
+		return (pair<T1, T2>(x, y));
+	}
+
 }
 
 #endif
