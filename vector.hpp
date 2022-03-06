@@ -228,9 +228,7 @@ namespace ft
 				this->resize(x._size); /* First resize to initialize capacity and size */				
 				
 				for (size_type i = 0; i < x._size; ++i)
-				{
 					this->_alloc.construct(this->_ptr + i, x._ptr[i]);
-				}
 				this->_size = x._size;
 			}
 
@@ -299,16 +297,15 @@ namespace ft
 
 			void	reserve(size_type n)
 			{
-				if (n > this->_capacity)
-				{
-					pointer tmp = this->_alloc.allocate(n);
-					for (size_type i = 0; i < this->_size; ++i) /* Move content */
-						this->_alloc.construct(tmp + i, this->_ptr[i]);
-					this->_alloc.deallocate(this->_ptr, this->_capacity);
-					this->_ptr = tmp;
-					this->_capacity = n;
-				}
-				
+				if (n <= this->_capacity)
+					return;
+					
+				pointer tmp = this->_alloc.allocate(n);
+				for (size_type i = 0; i < this->_size; ++i) /* Move content */
+					this->_alloc.construct(tmp + i, this->_ptr[i]);
+				this->_alloc.deallocate(this->_ptr, this->_capacity);
+				this->_ptr = tmp;
+				this->_capacity = n;
 			}
 
 			reference		operator[](size_type n) { return (*(this->_ptr + n)); }
