@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 06-03-2022 19:04 by                                             */
+/*   Updated: 06-03-2022 21:13 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ namespace ft
 			typedef allocator_type::const_reference				const_reference;
 			typedef allocator_type::pointer						pointer;
 			typedef allocator_type::const_pointer				const_pointer;
-			typedef BiIterator< map<Key, T, Compare, Alloc> >	iterator;
-			typedef BiIterator< map<Key, T, Compare, Alloc> >	const_iterator;
+			typedef MapIterator< map<Key, T, Compare, Alloc> >	iterator;
+			typedef MapIterator< map<Key, T, Compare, Alloc> >	const_iterator;
 	};
 
 }

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 04-03-2022 17:25 by                                             */
+/*   Updated: 06-03-2022 21:17 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,151 +21,15 @@
 #include <stdexcept>
 
 namespace ft
-{
-	/* InIterator, OutIterator, ForIterator, BiIterator, RandIterator
-		These are generic type names used for (respectively) input iterators, output iterators, forward iterators, bidirectional iterators, and random access iterators.
-		For example, vector<int>::iterator is a RandIterator, while list<string>::iterator is a BiIterator. */
-	template <typename Vector>
-	class RandIterator : public ft::iterator<ft::random_access_iterator_tag, typename Vector::value_type> /* Only define 2 types since the 3 other default values are those we want */
-	{
-		private:
-			typedef typename ft::iterator<ft::random_access_iterator_tag, typename Vector::value_type> iterator;
-
-		public:
-			typedef typename iterator::value_type		value_type;
-			typedef typename iterator::reference		reference;
-			typedef typename iterator::pointer			pointer;
-			typedef typename iterator::difference_type	difference_type;
-			typedef typename Vector::size_type			size_type;
-
-			RandIterator(pointer ptr) : _ptr(ptr) { }
-
-			RandIterator&	operator++() /* prefix */
-			{
-				++this->_ptr;
-				return (*this);
-			}
-
-			RandIterator	operator++(int) /* postfix, cannot return reference to stack memory */
-			{
-				RandIterator tmp = *this;
-				++(*this); /* so that if we want to change code, only change the prefix one */
-				return (tmp);
-			}
-
-			RandIterator&	operator--() /* prefix */
-			{
-				--this->_ptr;
-				return (*this);
-			}
-
-			RandIterator	operator--(int) /* postfix, cannot return reference to stack m */
-			{
-				RandIterator tmp = *this;
-				--(*this);
-				return (tmp);
-			}
-
-			/* Returns a reference to the type held, same as T& */
-			reference	operator[](size_type index)
-			{
-				return (*(this->_ptr[index]));
-			}
-
-			/* Calling Foo->x becomes the same as Foo.operator->()->x  or *(Foo.operator->()x)
-				The compiler calls the operator -> as many times as needed to get a raw pointer, then dereferences it */
-			pointer	operator->()
-			{
-				return (this->_ptr);
-			}
-
-			reference	operator*()
-			{
-				return (*this->_ptr); /* operator* has lower precedence than ->/. and associativity is from right to left, so no need for parentheses even if we used *this->value.someOtherValue->data */
-			}
-
-			RandIterator	operator+(difference_type n)
-			{
-				RandIterator tmp = *this;
-				tmp._ptr += n;
-				return (tmp);
-			}
-
-			RandIterator	operator+(const RandIterator& r)
-			{
-				RandIterator tmp = *this;
-				tmp._ptr += r._ptr;
-				return (tmp);
-			}
-
-			RandIterator&	operator+=(difference_type n)
-			{
-				this->_ptr += n;
-				return (*this);
-			}
-
-			RandIterator	operator-(difference_type n)
-			{
-				RandIterator tmp = *this;
-				tmp._ptr -= n;
-				return (tmp);
-			}
-
-			RandIterator	operator-(const RandIterator& r)
-			{
-				RandIterator tmp = *this;
-				tmp._ptr -= r._ptr;
-				return (tmp);
-			}
-
-			RandIterator&	operator-=(difference_type n)
-			{
-				this->_ptr -= n;
-				return (*this);
-			}
-
-			/* Relational operators */
-			friend bool	operator==(const RandIterator& rhs, const RandIterator& lhs)
-			{
-				return (rhs._ptr == lhs._ptr);
-			}
-
-			friend bool	operator!=(const RandIterator& rhs, const RandIterator& lhs)
-			{
-				return (!(rhs == lhs));
-			}
-
-			friend bool	operator>(const RandIterator& rhs, const RandIterator& lhs)
-			{
-				return (rhs > lhs);
-			}
-
-			friend bool	operator>=(const RandIterator& rhs, const RandIterator& lhs)
-			{
-				return (rhs >= lhs);
-			}
-
-			friend bool	operator<(const RandIterator& rhs, const RandIterator& lhs)
-			{
-				return (rhs < lhs);
-			}
-
-			friend bool	operator<=(const RandIterator& rhs, const RandIterator& lhs)
-			{
-				return (rhs <= lhs);
-			}
-
-		private:
-			pointer	_ptr;
-	};
-
-	// > > instead of >> because otherwise C++ might think it's a bitshift
+{	// > > instead of >> because otherwise C++ might think it's a bitshift
 	template <class T, class Allocator = std::allocator<T> >
 	class vector
 	{
 		/* IMO typedefs first, then pivate members, then public */
 		public:
-			public:
+			template <class Vector>
+			class VectIterator;
+
 			typedef T											value_type;
 			typedef Allocator									allocator_type;
 			/* All of these could be used with value_type for the default allocator, but maybe not custom ones */
@@ -174,8 +38,8 @@ namespace ft
 			typedef typename allocator_type::pointer			pointer; /* Same as value_type* */
 			typedef typename allocator_type::const_pointer		const_pointer; /* Same as const value_type* */
 
-			typedef RandIterator< vector<T, Allocator> >		iterator;
-			typedef RandIterator< vector<const T, Allocator> >	const_iterator;
+			typedef VectIterator< vector<T, Allocator> >		iterator;
+			typedef VectIterator< vector<const T, Allocator> >	const_iterator;
 			typedef ft::reverse_iterator<iterator>				reverse_iterator;
 			typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
 
@@ -190,7 +54,7 @@ namespace ft
 
 			/* Like std::distance but worse.
 			   Actual point is because the std version does not work with ft::<any_iterator>_tag */
-			template <typename InputIterator>
+			template <class InputIterator>
 			typename ft::iterator_traits<InputIterator>::difference_type
 			distance(InputIterator first, InputIterator last)
 			{
@@ -360,7 +224,7 @@ namespace ft
 			   3rd useless argument here just to check if InputIterator is really an iterator,
 			   could also use enable_if but didn't found a suitable condition, std::is_integral
 			   would not work with a vector of classes for instance */
-			template <typename InputIterator>
+			template <class InputIterator>
 			void	assign(InputIterator first, InputIterator last,
 						   typename InputIterator::value_type* pouet = NULL)
 			{
@@ -438,7 +302,7 @@ namespace ft
 			}
 
 			/* Same as above using range instead of fixed value / size */
-			template <typename InputIterator>
+			template <class InputIterator>
   			void insert(iterator position, InputIterator first, InputIterator last,
 			  			typename InputIterator::value_type* pouet = NULL)
 			{
@@ -525,6 +389,139 @@ namespace ft
 				return (allocator_type());
 			}
 
+			template <class Vector>
+			class VectIterator : public ft::iterator<ft::random_access_iterator_tag, typename Vector::value_type> /* Only define 2 types since the 3 other default values are those we want */
+			{
+				private:
+					typedef typename ft::iterator<ft::random_access_iterator_tag, typename Vector::value_type> iterator;
+
+				public:
+					typedef typename iterator::value_type		value_type;
+					typedef typename iterator::reference		reference;
+					typedef typename iterator::pointer			pointer;
+					typedef typename iterator::difference_type	difference_type;
+					typedef typename Vector::size_type			size_type;
+
+					VectIterator(pointer ptr) : _ptr(ptr) { }
+
+					VectIterator&	operator++() /* prefix */
+					{
+						++this->_ptr;
+						return (*this);
+					}
+
+					VectIterator	operator++(int) /* postfix, cannot return reference to stack memory */
+					{
+						VectIterator tmp = *this;
+						++(*this); /* so that if we want to change code, only change the prefix one */
+						return (tmp);
+					}
+
+					VectIterator&	operator--() /* prefix */
+					{
+						--this->_ptr;
+						return (*this);
+					}
+
+					VectIterator	operator--(int) /* postfix, cannot return reference to stack m */
+					{
+						VectIterator tmp = *this;
+						--(*this);
+						return (tmp);
+					}
+
+					/* Returns a reference to the type held, same as T& */
+					reference	operator[](size_type index)
+					{
+						return (*(this->_ptr[index]));
+					}
+
+					/* Calling Foo->x becomes the same as Foo.operator->()->x  or *(Foo.operator->()x)
+						The compiler calls the operator -> as many times as needed to get a raw pointer, then dereferences it */
+					pointer	operator->()
+					{
+						return (this->_ptr);
+					}
+
+					reference	operator*()
+					{
+						return (*this->_ptr); /* operator* has lower precedence than ->/. and associativity is from right to left, so no need for parentheses even if we used *this->value.someOtherValue->data */
+					}
+
+					VectIterator	operator+(difference_type n)
+					{
+						VectIterator tmp = *this;
+						tmp._ptr += n;
+						return (tmp);
+					}
+
+					VectIterator	operator+(const VectIterator& r)
+					{
+						VectIterator tmp = *this;
+						tmp._ptr += r._ptr;
+						return (tmp);
+					}
+
+					VectIterator&	operator+=(difference_type n)
+					{
+						this->_ptr += n;
+						return (*this);
+					}
+
+					VectIterator	operator-(difference_type n)
+					{
+						VectIterator tmp = *this;
+						tmp._ptr -= n;
+						return (tmp);
+					}
+
+					VectIterator	operator-(const VectIterator& r)
+					{
+						VectIterator tmp = *this;
+						tmp._ptr -= r._ptr;
+						return (tmp);
+					}
+
+					VectIterator&	operator-=(difference_type n)
+					{
+						this->_ptr -= n;
+						return (*this);
+					}
+
+					/* Relational operators */
+					friend bool	operator==(const VectIterator& rhs, const VectIterator& lhs)
+					{
+						return (rhs._ptr == lhs._ptr);
+					}
+
+					friend bool	operator!=(const VectIterator& rhs, const VectIterator& lhs)
+					{
+						return (!(rhs == lhs));
+					}
+
+					friend bool	operator>(const VectIterator& rhs, const VectIterator& lhs)
+					{
+						return (rhs > lhs);
+					}
+
+					friend bool	operator>=(const VectIterator& rhs, const VectIterator& lhs)
+					{
+						return (rhs >= lhs);
+					}
+
+					friend bool	operator<(const VectIterator& rhs, const VectIterator& lhs)
+					{
+						return (rhs < lhs);
+					}
+
+					friend bool	operator<=(const VectIterator& rhs, const VectIterator& lhs)
+					{
+						return (rhs <= lhs);
+					}
+
+				private:
+					pointer	_ptr;
+			};
 	};
 
 	template <class T, class Alloc>
