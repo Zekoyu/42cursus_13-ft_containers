@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 04-03-2022 14:31 by                                             */
+/*   Updated: 06-03-2022 19:48 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,12 +286,24 @@ void	test_vector(Vector v)
 	//v.get_allocator();
 }
 
+template <typename Iterator>
+void	modifyContent(Iterator begin, Iterator end)
+{
+	while (begin != end)
+	{
+		*begin += 1;
+		++begin;
+	}
+	std::cout << "Successfully modified content" << std::endl;
+}
+
 int main()
 {
 	typedef VECTOR_TYPE					vector_type;
-	typedef LIB::vector<vector_type>	vector;
+	typedef ft::vector<vector_type>	vector;
 
-	vector	v;
+	const vector	v;
 
-	test_vector<vector>(v);
+	//test_vector<vector>(v);
+	modifyContent<vector::const_iterator>(v.begin(), v.end());
 }
