@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 07-03-2022 15:14 by                                             */
+/*   Updated: 07-03-2022 22:40 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ struct RBNode
 };
 
 /* https://en.wikipedia.org/wiki/Red%E2%80%93black_tree */
-/* PROPERTES:
+/* PROPERTIES:
 	- The root node should always be black in color.
 	- Every null child of a node is black in red black tree.
 	- The children of a red node are black. It can be possible that parent of red node is black node.
@@ -40,6 +40,7 @@ struct RBNode
 	- Every simple path from the root node to the (downward) leaf node contains the same number of black nodes.
 
 	RBT operations are guaranteed to be O(log n)
+	Red Black Tree is a self balancing Binary Search Tree
 */
 template <class T, class Compare>
 class RBTree
@@ -131,6 +132,7 @@ class RBTree
 		{
 			node_pointer	parent = NULL;
 			node_pointer	grandParent = NULL;
+			node_pointer	uncle = NULL;
 
 			/* Start from newly inserted node all the way up to root */
 			while ((node != this->_root) && (node->color != BLACK) &&
@@ -138,7 +140,7 @@ class RBTree
 			{
 
 				parent = node->parent;
-				grandParent = node->parent->parent;
+				grandParent = node->parent->parent; /* We know there is always a grandparent because if parent == BLACK (root is always black) we don't enter it */
 
 				/*  Case : A
 					Parent of pt is left child
@@ -146,13 +148,12 @@ class RBTree
 				if (parent == grandParent->left)
 				{
 
-					node_pointer uncle = grandParent->right;
+					uncle = grandParent->right;
 
 					/* Case : 1
 						The uncle of pt is also red
 						Only Recoloring required */
-					if (uncle != NULL && uncle->color ==
-															RED)
+					if (uncle != NULL && uncle->color == RED)
 					{
 						grandParent->color = RED;
 						parent->color = BLACK;
@@ -185,15 +186,14 @@ class RBTree
 				/* Case : B
 					Parent of pt is right child
 					of Grand-parent of pt */
-				else
+				else /* Parent is on the left of grandparent*/
 				{
-					node_pointer uncle = grandParent->left;
+					uncle = grandParent->left;
 
 					/*  Case : 1
 						The uncle of pt is also red
 						Only Recoloring required */
-					if ((uncle != NULL) && (uncle->color ==
-															RED))
+					if ((uncle != NULL) && (uncle->color == RED))
 					{
 						grandParent->color = RED;
 						parent->color = BLACK;
