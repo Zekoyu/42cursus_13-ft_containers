@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 06-03-2022 21:18 by                                             */
+/*   Updated: 07-03-2022 11:27 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,7 +302,7 @@ int main()
 	typedef VECTOR_TYPE					vector_type;
 	typedef ft::vector<vector_type>	vector;
 
-	vector	v;
+	const vector	v;
 
 	test_vector<vector>(v);
 	modifyContent(v.begin(), v.end());

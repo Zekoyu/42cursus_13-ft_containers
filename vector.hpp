@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 06-03-2022 22:57 by                                             */
+/*   Updated: 07-03-2022 13:49 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -397,9 +397,10 @@ namespace ft
 					typedef typename ft::iterator<ft::random_access_iterator_tag, typename Vector::value_type> iterator;
 
 				public:
-					typedef typename iterator::value_type		value_type;
-					typedef typename iterator::reference		reference;
-					typedef typename iterator::pointer			pointer;
+					typedef typename iterator::iterator_category	iterator_category;
+					typedef typename iterator::value_type			value_type;
+					typedef typename iterator::reference			reference;
+					typedef typename iterator::pointer				pointer;
 
 					typedef ptrdiff_t	difference_type;
 					typedef size_t		size_type;
