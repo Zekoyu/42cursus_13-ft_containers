@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 08-03-2022 17:55 by                                             */
+/*   Updated: 08-03-2022 22:16 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,9 @@ class RBTree
 
 			node->color = RED;
 			node->data = value;
-			node->left = NULL;
-			node->parent = NULL;
-			node->right = NULL;
+			node->left = nullptr;
+			node->parent = nullptr;
+			node->right = nullptr;
 
 			return (node);
 		}
@@ -82,13 +82,13 @@ class RBTree
 			node_pointer	pivot = root->left;
 			node_pointer	rightChild;
 
-			if (pivot == NULL)
-				return NULL;
+			if (pivot == nullptr)
+				return nullptr;
 			
 			rightChild = pivot->right;
 
 			root->left = rightChild;
-			if (rightChild != NULL)
+			if (rightChild != nullptr)
 				rightChild->parent = root;
 
 			pivot->right = root;
@@ -97,7 +97,7 @@ class RBTree
 			pivot->parent = parent;
 
 			/* Set the new root to be pivot */
-			if (parent == NULL)
+			if (parent == nullptr)
 				this->_root = pivot;
 			else if (pivot == parent->left)
 				parent->left = pivot;
@@ -154,7 +154,7 @@ class RBTree
             nw_node->parent = x;
 
             if(x->right->right){ x->right = x->right->right; }
-            else { x->right = NULL; }
+            else { x->right = nullptr; }
 
             if(x->right){ x->right->parent = x; }
         }
@@ -162,82 +162,230 @@ class RBTree
 
 		/* As the name says, fix all violations, takes the newly added node */
 		/* See https://algorithmtutor.com/Data-Structures/Tree/Red-Black-Trees/ */
-		/* Also https://gist.github.com/SubCoder1/70c2cedc44353ffc539c7567b1051028 */
 
-		/* Strategy is to start from the node all the way up to the root */
-		void	fixRBTProperties(node_pointer n)
+		
+		//https://github.com/Bibeknam/algorithmtutorprograms/blob/master/data-structures/red-black-trees/RedBlackTree.cpp
+
+		/* Rotate node n right, makes it become the child and it's left child the parent 
+		   
+		   rightRotate(Y) does:
+		      Y           X      
+		     / \    >    / \      
+		    X   c   >   a   Y     
+		   / \      >      / \    
+		  a   b           b   c   
+		  Before         After
+
+		  Things that change are:
+		  - Y.left is now X.right
+		  - X.right is now Y
+		  - X.parent is now old Y.parent and
+		    Y.parent is now X
+		*/
+		void rightRotate(node_pointer node)
 		{
-			node_pointer	grandParent = NULL;
-			node_pointer	uncle = NULL;
-
-			while (n->parent->color == RED)
-			{
-				grandParent = n->parent->parent;
-				uncle = NULL;
-
-				if (n->parent == grandParent->left) /* Parent is left child of grandparent */
-				{
-					if (grandParent->right != NULL) /* If grandparent has another child, it's the node uncle */
-						uncle = grandParent->right;
-					
-					if (uncle != NULL && uncle->color == RED) /* If uncle is red, switch colors */
-					{
-						n->parent->color = BLACK;
-						uncle->color = BLACK;
-						grandParent->color = RED;
-						if (grandParent != this->_root)
-							n = grandParent;
-						else /* We finished our loop, we reached the top */
-							break;
-					}
-					else if (n == grandParent->left->right) /* Node is Right child of parent */
-					{
-						rotateLeft(n->parent);
-					}
-					else /* Node is red child of parent */
-					{
-						n->parent->color = BLACK;
-						grandParent->color = RED;
-						rotateRight(grandParent);
-						if (grandParent != this->_root)
-							n = grandParent; /* Up one node */
-						else
-							break ;
-					}
-				}
-				else /* Parent is grandparent right child */
-				{
-					if (grandParent->left != NULL) /* If grandparent has another child, it's the node uncle */
-						uncle = grandParent->left;
-					
-					if (uncle != NULL && uncle->color == RED) /* If uncle is red, switch colors */
-					{
-						n->parent->color = BLACK;
-						uncle->color = BLACK;
-						grandParent->color = RED;
-						if (grandParent != this->_root)
-							n = grandParent;
-						else /* We finished our loop, we reached the top */
-							break;
-					}
-					else if (n == grandParent->right->left) /* Node is left child of parent */
-					{
-						rotateRight(n->parent);
-					}
-					else /* Node is red child of parent */
-					{
-						n->parent->color = BLACK;
-						grandParent->color = RED;
-						rotateLeft(grandParent);
-						if (grandParent != this->_root)
-							n = grandParent; /* Up one node */
-						else
-							break ;
-					}
-				}
-			}
-			this->_root->color = BLACK; /* Since we rotated, set black just in case */
+			node_pointer newNode = node->left;		// new parent = X
+			/* Switch Y.left and X.right */
+			
+			node->left = newNode->right;			// Y.left = b
+			if (newNode->right != nullptr)
+				newNode->right->parent = node;		// b.parent = Y (to complete Y.left = b)
+			/* Redirect old links from X to Y */
+			newNode->parent = node->parent;			// X.parent = Y.parent (since we switch X and Y)
+			if (node->parent == nullptr)				// node is the root (same as node == this->_root)
+				this->_root = newNode;				// root = X
+			else if (node == node->parent->right)	// Y is the right child
+				node->parent->right = newNode;		// Modify parent to point to X
+			else									// Y is the left child
+				node->parent->left = newNode;		// Modify parent to point to X
+			/* Change links between X and Y */
+			newNode->right = node;					// X.right = Y
+			node->parent = newNode;					// Y.parent = X
 		}
+
+		/* Rotate node n left, makes it become the child and it's right child the parent 
+		   
+		   leftRotate(X) does:
+			X               Y
+		   / \      >      / \
+		  a   Y     >     X   c
+		     / \    >    / \
+			b   c       a   b
+		  Before         After
+
+		   Things that change are:
+		  - X.right is now Y.left
+		  - Y.left is now x
+		  - X.parent is now old Y.parent and
+		    Y.parent is now X
+		*/
+		void leftRotate(node_pointer node)
+		{
+			node_pointer newNode = node->right;		// new parent = X
+			/* Switch X.right and Y.left */
+			node->right = newNode->left;			// Y.left = b
+			if (newNode->left != nullptr)
+				newNode->left->parent = node;		// b.parent = Y (to complete Y.left = b)
+			/* Redirect old links from X to Y */
+			newNode->parent = node->parent;			// X.parent = Y.parent (since we switch X and Y)
+			if (node->parent == nullptr)				// node is the root (same as node == this->_root)
+				this->_root = newNode;				// root = X
+			else if (node == node->parent->left)	// Y is the left child
+				node->parent->left = newNode;		// Modify parent to point to X
+			else									// Y is the left child
+				node->parent->right = newNode;		// Modify parent to point to X
+			/* Change links between X and Y */
+			newNode->left = node;					// X.right = Y
+			node->parent = newNode;					// Y.parent = X
+		}
+
+		void	fixInsertionViolations(node_pointer k)
+		{
+			node_pointer	uncle;
+
+			/* Start from newly inserted node all the way up, since we put parent RED each time */
+			while (k->parent->color == RED)
+			{
+				if (k->parent == k->parent->parent->right) /* Node parent is the right node of grand-parent */
+				{
+					uncle = k->parent->parent->left;
+					if (uncle && uncle->color == RED) /* Uncle red, switch colors */
+					{
+						uncle->color = BLACK;
+						k->parent->color = BLACK;
+						k->parent->parent->color = RED;
+						k = k->parent->parent;
+					}
+					else /* Uncle black, set parent black and grand-parent red and rotate */
+					{
+						if (k == k->parent->left)
+						{
+							k = k->parent; /* parent will re-become child after rotate */
+							rightRotate(k);
+						}
+						k->parent->color = BLACK;		/* This still be parent after left rotate, so make it black since node is red */
+						k->parent->parent->color = RED;	/* Grand-parent will become sibling, so make it red since node is red */
+						leftRotate(k->parent->parent);
+					}
+				}
+				else /* Node parent is the left node of grand-parent => mirror scenario */
+				{
+					
+					uncle = k->parent->parent->right;
+					if (uncle && uncle->color == RED) /* Uncle red, switch colors */
+					{
+						uncle->color = BLACK;
+						k->parent->color = BLACK;
+						k->parent->parent->color = RED;
+						k = k->parent->parent;
+					}
+					else
+					{
+						if (k == k->parent->right)
+						{
+							k = k->parent; /* parent will re-become child after rotate */
+							leftRotate(k);
+						}
+						k->parent->color = BLACK;		/* This still be parent after left rotate, so make it black since node is red */
+						k->parent->parent->color = RED;	/* Grand-parent will become sibling, so make it red since node is red */
+
+						rightRotate(k->parent->parent);
+					}
+				}
+				if (k == this->_root)
+					break;
+			}
+			this->_root->color = BLACK;
+			/*
+					30
+				   /
+				 12
+				  \
+				   15
+
+				 30
+				 /
+				15
+			   /
+			  12 
+			*/
+		}
+		
+		/* Strategy is to start from the node all the way up to the root */
+		// V2
+		// void	fixRBTProperties(node_pointer n)
+		// {
+		// 	node_pointer	grandParent = NULL;
+		// 	node_pointer	uncle = NULL;
+
+		// 	while (n->parent->color == RED)
+		// 	{
+		// 		grandParent = n->parent->parent;
+		// 		uncle = NULL;
+
+		// 		if (n->parent == grandParent->left) /* Parent is left child of grandparent */
+		// 		{
+		// 			if (grandParent->right != NULL) /* If grandparent has another child, it's the node uncle */
+		// 				uncle = grandParent->right;
+					
+		// 			if (uncle != NULL && uncle->color == RED) /* If uncle is red, switch colors */
+		// 			{
+		// 				n->parent->color = BLACK;
+		// 				uncle->color = BLACK;
+		// 				grandParent->color = RED;
+		// 				if (grandParent != this->_root)
+		// 					n = grandParent;
+		// 				else /* We finished our loop, we reached the top */
+		// 					break;
+		// 			}
+		// 			else if (n == grandParent->left->right) /* Node is Right child of parent */
+		// 			{
+		// 				rotateLeft(n->parent);
+		// 			}
+		// 			else /* Node is red child of parent */
+		// 			{
+		// 				n->parent->color = BLACK;
+		// 				grandParent->color = RED;
+		// 				rotateRight(grandParent);
+		// 				if (grandParent != this->_root)
+		// 					n = grandParent; /* Up one node */
+		// 				else
+		// 					break ;
+		// 			}
+		// 		}
+		// 		else /* Parent is grandparent right child */
+		// 		{
+		// 			if (grandParent->left != NULL) /* If grandparent has another child, it's the node uncle */
+		// 				uncle = grandParent->left;
+					
+		// 			if (uncle != NULL && uncle->color == RED) /* If uncle is red, switch colors */
+		// 			{
+		// 				n->parent->color = BLACK;
+		// 				uncle->color = BLACK;
+		// 				grandParent->color = RED;
+		// 				if (grandParent != this->_root)
+		// 					n = grandParent;
+		// 				else /* We finished our loop, we reached the top */
+		// 					break;
+		// 			}
+		// 			else if (n == grandParent->right->left) /* Node is left child of parent */
+		// 			{
+		// 				rotateRight(n->parent);
+		// 			}
+		// 			else /* Node is red child of parent */
+		// 			{
+		// 				n->parent->color = BLACK;
+		// 				grandParent->color = RED;
+		// 				rotateLeft(grandParent);
+		// 				if (grandParent != this->_root)
+		// 					n = grandParent; /* Up one node */
+		// 				else
+		// 					break ;
+		// 			}
+		// 		}
+		// 	}
+		// 	this->_root->color = BLACK; /* Since we rotated, set black just in case */
+		// }
 
 		// void fixRBTProperties(node_pointer node)
 		// {
@@ -405,14 +553,14 @@ class RBTree
 
 	public:
 
-		RBTree() : _root(NULL) { }
+		RBTree() : _root(nullptr) { }	// NULL is typically convertible to int, nullptr only to pointers
 
 		/* Insert as in any Binary Search Tree, then fix the RBT violations if any */
 		void insert(T val)
 		{
 			node_pointer node = createNode(val);
 
-			if (this->_root == NULL)
+			if (this->_root == nullptr)
 			{
 				this->_root = node;
 				node->color = BLACK;
@@ -420,11 +568,11 @@ class RBTree
 			}
 
 			node_pointer	curr_node = this->_root;
-			node_pointer	parent = NULL; /* this.roo.parent */
+			node_pointer	parent = nullptr; /* this.roo.parent */
 			
 			Compare			comp;
 			
-			while (curr_node != NULL)
+			while (curr_node != nullptr)
 			{
 				parent = curr_node;
 				if (comp(node->data, curr_node->data)) /* node < curr_node */
@@ -442,12 +590,13 @@ class RBTree
 
 			/* No need to set color and childs since they should be initialized to NULL and RED */
 
-			this->fixRBTProperties(node);
+			//this->fixRBTProperties(node);
+			this->fixInsertionViolations(node);
 		}
 
 		node_pointer	search(T val)
 		{
-			if (this->_root == NULL || this->_root->data == val)
+			if (this->_root == nullptr || this->_root->data == val)
 				return (this->_root);
 
 			node_pointer curr = this->_root;
