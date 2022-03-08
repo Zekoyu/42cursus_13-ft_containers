@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 08-03-2022 17:30 by                                             */
+/*   Updated: 08-03-2022 17:55 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,7 @@ class RBTree
 			return (pivot); /* Return new root */	
 		}
 
+		/*
 		node_pointer rotateLeft(node_pointer root)
 		{
 			node_pointer	parent = root->parent;
@@ -125,18 +126,39 @@ class RBTree
 			pivot->left = root;
 			root->parent = pivot;
 
-			pivot->parent = parent;
-
 			if (parent == NULL)
+			{
 				this->_root = pivot;
+				return (this->_root);
+			}
 			else if (pivot == parent->left)
 				parent->left = pivot;
 			else
 				parent->right = pivot;
-				
+			pivot->parent = parent;
 
 			return (pivot);	
-		}
+		}*/
+
+		void rotateLeft(node_pointer x) {
+            node_pointer nw_node = createNode(x->data);
+            if(x->right->left) { nw_node->right = x->right->left; }
+            nw_node->left = x->left;
+            nw_node->data = x->data;
+            nw_node->color = x->color;
+            x->data = x->right->data;
+
+            x->left = nw_node;
+            if(nw_node->left){ nw_node->left->parent = nw_node; }
+            if(nw_node->right){ nw_node->right->parent = nw_node; }
+            nw_node->parent = x;
+
+            if(x->right->right){ x->right = x->right->right; }
+            else { x->right = NULL; }
+
+            if(x->right){ x->right->parent = x; }
+        }
+
 
 		/* As the name says, fix all violations, takes the newly added node */
 		/* See https://algorithmtutor.com/Data-Structures/Tree/Red-Black-Trees/ */
@@ -422,6 +444,7 @@ class RBTree
 
 			this->fixRBTProperties(node);
 		}
+
 		node_pointer	search(T val)
 		{
 			if (this->_root == NULL || this->_root->data == val)
@@ -438,6 +461,25 @@ class RBTree
 			}
 			return (curr); /* Either node / NULL */
 		}
+
+		void printTree(const std::string& prefix, node_pointer node, bool isLeft = false)
+		{
+			if( node != nullptr )
+			{
+				std::cout << prefix;
+
+				std::cout << (isLeft ? "├──" : "└──" );
+
+				// print the value of the node
+				std::cout << (node->color == RED ? "R" : "B") <<  node->data << std::endl;
+
+				// enter the next tree level - left and right branch
+				printTree( prefix + (isLeft ? "│   " : "    "), node->left, true);
+				printTree( prefix + (isLeft ? "│   " : "    "), node->right, false);
+			}
+		}
+
+		node_pointer getRoot() { return this->_root; }
 };
 
 #endif
