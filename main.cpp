@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 07-03-2022 11:27 by                                             */
+/*   Updated: 09-03-2022 17:23 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,8 @@ void	reverse_print_vector(Vector v)
 template < typename Vector >
 void	test_vector(Vector v)
 {
-	typedef typename Vector::iterator iterator;
-	typedef typename Vector::value_type value_type;
+	//typedef typename Vector::iterator iterator;
+	//typedef typename Vector::value_type value_type;
 
 	std::cout << "POUET\n";
 	std::cout << "Vector max potential size: " << v.max_size() << std::endl;
@@ -301,9 +301,17 @@ int main()
 {
 	typedef VECTOR_TYPE					vector_type;
 	typedef ft::vector<vector_type>	vector;
+	
+	vector	v;
 
-	const vector	v;
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
 
-	test_vector<vector>(v);
-	modifyContent(v.begin(), v.end());
+	vector v1(v);
+
+//	std::cout << "Len: " << (v1.end() - v1.begin()) << std::endl; 
+	
+	//test_vector<vector>(v);
+	//modifyContent(v.begin(), v.end());
 }
