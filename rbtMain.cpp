@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 08-03-2022  by  `-'                        `-'                  */
-/*   Updated: 08-03-2022 22:18 by                                             */
+/*   Updated: 09-03-2022 10:52 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,14 +52,38 @@ int main()
 	tree.insert(13);
 	tree.insert(118);
 	tree.insert(1202);
-	
-	//search_val(tree, 12);
-	//search_val(tree, 20);
-	//search_val(tree, 10);
-	//search_val(tree, 30);
-	//search_val(tree, 15);
-	//search_val(tree, 25);
-	//search_val(tree, 26);
 
+
+
+
+	//tree.insert(330);
+	//tree.insert(312);
+	//tree.insert(315);
+	//tree.insert(320);
+	//tree.insert(310);
+	//tree.insert(330);
+	//tree.insert(315);
+	//tree.insert(35);
+	//tree.insert(325);
+	//tree.insert(3120);
+	//tree.insert(3110);
+	//tree.insert(3130);
+	//tree.insert(3115);
+	//tree.insert(3125);
+	//tree.insert(312);
+	//tree.insert(311);
+	//tree.insert(313);
+	//tree.insert(3118);
+	//tree.insert(31202);
 	tree.printTree("", tree.getRoot());
+	
+	search_val(tree, 12);
+	search_val(tree, 20);
+	search_val(tree, 10);
+	search_val(tree, 30);
+	search_val(tree, 15);
+	search_val(tree, 25);
+	search_val(tree, 26);
+
+	
 }
