@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 09-03-2022 10:50 by                                             */
+/*   Updated: 09-03-2022 16:09 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ class RBTree
 
 		/* Nodes are red by default to not violate black depth property,
 		and it's easier to fix wrong red nodes than to find where to create black nodes */
-		node_pointer createNode(T value)
+		node_pointer createNode(T value) /* Non-static since T is template dependant */
 		{
 			node_pointer node = new(RBNode<T>);
 
@@ -71,6 +71,11 @@ class RBTree
 			node->right = nullptr;
 
 			return (node);
+		}
+
+		void deleteNode(node_pointer node) /* Non-static since T is template dependant */
+		{
+			delete node;
 		}
 
 
@@ -209,6 +214,97 @@ class RBTree
 			}
 			this->_root->color = BLACK;
 		}
+
+		void fixDeleteViolations(node_pointer x)
+		{
+			node_pointer s = nullptr;
+
+			while (x != this->_root && x->color == BLACK)
+			{
+				if (x == x->parent->left)
+				{
+					s = x->parent->right;
+					if (s->color == RED)
+					{
+						s->color = BLACK;
+						x->parent->color = RED;
+						leftRotate(x->parent);
+						s = x->parent->right;
+					}
+
+					if (s->left->color == BLACK && s->right->color == BLACK)
+					{
+						s->color = RED;
+						x = x->parent;
+					}
+					else
+					{
+						if (s->right->color == BLACK)
+						{
+							s->left->color = BLACK;
+							s->color = RED;
+							rightRotate(s);
+							s = x->parent->right;
+						}
+
+						s->color = x->parent->color;
+						x->parent->color = BLACK;
+						s->right->color = BLACK;
+						leftRotate(x->parent);
+						x = this->_root;
+					}
+				}
+				else
+				{
+					s = x->parent->left;
+					if (s->color == RED)
+					{
+						s->color = BLACK;
+						x->parent->color = RED;
+						rightRotate(x->parent);
+						s = x->parent->left;
+					}
+
+					if (s->left->color == BLACK && s->right->color == BLACK)
+					{
+						s->color = RED;
+						x = x->parent;
+					}
+					else
+					{
+						if (s->left->color == BLACK)
+						{
+							s->right->color = BLACK;
+							s->color = RED;
+							leftRotate(s);
+							s = x->parent->left;
+						}
+
+						s->color = x->parent->color;
+						x->parent->color = BLACK;
+						s->left->color = BLACK;
+						rightRotate(x->parent);
+						x = this->_root;
+					}
+				}
+			}
+			x->color = BLACK;
+		}
+
+		void replaceNode(node_pointer node, node_pointer replacement)
+		{
+			/* Parent now points to replacement */
+			if (node == this->_root)
+				this->_root = replacement;
+			else if (node == node->parent->left)
+				node->parent->left = replacement;
+			else
+				node->parent->right = replacement;
+
+			/* Replacement parent now points node parent */
+			if (replacement != nullptr)
+				replacement->parent = node->parent;
+		}
 		
 	public:
 
@@ -251,6 +347,65 @@ class RBTree
 
 			//this->fixRBTProperties(node);
 			this->fixInsertionViolations(node);
+		}
+
+		void remove(node_pointer node)
+		{
+			if (node == nullptr)
+				return ;
+
+			int originalColor = node->color;
+			node_pointer newNode = nullptr;
+			
+			/* If node is a leaf, delete it from the tree */
+			if (node->left == nullptr && node->right == nullptr)
+				replaceNode(node, nullptr);
+			else if (node->right == nullptr) /* Node has only one child (left) => replace node by it's left child */
+			{
+				newNode = node->left;
+				replaceNode(node, node->left);
+			}
+			else if (node->left == nullptr) /* Node has only one child (right) */
+			{
+				newNode = node->right;
+				replaceNode(node, node->right);
+			}
+			else /* Node has both child */
+			{
+				/* Find inorder successor of node (which basically in our case is the smallest value on root right subtree).
+				   when found, it will replace the node */
+				node_pointer successor = node->right;
+				while (successor->left != nullptr)
+					successor = successor->left;
+
+				originalColor = successor->color;
+				
+				newNode = successor->right;
+
+				if (successor->parent != node)
+				{
+					replaceNode(successor, successor->right);
+					successor->right = node->right;
+					successor->right->parent = node->right;
+				}
+
+				replaceNode(node, successor);
+				successor->left = node->left;
+				successor->left->parent = successor;
+				successor->color = node->color;
+			}
+			
+			this->deleteNode(node);
+			if (originalColor == BLACK)
+				this->fixDeleteViolations(newNode);
+		}
+		
+		void remove(T val)
+		{
+			node_pointer node = this->search(val);
+
+			if (node != nullptr)
+				this->remove(node);
 		}
 
 		node_pointer	search(T val)

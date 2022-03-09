@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 08-03-2022  by  `-'                        `-'                  */
-/*   Updated: 09-03-2022 10:52 by                                             */
+/*   Updated: 09-03-2022 16:05 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ int main()
 	//tree.insert(3118);
 	//tree.insert(31202);
 	tree.printTree("", tree.getRoot());
-	
+
 	search_val(tree, 12);
 	search_val(tree, 20);
 	search_val(tree, 10);
@@ -85,5 +85,19 @@ int main()
 	search_val(tree, 25);
 	search_val(tree, 26);
 
+	std::cout << "AFTER REMOVAL\n\n\n";
+	tree.remove(1202);
+	tree.remove(125);
+	tree.remove(12);
+	tree.remove(20);
+
+	tree.printTree("", tree.getRoot());
 	
+	search_val(tree, 12);
+	search_val(tree, 20);
+	search_val(tree, 10);
+	search_val(tree, 30);
+	search_val(tree, 15);
+	search_val(tree, 25);
+	search_val(tree, 26);
 }
