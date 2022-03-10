@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 06-03-2022 13:32 by                                             */
+/*   Updated: 10-03-2022 14:37 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,11 @@ namespace ft
 	}
 
 	/* Only uses operator< of members */
+	/* true if lhs.first < rhs.first, and in case they are equal, if lhs.second < rhs.second */
 	template <class T1, class T2>
 	bool operator<(const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
 	{
-		return (lhs.first < rhs.first || !(rhs.first < lhs.first) && lhs.second < rhs.second);
+		return (lhs.first < rhs.first || (!(rhs.first < lhs.first) && lhs.second < rhs.second));
 	}
 
 	template <class T1, class T2>
@@ -76,7 +77,7 @@ namespace ft
 	}
 
 	template <class T1, class T2>
-	bool operator<=(const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
+	bool operator>=(const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
 	{
 		return (!(lhs < rhs));
 	}

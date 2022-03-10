@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 09-03-2022 17:52 by                                             */
+/*   Updated: 10-03-2022 15:48 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -484,11 +484,11 @@ namespace ft
 						return (tmp);
 					}
 
-					VectIterator	operator-(const VectIterator& r)
+					difference_type	operator-(const VectIterator& r)
 					{
 						VectIterator tmp = *this;
 						tmp._ptr -= r._ptr;
-						return (tmp);
+						return (tmp._ptr);
 					}
 
 					VectIterator&	operator-=(difference_type n)
