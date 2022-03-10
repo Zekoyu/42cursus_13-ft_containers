@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 07-03-2022 13:49 by                                             */
+/*   Updated: 10-03-2022 18:43 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,13 @@ namespace ft
 
 		public:
 			/* Default constructor */
-			vector(const allocator_type& alloc = allocator_type()) : _ptr(0), _size(0), _capacity(0) { }
+			vector(const allocator_type& alloc = allocator_type()) : _ptr(0), _size(0), _capacity(0), _alloc(alloc) { }
 
 			/* Fill constructor */
 			/* The compiler is allow to make one implicit conversion to resolve parameters to a function, here we don't allow it.
 			   Eg. foo(Bar) with Bar(int) existing, we can call foo(42) with an int since compiler knows there is a Bar(int) it will do Bar(42) implicitely. */
 			explicit vector(size_type n, const value_type& val = value_type(),
-							 const allocator_type& alloc = allocator_type()) : _ptr(0), _size(0), _capacity(0)
+							 const allocator_type& alloc = allocator_type()) : _ptr(0), _size(0), _capacity(0), _alloc(alloc)
 			{
 				this->assign(n, val);
 			}
@@ -82,13 +82,13 @@ namespace ft
 			/* Range constructor */
 			template <class InputIterator>
         	vector(InputIterator first, InputIterator last,
-				   const allocator_type& alloc = allocator_type()) : _ptr(0), _size(0), _capacity(0)
+				   const allocator_type& alloc = allocator_type()) : _ptr(0), _size(0), _capacity(0), _alloc(alloc)
 			{
 				this->assign(first, last);
 			}
 
 			/* Copy constructor */
-			vector(const vector& x) : _ptr(0), _size(0), _capacity(0)
+			vector(const vector& x) : _ptr(0), _size(0), _capacity(0), _alloc(x._alloc)
 			{
 				this->resize(x._size); /* First resize to initialize capacity and size */				
 				
@@ -229,6 +229,8 @@ namespace ft
 			void	assign(InputIterator first, InputIterator last,
 						   typename InputIterator::value_type* pouet = NULL)
 			{
+				(void) pouet;
+
 				this->reserve(this->distance(first, last));
 				for (size_type i = 0; i < this->_size; ++i)
 					this->_alloc.destroy(this->_ptr + i);
@@ -307,6 +309,8 @@ namespace ft
   			void insert(iterator position, InputIterator first, InputIterator last,
 			  			typename InputIterator::value_type* pouet = NULL)
 			{
+				(void) pouet;
+
 				size_type n = this->distance(first, last);
 				size_type index = this->distance(this->begin(), position);
 
@@ -488,6 +492,12 @@ namespace ft
 					VectIterator&	operator-=(difference_type n)
 					{
 						this->_ptr -= n;
+						return (*this);
+					}
+
+					VectIterator&	operator=(const VectIterator &rhs)
+					{
+						this->_ptr = rhs._ptr;
 						return (*this);
 					}
 

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 07-03-2022 11:27 by                                             */
+/*   Updated: 10-03-2022 18:37 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,8 @@ void	reverse_print_vector(Vector v)
 template < typename Vector >
 void	test_vector(Vector v)
 {
-	typedef typename Vector::iterator iterator;
-	typedef typename Vector::value_type value_type;
+	//typedef typename Vector::iterator iterator;
+	//typedef typename Vector::value_type value_type;
 
 	std::cout << "POUET\n";
 	std::cout << "Vector max potential size: " << v.max_size() << std::endl;
@@ -302,8 +302,12 @@ int main()
 	typedef VECTOR_TYPE					vector_type;
 	typedef ft::vector<vector_type>	vector;
 
-	const vector	v;
+	vector	v;
 
 	test_vector<vector>(v);
 	modifyContent(v.begin(), v.end());
+
+	vector::const_iterator pouet = v.begin();
+
+	(void) pouet;
 }
