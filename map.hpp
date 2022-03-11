@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 14:54 by                                             */
+/*   Updated: 11-03-2022 16:39 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ namespace ft
 			value_compare value_comp() const { return (ValueCompare()); }
 
 			/* Operations */
-			iterator find (const key_type& k)
+			iterator find(const key_type& k)
 			{
 				value_type  tmp_pair(k, mapped_type());
 
@@ -183,7 +183,7 @@ namespace ft
 				return (iterator(value));
 			}
 
-			const_iterator find (const key_type& k) const
+			const_iterator find(const key_type& k) const
 			{
 				value_type  tmp_pair(k, mapped_type());
 
@@ -194,12 +194,87 @@ namespace ft
 				return (const_iterator(value));
 			}
 
-			template <typename Pair>
+			/* Basically returns either 1 or 0 in map, but not in containers like multiset, which is the same as map without unique */
+			size_type count(const key_type& k) const
+			{
+				value_type tmp_pair(k, mapped_type());
+
+				if (this->_tree.search(tmp_pair) != nullptr)
+					return (1);
+				return (0);
+			}
+
+			/* Returns first node (in-order) considered not to be before k (equivalent or goes after)
+			   (which most likely is k if it exists, otherwise the nearest upper value) */
+			iterator lower_bound(const key_type& k)
+			{
+				node_pointer curr = this->_tree.getRoot();
+				
+				while (curr != nullptr && !_comp(curr->data->first(), k))
+					curr = this->_tree.next_inorder(curr);
+				
+				if (curr == nullptr)
+					return (this->end());
+
+				return (iterator(curr));
+			}
+
+			const_iterator lower_bound(const key_type& k) const
+			{
+				node_pointer curr = this->_tree.getRoot();
+				
+				while (curr != nullptr && !_comp(curr->data->first(), k))
+					curr = this->_tree.next_inorder(curr);
+				
+				if (curr == nullptr)
+					return (this->end());
+
+				return (const_iterator(curr));
+			}
+
+			iterator upper_bound(const key_type& k)
+			{
+				node_pointer curr = this->_tree.getRoot();
+
+				while (curr != nullptr && _comp(k, curr->data->first()))
+					curr = this->_tree.next_inorder(curr);
+				
+				if (curr == nullptr)
+					return (iterator(this->end()));
+			}
+
+			const_iterator upper_bound(const key_type& k) const
+			{
+				node_pointer curr = this->_tree.getRoot();
+
+				while (curr != nullptr && _comp(k, curr->data->first()))
+					curr = this->_tree.next_inorder(curr);
+				
+				if (curr == nullptr)
+					return (const_iterator(this->end()));
+			}
+
+			/* Returns the bound of a range that includes all the elements which have a key equivalent to k
+			   since it's a map and has unique key, the range will contain at most 1 value */
+			pair<iterator,iterator> equal_range(const key_type& k)
+			{
+				return (ft::make_pair(this->lower_bound(k), this->upper_bound(k)));
+			}
+
+			pair<const_iterator,const_iterator> equal_range(const key_type& k) const
+			{
+				return (ft::make_pair(this->lower_bound(k), this->upper_bound(k)));
+			}
+
+			/* Allocator */
+			allocator_type get_allocator() const { return (Alloc()); }
+
+			template <typename Node>
 			class MapIterator
 			{
 				private:
-					typedef typename ft::iterator<ft::bidirectional_iterator_tag, Pair>	iterator;
-					typedef typename RBTree<value_type, Compare>::node_pointer			node_pointer;
+					typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>	iterator;
+					typedef typename RBTree<value_type, Compare>::node_pointer					node_pointer;
 
 				public:
 					typedef typename iterator::iterator_category	iterator_category;

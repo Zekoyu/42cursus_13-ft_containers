@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 14:42 by                                             */
+/*   Updated: 11-03-2022 16:25 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -500,6 +500,33 @@ class RBTree
 			clear(this->_root);
 			this->_root = nullptr;
 		}
+
+		node_pointer next_inorder(node_pointer node)
+		{
+			if (node == nullptr)
+				return (nullptr);
+			
+			/* If there is right child, travel to it (which means now every node > node),
+			   then go to the most-left we can (lowest value bigger than node basically) */
+			if (node->right != nullptr)
+			{
+				node = node->right;
+				while (node->left)
+					node = node->left;
+			}
+			else
+			{
+				/* Node is the furthest right in the subtree, go up all parents until we find one that is the left-child,
+				   the next inorder-one is that node's parent (NULL if node is the last one already) */
+				while (node->parent != nullptr && node == node->parent->right)
+					node = node->parent;
+				node = node->parent;
+			}
+
+			return (node);
+		}
+
+		node_pointer getRoot() { return (this->_root); }
 };
 
 #endif
