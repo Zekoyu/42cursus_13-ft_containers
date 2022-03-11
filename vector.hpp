@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 10:04 by                                             */
+/*   Updated: 11-03-2022 11:44 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ namespace ft
 			/* This value typically reflects the theoretical limit on the size of the container, at most std::numeric_limits<difference_type>::max()
 			   At runtime, the size of the container may be limited to a value smaller than max_size() by the amount of RAM available.
 			   Can also use Allocator.max_size since vector is contiguous memory */
-			size_type	max_size() const { return (_alloc.max_size()); }
+			size_type	max_size() const { return (this->_alloc.max_size()); }
 
 			/* Truncate if n < size; append otherwise, if n > capacity, realloc */
 			void resize(size_type n, value_type val = value_type())
@@ -397,7 +397,7 @@ namespace ft
 			}
 
 			template <class Vector>
-			class VectIterator : public ft::iterator<ft::random_access_iterator_tag, typename Vector::value_type> /* Only define 2 types since the 3 other default values are those we want */
+			class VectIterator
 			{
 				private:
 					typedef typename ft::iterator<ft::random_access_iterator_tag, typename Vector::value_type> iterator;
@@ -539,6 +539,7 @@ namespace ft
 			};
 	};
 
+	/* Should be optimized, but who cares */
 	template <class T, class Alloc>
 	void swap(vector<T,Alloc>& x, vector<T,Alloc>& y)
 	{

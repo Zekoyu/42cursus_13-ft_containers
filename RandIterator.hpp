@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 10-03-2022  by  `-'                        `-'                  */
-/*   Updated: 10-03-2022 20:19 by                                             */
+/*   Updated: 11-03-2022 10:14 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,20 @@
 
 #include "iterators.hpp"
 #include "utils.hpp"
+#include "enable_if.hpp"
 
 namespace ft
 {
 	/* https://quuxplusone.github.io/blog/2018/12/01/const-iterator-antipatterns/ */
 	/* https://stackoverflow.com/questions/2150192/how-to-avoid-code-duplication-implementing-const-and-non-const-iterators */
 	/* We keep T as non const, and in functions needing const we add it manually */
-	template <class T, bool IsConst>
+	template <class T, bool IsConst = false>
 	class RandIterator
 	{
 		private:
-			typedef typename ft::choose<IsConst, ft::iterator<ft::random_access_iterator_tag, const T>, ft::iterator<ft::random_access_iterator_tag, T> >::type iterator; /* If const, type is an iterator over const T, otherwise only over T */
+			/* If const, type is an iterator over const T, otherwise only over T */
+			typedef typename ft::choose<IsConst, ft::iterator<ft::random_access_iterator_tag, const T>,
+										ft::iterator<ft::random_access_iterator_tag, T> >::type iterator;
 			
 		public:
 			typedef RandIterator<T, IsConst> self_type;

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 09-03-2022 16:09 by                                             */
+/*   Updated: 11-03-2022 14:42 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,11 @@ struct RBNode
 	RBNode	*right;
 	RBNode	*left;
 
-	T		data;
+	T*		data;
 	
 	e_color	color;
+
+	RBNode() : parent(nullptr), right(nullptr), left(nullptr), data(nullptr), color(RED) { }
 };
 
 /* https://en.wikipedia.org/wiki/Red%E2%80%93black_tree */
@@ -47,7 +49,7 @@ struct RBNode
 
 	https://algorithmtutor.com/Data-Structures/Tree/Red-Black-Trees/
 */
-template <class T, class Compare = std::less<T> >
+template <class T, class Compare = std::less<T>, class Alloc = std::allocator<T> >
 class RBTree
 {
 	public:
@@ -55,6 +57,7 @@ class RBTree
 
 	private:
 		RBNode<T>*	_root;
+		Alloc		_alloc;
 
 	private:
 
@@ -62,19 +65,16 @@ class RBTree
 		and it's easier to fix wrong red nodes than to find where to create black nodes */
 		node_pointer createNode(T value) /* Non-static since T is template dependant */
 		{
-			node_pointer node = new(RBNode<T>);
-
-			node->color = RED;
-			node->data = value;
-			node->left = nullptr;
-			node->parent = nullptr;
-			node->right = nullptr;
-
+			node_pointer node = new(RBNode<T>());
+			node->data = this->_alloc.allocate(1);
+			this->_alloc.construct(node->data, value);
 			return (node);
 		}
 
 		void deleteNode(node_pointer node) /* Non-static since T is template dependant */
 		{
+			this->_alloc.destroy(node->data);
+			this->_alloc.deallocate(node->data, 1);
 			delete node;
 		}
 
@@ -186,8 +186,7 @@ class RBTree
 					}
 				}
 				else /* Node parent is the left node of grand-parent => mirror scenario */
-				{
-					
+				{					
 					uncle = k->parent->parent->right;
 					if (uncle && uncle->color == RED) /* Uncle red, switch colors */
 					{
@@ -305,13 +304,33 @@ class RBTree
 			if (replacement != nullptr)
 				replacement->parent = node->parent;
 		}
+
+		/* Size is size of left tree + size of right tree + 1 (parent) */
+		size_t size(node_pointer node)
+		{
+			if (node == nullptr)
+				return (0);
+			return (size(node->left) + size(node->right) + 1);
+		}
+
+		/* Recursive call to clear tree, from leaves to root */
+		void clear(node_pointer node)
+		{
+			if (node == nullptr)
+				return;
+			
+			clear(node->left);
+			clear(node->right);
+
+			deleteNode(node);
+		}
 		
 	public:
 
 		RBTree() : _root(nullptr) { }	// NULL is typically convertible to int, nullptr only to pointers
 
 		/* Insert as in any Binary Search Tree, then fix the RBT violations if any */
-		void insert(T val)
+		void insert(const T& val)
 		{
 			node_pointer node = createNode(val);
 
@@ -330,7 +349,7 @@ class RBTree
 			while (curr_node != nullptr)
 			{
 				parent = curr_node;
-				if (comp(node->data, curr_node->data)) /* node < curr_node */
+				if (comp(*(node->data), *(curr_node->data))) /* node < curr_node */
 					curr_node = curr_node->left;
 				else
 					curr_node = curr_node->right;
@@ -338,7 +357,7 @@ class RBTree
 
 			/* Here curr_node is a leaf (NULL), and parent is the parent of that leaf */
 			node->parent = parent; /* Set parent */
-			if (comp(node->data, parent->data)) /* Set child */
+			if (comp(*(node->data), *(parent->data))) /* Set child */
 				parent->left = node;
 			else
 				parent->right = node;
@@ -400,7 +419,7 @@ class RBTree
 				this->fixDeleteViolations(newNode);
 		}
 		
-		void remove(T val)
+		void remove(const T& val)
 		{
 			node_pointer node = this->search(val);
 
@@ -408,16 +427,17 @@ class RBTree
 				this->remove(node);
 		}
 
-		node_pointer	search(T val)
+		/* Value is equal when comp return false reflexively (rhs !< lhs and lhs !< rhs) */
+		node_pointer	search(const T& val)
 		{
-			if (this->_root == nullptr || this->_root->data == val)
+			if (this->_root == nullptr || *(this->_root->data) == val)
 				return (this->_root);
 
 			node_pointer curr = this->_root;
 			Compare comp;
-			while (curr && curr->data != val)
+			while (curr != nullptr && (!comp(val, *(curr->data) && !comp(*(curr->data), val)))
 			{
-				if (comp(val, curr->data))
+				if (comp(val, *(curr->data)))
 					curr = curr->left;
 				else
 					curr = curr->right;
@@ -434,7 +454,7 @@ class RBTree
 				std::cout << (isLeft ? "├──" : "└──" );
 
 				// print the value of the node
-				std::cout << (node->color == RED ? "R" : "B") <<  node->data << std::endl;
+				std::cout << (node->color == RED ? "R" : "B") <<  *(node->data) << std::endl;
 
 				// enter the next tree level - left and right branch
 				printTree( prefix + (isLeft ? "│   " : "    "), node->left, true);
@@ -443,6 +463,43 @@ class RBTree
 		}
 
 		node_pointer getRoot() { return this->_root; }
+
+		size_t size()
+		{
+			return (size(this->_root));
+		}
+
+		/* Return first in-order element */
+		node_pointer first()
+		{
+			node_pointer curr = this->_root;
+
+			if (curr == nullptr)
+				return (nullptr);
+
+			while (curr->left)
+				curr = curr->left;
+			return (curr);
+		}
+
+		/* Return last in-order element */
+		node_pointer last()
+		{
+			node_pointer curr = this->_root;
+
+			if (curr == nullptr)
+				return (nullptr);
+
+			while (curr->right)
+				curr = curr->right;
+			return (curr);
+		}
+
+		void clear()
+		{
+			clear(this->_root);
+			this->_root = nullptr;
+		}
 };
 
 #endif
