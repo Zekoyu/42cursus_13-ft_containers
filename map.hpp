@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 16:39 by                                             */
+/*   Updated: 11-03-2022 17:20 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ namespace ft
 			template <class Map>
 			class MapIterator;
 
+			class ValueCompare;
+
 			typedef Key								key_type;
 			typedef T								mapped_type;
 			typedef pair<key_type, mapped_type>		value_type;
@@ -40,10 +42,10 @@ namespace ft
 			typedef ValueCompare					value_compare; /* Returns an object that can be used to compare 2 elements, (pair element not key) */
 			typedef Alloc							allocator_type;
 
-			typedef allocator_type::reference		reference;
-			typedef allocator_type::const_reference	const_reference;
-			typedef allocator_type::pointer			pointer;
-			typedef allocator_type::const_pointer	const_pointer;
+			typedef typename allocator_type::reference			reference;
+			typedef typename allocator_type::const_reference	const_reference;
+			typedef typename allocator_type::pointer			pointer;
+			typedef typename allocator_type::const_pointer		const_pointer;
 		
 			/* When dereferencing iterator we access a std::pair<Key, T>, just like vector access T */
 			typedef MapIterator< map<Key, T, Compare, Alloc> >				iterator;
@@ -52,8 +54,8 @@ namespace ft
 			typedef ft::reverse_iterator<const_iterator>					const_reverse_iterator;
 
 			/* Identical to iterator_traits<iterator>::size_type/difference_type */
-			typedef ft::iterator_traits<iterator>::difference_type	difference_type;
-			typedef ft::iterator_traits<iterator>::size_type		size_type;
+			typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
+			typedef size_t													size_type;
 	
 		private:
 			typedef typename RBTree<value_type, Compare>::node_pointer			node_pointer;
@@ -91,14 +93,14 @@ namespace ft
 					return (ft::make_pair(iterator(alreadyExists), false));
 				
 				this->_tree.insert(val);
-				return (ft::make_pair(this->_tree.search(val), true));
+				return (ft::make_pair(iterator(this->_tree.search(val)), true));
 			}
 
 			/* Insert as close to position as possible (to optimize insertion we give hint) \.
 			   Since we don't want our container to be fully optimized, just call insert coz im lazy */
 			iterator insert(iterator position, const value_type& val)
 			{
-				return (this->insert(val).first());
+				return (this->insert(val).first);
 			}
 
 			template <class InputIterator>
@@ -165,7 +167,8 @@ namespace ft
 					/* Work like: 'ValueCompare comp; comp(pouet, pouet) == true' */
 					bool operator()(value_type lhs, value_type rhs)
 					{
-						return (_comp(lhs.first(), rhs.first()));
+						Compare comp;
+						return (comp(lhs.first, rhs.first));
 					}
 			};
 
@@ -210,7 +213,7 @@ namespace ft
 			{
 				node_pointer curr = this->_tree.getRoot();
 				
-				while (curr != nullptr && !_comp(curr->data->first(), k))
+				while (curr != nullptr && !_comp(curr->data->first, k))
 					curr = this->_tree.next_inorder(curr);
 				
 				if (curr == nullptr)
@@ -223,7 +226,7 @@ namespace ft
 			{
 				node_pointer curr = this->_tree.getRoot();
 				
-				while (curr != nullptr && !_comp(curr->data->first(), k))
+				while (curr != nullptr && !_comp(curr->data->first, k))
 					curr = this->_tree.next_inorder(curr);
 				
 				if (curr == nullptr)
@@ -236,7 +239,7 @@ namespace ft
 			{
 				node_pointer curr = this->_tree.getRoot();
 
-				while (curr != nullptr && _comp(k, curr->data->first()))
+				while (curr != nullptr && _comp(k, curr->data->first))
 					curr = this->_tree.next_inorder(curr);
 				
 				if (curr == nullptr)
@@ -247,7 +250,7 @@ namespace ft
 			{
 				node_pointer curr = this->_tree.getRoot();
 
-				while (curr != nullptr && _comp(k, curr->data->first()))
+				while (curr != nullptr && _comp(k, curr->data->first))
 					curr = this->_tree.next_inorder(curr);
 				
 				if (curr == nullptr)
@@ -285,11 +288,16 @@ namespace ft
 					typedef ptrdiff_t	difference_type;
 					typedef size_t		size_type;
 
+					MapIterator(node_pointer node) : _node(node) { }
+					
 					MapIterator()
+					{
+
+					}
 
 				private:
 					node_pointer _node;
-			}
+			};
 
 
 	};

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 10-03-2022 14:37 by                                             */
+/*   Updated: 11-03-2022 16:49 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ namespace ft
 	template <class T1, class T2>
 	struct pair
 	{
-		typedef T1	first_type;
-		typedef T2	second_type;
+		typedef T1 first_type;
+		typedef T2 second_type;
 
 		T1	first;
 		T2	second;

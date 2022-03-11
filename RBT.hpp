@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 16:25 by                                             */
+/*   Updated: 11-03-2022 17:20 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,9 @@ class RBTree
 
 		/* Nodes are red by default to not violate black depth property,
 		and it's easier to fix wrong red nodes than to find where to create black nodes */
-		node_pointer createNode(T value) /* Non-static since T is template dependant */
+		node_pointer createNode(const T& value) /* Non-static since T is template dependant */
 		{
-			node_pointer node = new(RBNode<T>());
+			node_pointer node = new RBNode<T>();
 			node->data = this->_alloc.allocate(1);
 			this->_alloc.construct(node->data, value);
 			return (node);
@@ -306,21 +306,21 @@ class RBTree
 		}
 
 		/* Size is size of left tree + size of right tree + 1 (parent) */
-		size_t size(node_pointer node)
+		size_t recur_size(node_pointer node) const
 		{
 			if (node == nullptr)
 				return (0);
-			return (size(node->left) + size(node->right) + 1);
+			return (recur_size(node->left) + recur_size(node->right) + 1);
 		}
 
 		/* Recursive call to clear tree, from leaves to root */
-		void clear(node_pointer node)
+		void recur_clear(node_pointer node)
 		{
 			if (node == nullptr)
 				return;
 			
-			clear(node->left);
-			clear(node->right);
+			recur_clear(node->left);
+			recur_clear(node->right);
 
 			deleteNode(node);
 		}
@@ -373,6 +373,8 @@ class RBTree
 			if (node == nullptr)
 				return ;
 
+			std::cout << "Trying to remove " << node->data->first << std::endl;
+			
 			int originalColor = node->color;
 			node_pointer newNode = nullptr;
 			
@@ -422,55 +424,65 @@ class RBTree
 		void remove(const T& val)
 		{
 			node_pointer node = this->search(val);
-
+			
 			if (node != nullptr)
 				this->remove(node);
 		}
 
 		/* Value is equal when comp return false reflexively (rhs !< lhs and lhs !< rhs) */
-		node_pointer	search(const T& val)
+		node_pointer	search(const T& val) const
 		{
-			if (this->_root == nullptr || *(this->_root->data) == val)
+			Compare comp;
+
+			if (this->_root == nullptr || (!comp(val, *(this->_root->data)) && !comp(*(this->_root->data), val)))
 				return (this->_root);
 
+
 			node_pointer curr = this->_root;
-			Compare comp;
-			while (curr != nullptr && (!comp(val, *(curr->data) && !comp(*(curr->data), val)))
+
+			/* While not NULL and not equal */
+			while (curr != nullptr && !(!comp(val, *(curr->data)) && !comp(*(curr->data), val)))
 			{
 				if (comp(val, *(curr->data)))
+				{
 					curr = curr->left;
+					//std::cout << "Left\n";
+				}
 				else
+				{
 					curr = curr->right;
+					//std::cout << "Right\n";
+				}
 			}
 			return (curr); /* Either node / NULL */
 		}
 
-		void printTree(const std::string& prefix, node_pointer node, bool isLeft = false)
+		// void printTree(const std::string& prefix, node_pointer node, bool isLeft = false) const
+		// {
+		// 	if( node != nullptr )
+		// 	{
+		// 		std::cout << prefix;
+
+		// 		std::cout << (isLeft ? "├──" : "└──" );
+
+		// 		// print the value of the node
+		// 		std::cout << (node->color == RED ? "R" : "B") <<  *(node->data) << std::endl;
+
+		// 		// enter the next tree level - left and right branch
+		// 		printTree( prefix + (isLeft ? "│   " : "    "), node->left, true);
+		// 		printTree( prefix + (isLeft ? "│   " : "    "), node->right, false);
+		// 	}
+		// }
+
+		node_pointer getRoot() const { return (this->_root); }
+
+		size_t size() const
 		{
-			if( node != nullptr )
-			{
-				std::cout << prefix;
-
-				std::cout << (isLeft ? "├──" : "└──" );
-
-				// print the value of the node
-				std::cout << (node->color == RED ? "R" : "B") <<  *(node->data) << std::endl;
-
-				// enter the next tree level - left and right branch
-				printTree( prefix + (isLeft ? "│   " : "    "), node->left, true);
-				printTree( prefix + (isLeft ? "│   " : "    "), node->right, false);
-			}
-		}
-
-		node_pointer getRoot() { return this->_root; }
-
-		size_t size()
-		{
-			return (size(this->_root));
+			return (recur_size(this->_root));
 		}
 
 		/* Return first in-order element */
-		node_pointer first()
+		node_pointer first() const
 		{
 			node_pointer curr = this->_root;
 
@@ -483,7 +495,7 @@ class RBTree
 		}
 
 		/* Return last in-order element */
-		node_pointer last()
+		node_pointer last() const
 		{
 			node_pointer curr = this->_root;
 
@@ -497,11 +509,11 @@ class RBTree
 
 		void clear()
 		{
-			clear(this->_root);
+			recur_clear(this->_root);
 			this->_root = nullptr;
 		}
 
-		node_pointer next_inorder(node_pointer node)
+		node_pointer next_inorder(node_pointer node) const
 		{
 			if (node == nullptr)
 				return (nullptr);
@@ -525,8 +537,6 @@ class RBTree
 
 			return (node);
 		}
-
-		node_pointer getRoot() { return (this->_root); }
 };
 
 #endif

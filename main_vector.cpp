@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 10:05 by                                             */
+/*   Updated: 11-03-2022 16:42 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,7 +299,7 @@ void	modifyContent(Iterator begin, Iterator end)
 
 int main()
 {
-	typedef VECTOR_TYPE					vector_type;
+	typedef VECTOR_TYPE				vector_type;
 	typedef ft::vector<vector_type>	vector;
 	
 	vector	v;
