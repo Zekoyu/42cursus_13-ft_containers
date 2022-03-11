@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 10-03-2022 15:48 by                                             */
+/*   Updated: 11-03-2022 10:04 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -312,7 +312,7 @@ namespace ft
 			  			typename InputIterator::value_type* pouet = NULL)
 			{
 				(void) pouet;
-				
+
 				size_type n = this->distance(first, last);
 				size_type index = this->distance(this->begin(), position);
 
@@ -494,6 +494,12 @@ namespace ft
 					VectIterator&	operator-=(difference_type n)
 					{
 						this->_ptr -= n;
+						return (*this);
+					}
+
+					VectIterator&	operator=(const VectIterator &rhs)
+					{
+						this->_ptr = rhs._ptr;
 						return (*this);
 					}
 
