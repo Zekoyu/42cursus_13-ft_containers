@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 14:42 by                                             */
+/*   Updated: 11-03-2022 14:54 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ namespace ft
 			typedef T								mapped_type;
 			typedef pair<key_type, mapped_type>		value_type;
 			typedef Compare							key_compare;
-			typedef value_comp						value_compare; /* Returns an object that can be used to compare 2 elements, (pair element not key) */
+			typedef ValueCompare					value_compare; /* Returns an object that can be used to compare 2 elements, (pair element not key) */
 			typedef Alloc							allocator_type;
 
 			typedef allocator_type::reference		reference;
@@ -158,8 +158,41 @@ namespace ft
 			/* Observers */
 			key_compare key_comp() const { return (key_comp()); }
 
-			value_compare value_comp() const { return (value_comp()); }
+			/* Compare using value (pair) instead of key */
+			class ValueCompare
+			{
+				public:
+					/* Work like: 'ValueCompare comp; comp(pouet, pouet) == true' */
+					bool operator()(value_type lhs, value_type rhs)
+					{
+						return (_comp(lhs.first(), rhs.first()));
+					}
+			};
 
+			value_compare value_comp() const { return (ValueCompare()); }
+
+			/* Operations */
+			iterator find (const key_type& k)
+			{
+				value_type  tmp_pair(k, mapped_type());
+
+				node_pointer value = this->_tree.search(tmp_pair);
+				if (value == nullptr)
+					return (this->end());
+				
+				return (iterator(value));
+			}
+
+			const_iterator find (const key_type& k) const
+			{
+				value_type  tmp_pair(k, mapped_type());
+
+				node_pointer value = this->_tree.search(tmp_pair);
+				if (value == nullptr)
+					return (this->end());
+				
+				return (const_iterator(value));
+			}
 
 			template <typename Pair>
 			class MapIterator
