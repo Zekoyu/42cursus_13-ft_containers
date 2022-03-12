@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 18:22 by                                             */
+/*   Updated: 12-03-2022 18:46 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,8 +267,8 @@ namespace ft
 					this->reserve(1);
 				else if (this->_size + 1 > this->_capacity)
 					this->reserve(this->_capacity * 2);
-				
-				for (size_type i = this->_size - 1; i >= index; --i) /* Move everything and destroy the value at index */
+
+				for (size_type i = this->_size; i >= index; --i) /* Move everything and destroy the value at index */
 				{
 					this->_alloc.construct(this->_ptr + i + 1, this->_ptr[i]);
 					this->_alloc.destroy(this->_ptr + i);
@@ -289,7 +289,7 @@ namespace ft
 				while (this->_size + n > this->_capacity) /* while instead of if in case we want to add many many values */
 					this->reserve(this->_capacity * 2);
 
-				for (size_type i = this->_size - 1; i >= (index + n); --i) /* Move everything and destroy the value at index */
+				for (size_type i = this->_size; i >= index; --i) /* Move everything and destroy the value at index */
 				{
 					this->_alloc.construct(this->_ptr + i + n, this->_ptr[i]); /* Same as above except instead of moving 1 we move n to the right */
 					this->_alloc.destroy(this->_ptr + i);
@@ -320,7 +320,7 @@ namespace ft
 					this->reserve(this->_capacity * 2);
 					
 				/* Move everything, leave n unconstructed values */
-				for (size_type i = this->_size - 1; i >= index; --i)
+				for (size_type i = this->_size; i >= index; --i)
 				{
 					this->_alloc.construct(this->_ptr + i + n, this->_ptr[i]);
 					this->_alloc.destroy(this->_ptr + i);
