@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 16:42 by                                             */
+/*   Updated: 12-03-2022 14:29 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ template <typename Vector>
 void	reverse_print_vector(Vector v)
 {
 	std::cout << "Reverse vector content: ";
-	for (typename Vector::reverse_iterator it = v.rbegin(); it != v.rend(); it++)
+	for (typename Vector::reverse_iterator it = v.rbegin(); it != v.rend(); ++it)
 		std::cout << *it << " ";
 	std::cout << std::endl;
 }
@@ -71,7 +71,7 @@ void	test_vector(Vector v)
 	std::cout << "Capacity=" << v.capacity() << ", Size=" << v.size() << std::endl;
 	std::cout << "Empty ? " << v.empty() << std::endl;
 	print_vector(v);
-	reverse_print_vector(v);
+	reverse_print_vector<Vector>(v);
 	std::cout << std::endl;
 
 	std::cout << "Resizing vector to 10" << std::endl;
@@ -312,6 +312,6 @@ int main()
 
 //	std::cout << "Len: " << (v1.end() - v1.begin()) << std::endl; 
 	
-	//test_vector<vector>(v);
+	test_vector<vector>(v);
 	//modifyContent(v.begin(), v.end());
 }

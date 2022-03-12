@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 14:07 by                                             */
+/*   Updated: 12-03-2022 14:58 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ class RBTree
 	private:
 		RBNode<T>*	_root;
 		Alloc		_alloc;
-		RBNode<T>* _end;
+		RBNode<T>*  _end;
 
 	private:
 
@@ -361,36 +361,41 @@ class RBTree
 			deleteNode(node);
 		}
 
-		void setEndNode() const
-		{
-			node_pointer curr = this->_root;
-			node_pointer last = this->_root;
-			
-			//if (curr == nullptr)
-			//{
-			//	deleteEnd();
-			//	return ;
-			//}
-
-			while (next_inorder(curr) != nullptr)
-			{
-				last = curr;
-				curr = next_inorder(curr);
-			}
-
-			//if (this->_end == nullptr)
-			//{
-			//	this->_end = createNode(T());
-			//	this->_end->left = this->_end;
-			//}
-
-			last->right = this->_end;
-			this->_end->parent = last;			
-		}
+		//void setEndNode() const
+		//{
+		//	node_pointer curr = this->_root;
+		//	node_pointer last = this->_root;
+		//	
+		//	//if (curr == nullptr)
+		//	//{
+		//	//	deleteEnd();
+		//	//	return ;
+		//	//}
+//
+		//	while (inOrderNext(curr) != nullptr)
+		//	{
+		//		last = curr;
+		//		curr = inOrderNext(curr);
+		//	}
+//
+		//	//if (this->_end == nullptr)
+		//	//{
+		//	//	this->_end = createNode(T());
+		//	//	this->_end->left = this->_end;
+		//	//}
+//
+		//	//last->right = this->_end;
+		//	this->_end->parent = last;			
+		//}
 		
 	public:
 
-		RBTree() : _root(nullptr), _end(nullptr) { }	// NULL is typically convertible to int, nullptr only to pointers
+		/* End.left is the root, and end.right is end itself */
+		RBTree() : _root(nullptr), _end(createNode(T()))
+		{
+			this->_end->left = this->_root;
+			this->_end->right = this->_end;
+		}
 
 		/* Insert as in any Binary Search Tree, then fix the RBT violations if any */
 		void insert(const T& val)
@@ -431,6 +436,9 @@ class RBTree
 
 			//this->fixRBTProperties(node);
 			this->fixInsertionViolations(node);
+
+			this->_end->parent = this->last();
+
 			// this->setEndNode();
 		}
 
@@ -487,6 +495,7 @@ class RBTree
 			if (originalColor == BLACK)
 				this->fixDeleteViolations(newNode);
 
+			this->_end->parent = this->last();
 			// this->setEndNode();
 		}
 		
@@ -592,9 +601,10 @@ class RBTree
 		{
 			recursiveClear(this->_root);
 			this->_root = nullptr;
+			this->_end->parent = nullptr;
 		}
 
-		static node_pointer next_inorder(node_pointer node)
+		static node_pointer inOrderNext(node_pointer node)
 		{
 			if (node == nullptr)
 				return (nullptr);
@@ -623,8 +633,8 @@ class RBTree
 			return (node);
 		}
 
-		/* Basically a mirror of next_inorder */
-		static node_pointer prev_inorder(node_pointer node)
+		/* Basically a mirror of inOrderNext */
+		static node_pointer inOrderPrev(node_pointer node)
 		{
 			if (node == nullptr)
 				return (nullptr);
@@ -649,7 +659,7 @@ class RBTree
 			return (node);
 		}
 
-		node_pointer end()
+		node_pointer end() const
 		{
 			return (this->_end);
 		}

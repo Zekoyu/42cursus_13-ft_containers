@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 12:37 by                                             */
+/*   Updated: 12-03-2022 14:28 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -416,12 +416,6 @@ namespace ft
 					VectIterator(const VectIterator& v) : _ptr(v._ptr) { }
 					~VectIterator() { }
 
-					VectIterator& operator=(const VectIterator& v)
-					{
-						this->_ptr = v._ptr;
-						return (*this);
-					}
-					
 					VectIterator&	operator++() /* prefix */
 					{
 						++this->_ptr;

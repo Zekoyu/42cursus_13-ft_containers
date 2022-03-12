@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 14:02 by                                             */
+/*   Updated: 12-03-2022 14:59 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,7 @@ namespace ft
 				node_pointer curr = this->_tree.getRoot();
 				
 				while (curr != nullptr && !_comp(curr->data->first, k))
-					curr = this->_tree.next_inorder(curr);
+					curr = this->_tree.inOrderNext(curr);
 				
 				if (curr == nullptr)
 					return (this->end());
@@ -241,7 +241,7 @@ namespace ft
 				node_pointer curr = this->_tree.getRoot();
 				
 				while (curr != nullptr && !_comp(curr->data->first, k))
-					curr = this->_tree.next_inorder(curr);
+					curr = this->_tree.inOrderNext(curr);
 				
 				if (curr == nullptr)
 					return (this->end());
@@ -254,7 +254,7 @@ namespace ft
 				node_pointer curr = this->_tree.getRoot();
 
 				while (curr != nullptr && _comp(k, curr->data->first))
-					curr = this->_tree.next_inorder(curr);
+					curr = this->_tree.inOrderNext(curr);
 				
 				if (curr == nullptr)
 					return (iterator(this->end()));
@@ -265,7 +265,7 @@ namespace ft
 				node_pointer curr = this->_tree.getRoot();
 
 				while (curr != nullptr && _comp(k, curr->data->first))
-					curr = this->_tree.next_inorder(curr);
+					curr = this->_tree.inOrderNext(curr);
 				
 				if (curr == nullptr)
 					return (const_iterator(this->end()));
@@ -294,6 +294,42 @@ namespace ft
 					typedef typename RBTree<value_type, Compare>::node_pointer					node_pointer;
 					typedef RBTree<value_type, Compare, Alloc>									tree;
 
+					/* end.left is root, end.right is end */
+					static bool isEndNode(node_pointer node)
+					{
+						return (node == nullptr || node->right == node);
+					}
+
+					node_pointer findRoot(node_pointer node)
+					{
+						if (node == nullptr)
+							return (nullptr);
+
+						if (isEndNode(node))
+							return (node->left);
+
+						if (node->parent == nullptr) /* Node IS the root */
+							return (node);
+
+						while (node->parent != nullptr)
+							node = node->parent;
+						
+						return (node);
+					}
+
+					node_pointer findLast(node_pointer root)
+					{
+						if (root == nullptr)
+							return (nullptr);
+
+
+						while (tree::inOrderNext(root) != nullptr)
+							root = tree::inOrderNext(root);
+
+						return (root);
+					}
+
+
 				public:
 					typedef typename iterator::iterator_category	iterator_category;
 					typedef typename iterator::value_type			value_type;
@@ -303,9 +339,9 @@ namespace ft
 					typedef ptrdiff_t	difference_type;
 					typedef size_t		size_type;
 
-					MapIterator(node_pointer node) : _node(node), _last(nullptr) { }
-					MapIterator() : _node(nullptr), _last(nullptr) { }
-					MapIterator(const MapIterator& m) : _node(m._node), _last(nullptr) { }
+					MapIterator(node_pointer node) : _node(node), _root(this->findRoot(_node)) { }
+					MapIterator() : _node(nullptr), _root(this->findRoot(_node)) { }
+					MapIterator(const MapIterator& m) : _node(m._node), _root(this->findRoot(_node)) { }
 					~MapIterator() { }
 
 					MapIterator& operator=(const MapIterator& m)
@@ -323,20 +359,7 @@ namespace ft
 					/* If we are past-the end, save the last element and set to null, then if we want to go back, node = last */
 					MapIterator& operator++()
 					{
-						// std::cout << "++Begin\n";
-						// if (tree::next_inorder(this->_node) == nullptr)
-						// {
-						// 	std::cout << "Next is end\n";
-						// 	this->_last = tree::next_inorder(this->_node);
-						// 	this->_node = map::end()._node;
-						// 	return (*this);
-						// }
-
-						if (tree::next_inorder(this->_node) == nullptr)
-							this->_node = this->_node->right; /* Set node to end */
-						else
-							this->_node = tree::next_inorder(this->_node);
-						//std::cout << "++End\n";
+						this->_node = tree::inOrderNext(this->_node);
 						return (*this);
 					}
 
@@ -349,10 +372,10 @@ namespace ft
 
 					MapIterator& operator--()
 					{
-						//if (this->_node == nullptr && this->_last != nullptr)
-						//	this->_node = this->_last;
-						//else
-						this->_node = tree::prev_inorder(this->_node);
+						if (this->_node == nullptr)
+							this->_node = this->findLast(this->_root);
+						else
+							this->_node = tree::inOrderPrev(this->_node);
 						return (*this);
 					}
 
@@ -363,12 +386,19 @@ namespace ft
 						return (tmp);
 					}
 
-					friend bool operator==(const MapIterator& lhs, const MapIterator& rhs) { return (lhs._node == rhs._node); }
+					/* Check if either both nodes are equal, or if it's on the end node */
+					friend bool operator==(const MapIterator& lhs, const MapIterator& rhs)
+					{
+						if (isEndNode(lhs._node) || isEndNode(rhs._node))
+							return (isEndNode(lhs._node) && isEndNode(rhs._node));
+
+						return (lhs._node == rhs._node);
+					}
 					friend bool operator!=(const MapIterator& lhs, const MapIterator& rhs) { return (!(lhs == rhs)); }
 
 				private:
 					node_pointer _node;
-					node_pointer _last;
+					node_pointer _root;
 			};
 
 
