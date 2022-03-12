@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 18:46 by                                             */
+/*   Updated: 12-03-2022 20:34 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ namespace ft
 		public:
 			class iterator;
 			class const_iterator;
+			class reverse_iterator;
+			class const_reverse_iterator;
 
 			typedef T											value_type;
 			typedef Allocator									allocator_type;
@@ -40,8 +42,8 @@ namespace ft
 
 			/* if we define a non-const vector and call vector::const_iterator it = begin(), compiler has no way to know we want const version
 			   https://stackoverflow.com/questions/2844339/c-iterator-and-const-iterator-problem-for-own-container-class */
-			typedef ft::reverse_iterator<iterator>			reverse_iterator;
-			typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+			//typedef ft::reverse_iterator<iterator>			reverse_iterator;
+			//typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 			/* Identical to iterator_traits<iterator>::size_type/difference_type */
 			typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
@@ -109,11 +111,17 @@ namespace ft
 			iterator		end() { return (iterator(this->_ptr + _size)); }
 			const_iterator	end() const { return (const_iterator(this->_ptr + _size)); }
 
-			reverse_iterator		rbegin() { return (ft::reverse_iterator<iterator>(this->end())); } /* Returns reverse iterator starting from vector.end() */
-			const_reverse_iterator	rbegin() const { return (ft::reverse_iterator<const_iterator>(this->end())); } /* Same but const */
+			reverse_iterator		rbegin() { return (reverse_iterator(this->end())); }
+			const_reverse_iterator	rbegin() const { return (const_reverse_iterator(this->end())); }
 
-			reverse_iterator		rend() { return (ft::reverse_iterator<iterator>(this->begin())); } /* Same but starting at vector.begin() */
-			const_reverse_iterator	rend() const { return (ft::reverse_iterator<const_iterator>(this->begin())); }  /* Again same but const */
+			reverse_iterator		rend() { return (reverse_iterator(this->begin())); }
+			const_reverse_iterator	rend() const { return (const_reverse_iterator(this->begin())); }
+
+			//reverse_iterator		rbegin() { return (ft::reverse_iterator<iterator>(this->end())); } /* Returns reverse iterator starting from vector.end() */
+			//const_reverse_iterator	rbegin() const { return (ft::reverse_iterator<const_iterator>(this->end())); } /* Same but const */
+
+			//reverse_iterator		rend() { return (ft::reverse_iterator<iterator>(this->begin())); } /* Same but starting at vector.begin() */
+			//const_reverse_iterator	rend() const { return (ft::reverse_iterator<const_iterator>(this->begin())); }  /* Again same but const */
 	
 			size_type	size() const { return (this->_size); }
 			/* This value typically reflects the theoretical limit on the size of the container, at most std::numeric_limits<difference_type>::max()
@@ -396,13 +404,14 @@ namespace ft
 
 			/* Iterator */
 			/* See https://gist.github.com/jeetsukumaran/307264 */
-			class iterator : public ft::iterator<ft::random_access_iterator_tag, T> /* Only define 2 types since the 3 other default values are those we want */
+			class iterator
 			{
 				private:
 					typedef size_t		size_type;
 					typedef iterator	self_type; /* Used to that we can copypasta for const_iterator and modify only here */
 					typedef ft::iterator<ft::random_access_iterator_tag, T>	it;
-				
+					friend class const_iterator; /* For relational operators */
+
 				public:
 					typedef typename it::iterator_category					iterator_category;
 					typedef typename it::value_type							value_type;
@@ -412,7 +421,12 @@ namespace ft
 
 				public:
 					iterator(pointer ptr) : _ptr(ptr) { }
+					iterator() : _ptr(NULL) { }
+					iterator(const iterator& it) : _ptr(it._ptr) { }
+					~iterator() { }
+					iterator& operator=(const iterator& it) { this->_ptr = it._ptr; return (*this); }
 
+					/* Allow to convert from iterator to const_iterator, though not the other way around */
 					operator const_iterator() const { return (const_iterator(this->_ptr)); }
 
 					self_type& operator++() /* prefix */
@@ -444,7 +458,7 @@ namespace ft
 					/* Returns a reference to the type held, same as T& */
 					reference operator[](size_type index)
 					{
-						return (*(this->_ptr[index]));
+						return (this->_ptr[index]);
 					}
 
 					/* Calling Foo->x becomes the same as Foo.operator->()->x  or *(Foo.operator->()x)
@@ -461,9 +475,13 @@ namespace ft
 
 					self_type operator+(difference_type n) const
 					{
-						self_type tmp = *this;
-						tmp._ptr += n;
-						return (tmp);
+						return (self_type(n + *this));
+					}
+
+					/* For the tester, 1 + it ... */
+					friend self_type operator+(difference_type n, const self_type& rhs)
+					{
+						return (self_type(n + rhs._ptr));
 					}
 
 					self_type operator+(const self_type& r) const
@@ -498,6 +516,22 @@ namespace ft
 					}
 
 					/* Relational operators */
+					/* Version with const and non-const iterators, a smarter way would be for both to inherit from the same class */
+					bool operator==(const const_iterator& it) const { return (this->_ptr == it._ptr); }
+					bool operator!=(const const_iterator& it) const { return (this->_ptr != it._ptr); }
+					bool operator<(const const_iterator& it) const { return (this->_ptr < it._ptr); } 
+					bool operator<=(const const_iterator& it) const { return (this->_ptr <= it._ptr); }
+					bool operator>(const const_iterator& it) const { return (this->_ptr > it._ptr); }
+					bool operator>=(const const_iterator& it) const { return (this->_ptr >= it._ptr); }
+
+					bool operator==(const iterator& it) const { return (this->_ptr == it._ptr); }
+					bool operator!=(const iterator& it) const { return (this->_ptr != it._ptr); }
+					bool operator<(const iterator& it) const { return (this->_ptr < it._ptr); } 
+					bool operator<=(const iterator& it) const { return (this->_ptr <= it._ptr); }
+					bool operator>(const iterator& it) const { return (this->_ptr > it._ptr); }
+					bool operator>=(const iterator& it) const { return (this->_ptr >= it._ptr); }
+
+					/* Old version, does not allow for comparison between const iterator and iterator, new one does with implicit cast
 					friend bool operator==(const self_type& rhs, const self_type& lhs)
 					{
 						return (rhs._ptr == lhs._ptr);
@@ -527,6 +561,7 @@ namespace ft
 					{
 						return (rhs <= lhs);
 					}
+					*/
 
 				private:
 					pointer	_ptr;
@@ -534,25 +569,29 @@ namespace ft
 
 			/* Const iterator, almost the same as iterator */
 			/* See https://gist.github.com/jeetsukumaran/307264 */
-			class const_iterator : public ft::iterator<ft::random_access_iterator_tag, const T> /* Only define 2 types since the 3 other default values are those we want */
+			class const_iterator
 			{
 				private:
 					typedef size_t				size_type;
 					typedef const_iterator		self_type; /* Used to that we can copypasta for const_iterator and modify only here */
 					typedef ft::iterator<ft::random_access_iterator_tag, const T>	it;
-				
-				public:
-					typedef typename it::iterator_category							iterator_category;
-					typedef const typename it::value_type							value_type;
-					typedef const typename it::difference_type						difference_type;
-					typedef const typename it::pointer								pointer;
-					typedef const typename it::reference							reference;
-
-				public:
-					const_iterator(T* ptr) : _ptr(ptr) { }
+					friend class iterator; /* For relational operators */
 					
-					operator iterator() const { return (iterator(this->_ptr)); }
+				public:
+					typedef typename it::iterator_category		iterator_category;
+					typedef typename it::value_type				value_type;
+					typedef typename it::difference_type		difference_type;
+					typedef typename it::pointer				pointer;
+					typedef typename it::reference				reference;
 
+				public:
+					const_iterator(T* ptr) : _ptr(ptr) { } /* Pointer classic */
+					const_iterator(pointer ptr) : _ptr(ptr) { } /* Pointer to const */
+					const_iterator() : _ptr(NULL) { }
+					const_iterator(const const_iterator& it) : _ptr(it._ptr) { }
+					~const_iterator() { }
+					const_iterator& operator=(const const_iterator& it) { this->_ptr = it._ptr; return (*this); }
+					
 					self_type& operator++() /* prefix */
 					{
 						++this->_ptr;
@@ -582,7 +621,7 @@ namespace ft
 					/* Returns a reference to the type held, same as T& */
 					reference operator[](size_type index)
 					{
-						return (*(this->_ptr[index]));
+						return (this->_ptr[index]);
 					}
 
 					/* Calling Foo->x becomes the same as Foo.operator->()->x  or *(Foo.operator->()x)
@@ -599,9 +638,13 @@ namespace ft
 
 					self_type operator+(difference_type n) const
 					{
-						self_type tmp = *this;
-						tmp._ptr += n;
-						return (tmp);
+						return (self_type(n + *this));
+					}
+
+					/* For the tester, 1 + it ... */
+					friend self_type operator+(difference_type n, const self_type& rhs)
+					{
+						return (self_type(n + rhs._ptr));
 					}
 
 					self_type operator+(const self_type& r) const
@@ -636,38 +679,54 @@ namespace ft
 					}
 
 					/* Relational operators */
-					friend bool operator==(const self_type& rhs, const self_type& lhs)
-					{
-						return (rhs._ptr == lhs._ptr);
-					}
+					/* Version with const and non-const iterators, a smarter way would be for both to inherit from the same class */
+					bool operator==(const const_iterator& it) const { return (this->_ptr == it._ptr); }
+					bool operator!=(const const_iterator& it) const { return (this->_ptr != it._ptr); }
+					bool operator<(const const_iterator& it) const { return (this->_ptr < it._ptr); } 
+					bool operator<=(const const_iterator& it) const { return (this->_ptr <= it._ptr); }
+					bool operator>(const const_iterator& it) const { return (this->_ptr > it._ptr); }
+					bool operator>=(const const_iterator& it) const { return (this->_ptr >= it._ptr); }
 
-					friend bool operator!=(const self_type& rhs, const self_type& lhs)
-					{
-						return (!(rhs == lhs));
-					}
-
-					friend bool operator>(const self_type& rhs, const self_type& lhs)
-					{
-						return (rhs > lhs);
-					}
-
-					friend bool operator>=(const self_type& rhs, const self_type& lhs)
-					{
-						return (rhs >= lhs);
-					}
-
-					friend bool operator<(const self_type& rhs, const self_type& lhs)
-					{
-						return (rhs < lhs);
-					}
-
-					friend bool operator<=(const self_type& rhs, const self_type& lhs)
-					{
-						return (rhs <= lhs);
-					}
-
+					bool operator==(const iterator& it) const { return (this->_ptr == it._ptr); }
+					bool operator!=(const iterator& it) const { return (this->_ptr != it._ptr); }
+					bool operator<(const iterator& it) const { return (this->_ptr < it._ptr); } 
+					bool operator<=(const iterator& it) const { return (this->_ptr <= it._ptr); }
+					bool operator>(const iterator& it) const { return (this->_ptr > it._ptr); }
+					bool operator>=(const iterator& it) const { return (this->_ptr >= it._ptr); }
+					
 				private:
 					T*	_ptr;
+			};
+
+			class reverse_iterator : public ft::reverse_iterator<iterator>
+			{
+				private:
+					typedef reverse_iterator				self_type;
+					typedef ft::reverse_iterator<iterator>	rit;
+					
+				public:
+					/* Same prototypes, see cplusplus.com */
+					reverse_iterator() { }
+					explicit reverse_iterator(iterator it) { this->_it = it; }
+
+					/* Same as iterators, allow conversion from reverse to const reverse */
+					operator const_reverse_iterator() const { return (const_reverse_iterator(this->base())); }
+
+					/* With the exception of operator=(), all operator are inherited */
+					reverse_iterator& operator=(const rit& rit) { this->_it = rit.base(); return (*this); }
+			};
+
+			class const_reverse_iterator : public ft::reverse_iterator<const_iterator>
+			{
+				private:
+					typedef const_reverse_iterator					self_type;
+					typedef ft::reverse_iterator<reverse_iterator>	rit;
+					
+				public:
+					const_reverse_iterator() { }
+					explicit const_reverse_iterator(const_iterator it) { this->_it = it; }
+
+					const_reverse_iterator& operator=(const rit& rit) { this->operator=(rit); return (*this); }
 			};
 
 			// class VectIterator
@@ -684,10 +743,10 @@ namespace ft
 			// 		typedef ptrdiff_t	difference_type;
 			// 		typedef size_t		size_type;
 
-			// 		VectIterator(pointer ptr) : _ptr(ptr) { }
-			// 		VectIterator() : _ptr(NULL) { }
-			// 		VectIterator(const VectIterator<T> &v) : _ptr(v._ptr) { }
-			// 		~VectIterator() { }
+					// VectIterator(pointer ptr) : _ptr(ptr) { }
+					// VectIterator() : _ptr(NULL) { }
+					// VectIterator(const VectIterator<T> &v) : _ptr(v._ptr) { }
+					// ~VectIterator() { }
 
 			// 		VectIterator&	operator++() /* prefix */
 			// 		{

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 17:33 by                                             */
+/*   Updated: 12-03-2022 20:42 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ namespace ft
 			typedef typename ft::iterator_traits<Iterator>::pointer				pointer;
 			typedef typename ft::iterator_traits<Iterator>::reference			reference;
 
-		private:
+		protected:
 			iterator_type _it;
 
 		public:
@@ -111,11 +111,11 @@ namespace ft
 			/* For a reverse iterator r constructed from an iterator i, the relationship &*r == &*(i-1) is always true (as long as r is dereferenceable);
 			   thus a reverse iterator constructed from a one-past-the-end iterator dereferences to the last element in a sequence,
 			   and a reverse iterator constructed from the begin iterator point to the element before it (which is the past-the-end element in the reversed range) */
-			explicit reverse_iterator (iterator_type it) : _it(it) { }
+			explicit reverse_iterator(iterator_type it) : _it(it) { }
 
 			/* Copy constructor, takes another reverse_iterator of the same type as argument, preserve the sense of iteration */
 			template <class Iter>
-			reverse_iterator (const reverse_iterator<Iter>& rev_it) : _it(rev_it.base()) { }
+			reverse_iterator(const reverse_iterator<Iter>& rev_it) : _it(rev_it.base()) { }
 
 			iterator_type	base() const { return (this->_it); }
 
@@ -128,8 +128,14 @@ namespace ft
 			}
 
 			/* Internally, the function applies the binary operator- on the base iterator and returns a reverse iterator constructed with the resulting iterator value. */
-			reverse_iterator operator+ (difference_type n) const { return (reverse_iterator(this->_it - n)); }
+			reverse_iterator operator+(difference_type n) const { return (reverse_iterator(this->_it - n)); }
 
+			/* For the tester, 1 + it ... */
+			friend reverse_iterator operator+(difference_type n, const reverse_iterator& rhs)
+			{
+				return (rhs + n);
+			}
+					
 			/* Internally, the pre-increment version (1) decrements the base iterator kept by the object (as if applying operator-- to it). */
 			reverse_iterator& operator++()
 			{
@@ -146,14 +152,18 @@ namespace ft
 			}
 
 			/* Internally, the function decreases by n the base iterator kept by the object (as if applying operator-= to it). */
-			reverse_iterator& operator+= (difference_type n)
+			reverse_iterator& operator+=(difference_type n)
 			{
 				this->_it -= n;
 				return (*this);
 			}
 
+			
+
 			/* Decrement operators are the same as increment reversed */
-			reverse_iterator operator- (difference_type n) const { return (reverse_iterator(this->_it + n)); }
+			difference_type operator-(const reverse_iterator& rit) const { return (rit._it - this->_it); };
+
+			reverse_iterator operator-(difference_type n) const { return (reverse_iterator(this->_it.operator+(n))); };
 
 			reverse_iterator& operator--()
 			{
@@ -186,8 +196,18 @@ namespace ft
 			friend bool operator<=(const ft::reverse_iterator<iterator_type>& lhs, const ft::reverse_iterator<iterator_type>& rhs);
 			friend bool operator>(const ft::reverse_iterator<iterator_type>& lhs, const ft::reverse_iterator<iterator_type>& rhs);
 			friend bool operator>=(const ft::reverse_iterator<iterator_type>& lhs, const ft::reverse_iterator<iterator_type>& rhs);
+
+			template <class Iter>
+			reverse_iterator& operator=(const reverse_iterator<Iter>& rit);
 	};
 	
+	template <class Iter> template <class U>
+	reverse_iterator<Iter>& reverse_iterator<Iter>::operator=(const reverse_iterator<U>& u) {
+		this->_it = u.base();
+		return (*this);
+	};
+
+
 	template< class Iterator1, class Iterator2 >
 	bool operator==(const ft::reverse_iterator<Iterator1>& lhs, const ft::reverse_iterator<Iterator2>& rhs)
 	{ return (lhs.base() == rhs.base()); }
