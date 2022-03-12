@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 11:44 by                                             */
+/*   Updated: 12-03-2022 12:37 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,7 +229,7 @@ namespace ft
 			   would not work with a vector of classes for instance */
 			template <class InputIterator>
 			void	assign(InputIterator first, InputIterator last,
-						   typename InputIterator::value_type* pouet = NULL)
+						   typename InputIterator::value_type* pouet = nullptr)
 			{
 				(void) pouet;
 
@@ -309,7 +309,7 @@ namespace ft
 			/* Same as above using range instead of fixed value / size */
 			template <class InputIterator>
   			void insert(iterator position, InputIterator first, InputIterator last,
-			  			typename InputIterator::value_type* pouet = NULL)
+			  			typename InputIterator::value_type* pouet = nullptr)
 			{
 				(void) pouet;
 
@@ -412,7 +412,16 @@ namespace ft
 					typedef size_t		size_type;
 
 					VectIterator(pointer ptr) : _ptr(ptr) { }
+					VectIterator() : _ptr(nullptr) { }
+					VectIterator(const VectIterator& v) : _ptr(v._ptr) { }
+					~VectIterator() { }
 
+					VectIterator& operator=(const VectIterator& v)
+					{
+						this->_ptr = v._ptr;
+						return (*this);
+					}
+					
 					VectIterator&	operator++() /* prefix */
 					{
 						++this->_ptr;
@@ -455,6 +464,11 @@ namespace ft
 					reference	operator*()
 					{
 						return (*this->_ptr); /* operator* has lower precedence than ->/. and associativity is from right to left, so no need for parentheses even if we used *this->value.someOtherValue->data */
+					}
+
+					const_reference operator*() const
+					{
+						return (*this->_ptr);
 					}
 
 					VectIterator	operator+(difference_type n)
@@ -504,34 +518,34 @@ namespace ft
 					}
 
 					/* Relational operators */
-					friend bool	operator==(const VectIterator& rhs, const VectIterator& lhs)
+					friend bool	operator==(const VectIterator& lhs, const VectIterator& rhs)
 					{
-						return (rhs._ptr == lhs._ptr);
+						return (lhs._ptr == rhs._ptr);
 					}
 
-					friend bool	operator!=(const VectIterator& rhs, const VectIterator& lhs)
+					friend bool	operator!=(const VectIterator& lhs, const VectIterator& rhs)
 					{
-						return (!(rhs == lhs));
+						return (!(lhs == rhs));
 					}
 
-					friend bool	operator>(const VectIterator& rhs, const VectIterator& lhs)
+					friend bool	operator>(const VectIterator& lhs, const VectIterator& rhs)
 					{
-						return (rhs > lhs);
+						return (lhs > rhs);
 					}
 
-					friend bool	operator>=(const VectIterator& rhs, const VectIterator& lhs)
+					friend bool	operator>=(const VectIterator& lhs, const VectIterator& rhs)
 					{
-						return (rhs >= lhs);
+						return (lhs >= rhs);
 					}
 
-					friend bool	operator<(const VectIterator& rhs, const VectIterator& lhs)
+					friend bool	operator<(const VectIterator& lhs, const VectIterator& rhs)
 					{
-						return (rhs < lhs);
+						return (lhs < rhs);
 					}
 
-					friend bool	operator<=(const VectIterator& rhs, const VectIterator& lhs)
+					friend bool	operator<=(const VectIterator& lhs, const VectIterator& rhs)
 					{
-						return (rhs <= lhs);
+						return (lhs <= rhs);
 					}
 
 				private:

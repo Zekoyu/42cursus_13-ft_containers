@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 17:20 by                                             */
+/*   Updated: 12-03-2022 14:02 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ namespace ft
 			typedef size_t													size_type;
 	
 		private:
-			typedef typename RBTree<value_type, Compare>::node_pointer			node_pointer;
+			typedef typename RBTree<value_type, Compare, Alloc>::node_pointer	node_pointer;
 		
 			allocator_type						_alloc;
 			RBTree<value_type, value_compare>	_tree;
@@ -66,11 +66,23 @@ namespace ft
 
 		public:
 			/* Iterators */
-			iterator		begin() { return (iterator(this->_tree.first())); }
-			const_iterator	begin() const { return const_iterator(this->_tree.first()); }
+			iterator		begin()
+			{
+				if (this->size() == 0)
+					return (this->end());
 
-			iterator		end() { return (iterator(this->_tree.last())); }
-			const_iterator	end() const { return (const_iterator(this->_tree.last())); }
+				return (iterator(this->_tree.first()));
+			}
+
+			const_iterator	begin() const
+			{
+				if (this->size() == 0)
+					return (this->end());
+				return (iterator(this->_tree.first()));
+			}
+
+			iterator		end() { return (iterator(this->_tree.end())); }
+			const_iterator	end() const { return (const_iterator(this->_tree.end())); }
 
 			reverse_iterator		rbegin() { return (ft::reverse_iterator<iterator>(this->end())); }
 			const_reverse_iterator	rbegin() const { return (ft::reverse_iterator<const_iterator>(this->end())); }
@@ -100,6 +112,8 @@ namespace ft
 			   Since we don't want our container to be fully optimized, just call insert coz im lazy */
 			iterator insert(iterator position, const value_type& val)
 			{
+				(void) position;
+				
 				return (this->insert(val).first);
 			}
 
@@ -278,6 +292,7 @@ namespace ft
 				private:
 					typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>	iterator;
 					typedef typename RBTree<value_type, Compare>::node_pointer					node_pointer;
+					typedef RBTree<value_type, Compare, Alloc>									tree;
 
 				public:
 					typedef typename iterator::iterator_category	iterator_category;
@@ -288,15 +303,72 @@ namespace ft
 					typedef ptrdiff_t	difference_type;
 					typedef size_t		size_type;
 
-					MapIterator(node_pointer node) : _node(node) { }
-					
-					MapIterator()
-					{
+					MapIterator(node_pointer node) : _node(node), _last(nullptr) { }
+					MapIterator() : _node(nullptr), _last(nullptr) { }
+					MapIterator(const MapIterator& m) : _node(m._node), _last(nullptr) { }
+					~MapIterator() { }
 
+					MapIterator& operator=(const MapIterator& m)
+					{
+						this->_node = m._node;
+						return (*this);
 					}
+
+					reference operator*() { return (*this->_node->data); }
+
+					const_reference operator*() const { return (*this->_node->data); }
+
+					pointer operator->() { return (this->_node->data); }
+
+					/* If we are past-the end, save the last element and set to null, then if we want to go back, node = last */
+					MapIterator& operator++()
+					{
+						// std::cout << "++Begin\n";
+						// if (tree::next_inorder(this->_node) == nullptr)
+						// {
+						// 	std::cout << "Next is end\n";
+						// 	this->_last = tree::next_inorder(this->_node);
+						// 	this->_node = map::end()._node;
+						// 	return (*this);
+						// }
+
+						if (tree::next_inorder(this->_node) == nullptr)
+							this->_node = this->_node->right; /* Set node to end */
+						else
+							this->_node = tree::next_inorder(this->_node);
+						//std::cout << "++End\n";
+						return (*this);
+					}
+
+					MapIterator operator++(int)
+					{
+						MapIterator tmp = *this; /* Calls copy constructor, smart C++ */
+						++(*this);
+						return (tmp);
+					}
+
+					MapIterator& operator--()
+					{
+						//if (this->_node == nullptr && this->_last != nullptr)
+						//	this->_node = this->_last;
+						//else
+						this->_node = tree::prev_inorder(this->_node);
+						return (*this);
+					}
+
+					MapIterator operator--(int)
+					{
+						MapIterator tmp = *this;
+						--(*this);
+						return (tmp);
+					}
+
+					friend bool operator==(const MapIterator& lhs, const MapIterator& rhs) { return (lhs._node == rhs._node); }
+					friend bool operator!=(const MapIterator& lhs, const MapIterator& rhs) { return (!(lhs == rhs)); }
 
 				private:
 					node_pointer _node;
+					node_pointer _last;
 			};
 
 

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 17:19 by                                             */
+/*   Updated: 12-03-2022 13:36 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,19 +55,40 @@ void	modifyContent(Iterator begin, Iterator end)
 	std::cout << "Successfully modified content" << std::endl;
 }*/
 
+#include <map>
+
+#define POUET ft
 int main()
 {
-	typedef ft::map<KEY_TYPE, VAL_TYPE>	map;
+	typedef POUET::map<KEY_TYPE, VAL_TYPE>	map;
+	typedef typename map::iterator		it;
 	
 	map	v;
 
-	std::cout << "Size: " << v.size() << std::endl;
-	v.insert(ft::make_pair(1, "pouet"));
-	std::cout << "Size: " << v.size() << std::endl;
-	v.erase(0);
-	std::cout << "Size: " << v.size() << std::endl;
-	v.erase(1);
 	//std::cout << "Size: " << v.size() << std::endl;
+	//v.insert(POUET::make_pair(1, "pouet"));
+	//std::cout << "Size: " << v.size() << std::endl;
+	//v.erase(0);
+	//std::cout << "Size: " << v.size() << std::endl;
+	//v.erase(1);
+	//std::cout << "Size: " << v.size() << std::endl;
+
+	v.insert(POUET::make_pair(10, "Salut"));
+	v.insert(POUET::make_pair(20, "espece"));
+	//v.insert(POUET::make_pair(30, "de"));
+	//v.insert(POUET::make_pair(40, "beau"));
+	//v.insert(POUET::make_pair(50, "gosse"));
+	
+	for (it b = v.begin(); b != v.end(); ++b)
+		std::cout << (*b).second << ' ';
+	std::cout << std::endl;
+
+	it test = v.end();
+
+	//--test;
+
+	//std::cout << "--End: " << test->first << std::endl;
+
 
 //	std::cout << "Len: " << (v1.end() - v1.begin()) << std::endl; 
 	
