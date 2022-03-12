@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 14:28 by                                             */
+/*   Updated: 12-03-2022 18:22 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ namespace ft
 	{
 		/* IMO typedefs first, then pivate members, then public */
 		public:
-			template <class Vector>
-			class VectIterator;
+			class iterator;
+			class const_iterator;
 
 			typedef T											value_type;
 			typedef Allocator									allocator_type;
@@ -40,10 +40,8 @@ namespace ft
 
 			/* if we define a non-const vector and call vector::const_iterator it = begin(), compiler has no way to know we want const version
 			   https://stackoverflow.com/questions/2844339/c-iterator-and-const-iterator-problem-for-own-container-class */
-			typedef VectIterator< vector<T, Allocator> >		iterator;
-			typedef VectIterator< vector<const T, Allocator> >	const_iterator;
-			typedef ft::reverse_iterator<iterator>				reverse_iterator;
-			typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
+			typedef ft::reverse_iterator<iterator>			reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 			/* Identical to iterator_traits<iterator>::size_type/difference_type */
 			typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
@@ -229,7 +227,7 @@ namespace ft
 			   would not work with a vector of classes for instance */
 			template <class InputIterator>
 			void	assign(InputIterator first, InputIterator last,
-						   typename InputIterator::value_type* pouet = nullptr)
+						   typename InputIterator::value_type* pouet = NULL)
 			{
 				(void) pouet;
 
@@ -309,7 +307,7 @@ namespace ft
 			/* Same as above using range instead of fixed value / size */
 			template <class InputIterator>
   			void insert(iterator position, InputIterator first, InputIterator last,
-			  			typename InputIterator::value_type* pouet = nullptr)
+			  			typename InputIterator::value_type* pouet = NULL)
 			{
 				(void) pouet;
 
@@ -396,160 +394,421 @@ namespace ft
 				return (allocator_type());
 			}
 
-			template <class Vector>
-			class VectIterator
+			/* Iterator */
+			/* See https://gist.github.com/jeetsukumaran/307264 */
+			class iterator : public ft::iterator<ft::random_access_iterator_tag, T> /* Only define 2 types since the 3 other default values are those we want */
 			{
 				private:
-					typedef typename ft::iterator<ft::random_access_iterator_tag, typename Vector::value_type> iterator;
+					typedef size_t		size_type;
+					typedef iterator	self_type; /* Used to that we can copypasta for const_iterator and modify only here */
+					typedef ft::iterator<ft::random_access_iterator_tag, T>	it;
+				
+				public:
+					typedef typename it::iterator_category					iterator_category;
+					typedef typename it::value_type							value_type;
+					typedef typename it::difference_type					difference_type;
+					typedef typename it::pointer							pointer;
+					typedef typename it::reference							reference;
 
 				public:
-					typedef typename iterator::iterator_category	iterator_category;
-					typedef typename iterator::value_type			value_type;
-					typedef typename iterator::reference			reference;
-					typedef typename iterator::pointer				pointer;
+					iterator(pointer ptr) : _ptr(ptr) { }
 
-					typedef ptrdiff_t	difference_type;
-					typedef size_t		size_type;
+					operator const_iterator() const { return (const_iterator(this->_ptr)); }
 
-					VectIterator(pointer ptr) : _ptr(ptr) { }
-					VectIterator() : _ptr(nullptr) { }
-					VectIterator(const VectIterator& v) : _ptr(v._ptr) { }
-					~VectIterator() { }
-
-					VectIterator&	operator++() /* prefix */
+					self_type& operator++() /* prefix */
 					{
 						++this->_ptr;
 						return (*this);
 					}
 
-					VectIterator	operator++(int) /* postfix, cannot return reference to stack memory */
+					self_type operator++(int) /* postfix, cannot return reference to stack memory */
 					{
-						VectIterator tmp = *this;
+						self_type tmp = *this;
 						++(*this); /* so that if we want to change code, only change the prefix one */
 						return (tmp);
 					}
 
-					VectIterator&	operator--() /* prefix */
+					self_type& operator--() /* prefix */
 					{
 						--this->_ptr;
 						return (*this);
 					}
 
-					VectIterator	operator--(int) /* postfix, cannot return reference to stack m */
+					self_type operator--(int) /* postfix, cannot return reference to stack m */
 					{
-						VectIterator tmp = *this;
+						self_type tmp = *this;
 						--(*this);
 						return (tmp);
 					}
 
 					/* Returns a reference to the type held, same as T& */
-					reference	operator[](size_type index)
+					reference operator[](size_type index)
 					{
 						return (*(this->_ptr[index]));
 					}
 
 					/* Calling Foo->x becomes the same as Foo.operator->()->x  or *(Foo.operator->()x)
 						The compiler calls the operator -> as many times as needed to get a raw pointer, then dereferences it */
-					pointer	operator->()
+					pointer operator->()
 					{
 						return (this->_ptr);
 					}
 
-					reference	operator*()
+					reference operator*()
 					{
 						return (*this->_ptr); /* operator* has lower precedence than ->/. and associativity is from right to left, so no need for parentheses even if we used *this->value.someOtherValue->data */
 					}
 
-					const_reference operator*() const
+					self_type operator+(difference_type n) const
 					{
-						return (*this->_ptr);
-					}
-
-					VectIterator	operator+(difference_type n)
-					{
-						VectIterator tmp = *this;
+						self_type tmp = *this;
 						tmp._ptr += n;
 						return (tmp);
 					}
 
-					VectIterator	operator+(const VectIterator& r)
+					self_type operator+(const self_type& r) const
 					{
-						VectIterator tmp = *this;
+						self_type tmp = *this;
 						tmp._ptr += r._ptr;
 						return (tmp);
 					}
 
-					VectIterator&	operator+=(difference_type n)
+					self_type& operator+=(difference_type n)
 					{
 						this->_ptr += n;
 						return (*this);
 					}
 
-					VectIterator	operator-(difference_type n)
+					difference_type operator-(const self_type& r) const
 					{
-						VectIterator tmp = *this;
+						return (this->_ptr - r._ptr);
+					}
+
+					self_type operator-(difference_type n) const
+					{
+						self_type tmp = *this;
 						tmp._ptr -= n;
 						return (tmp);
 					}
 
-					difference_type	operator-(const VectIterator& r)
-					{
-						VectIterator tmp = *this;
-						tmp._ptr -= r._ptr;
-						return (tmp._ptr);
-					}
-
-					VectIterator&	operator-=(difference_type n)
+					self_type& operator-=(difference_type n)
 					{
 						this->_ptr -= n;
 						return (*this);
 					}
 
-					VectIterator&	operator=(const VectIterator &rhs)
-					{
-						this->_ptr = rhs._ptr;
-						return (*this);
-					}
-
 					/* Relational operators */
-					friend bool	operator==(const VectIterator& lhs, const VectIterator& rhs)
+					friend bool operator==(const self_type& rhs, const self_type& lhs)
 					{
-						return (lhs._ptr == rhs._ptr);
+						return (rhs._ptr == lhs._ptr);
 					}
 
-					friend bool	operator!=(const VectIterator& lhs, const VectIterator& rhs)
+					friend bool operator!=(const self_type& rhs, const self_type& lhs)
 					{
-						return (!(lhs == rhs));
+						return (!(rhs == lhs));
 					}
 
-					friend bool	operator>(const VectIterator& lhs, const VectIterator& rhs)
+					friend bool operator>(const self_type& rhs, const self_type& lhs)
 					{
-						return (lhs > rhs);
+						return (rhs > lhs);
 					}
 
-					friend bool	operator>=(const VectIterator& lhs, const VectIterator& rhs)
+					friend bool operator>=(const self_type& rhs, const self_type& lhs)
 					{
-						return (lhs >= rhs);
+						return (rhs >= lhs);
 					}
 
-					friend bool	operator<(const VectIterator& lhs, const VectIterator& rhs)
+					friend bool operator<(const self_type& rhs, const self_type& lhs)
 					{
-						return (lhs < rhs);
+						return (rhs < lhs);
 					}
 
-					friend bool	operator<=(const VectIterator& lhs, const VectIterator& rhs)
+					friend bool operator<=(const self_type& rhs, const self_type& lhs)
 					{
-						return (lhs <= rhs);
+						return (rhs <= lhs);
 					}
 
 				private:
 					pointer	_ptr;
 			};
+
+			/* Const iterator, almost the same as iterator */
+			/* See https://gist.github.com/jeetsukumaran/307264 */
+			class const_iterator : public ft::iterator<ft::random_access_iterator_tag, const T> /* Only define 2 types since the 3 other default values are those we want */
+			{
+				private:
+					typedef size_t				size_type;
+					typedef const_iterator		self_type; /* Used to that we can copypasta for const_iterator and modify only here */
+					typedef ft::iterator<ft::random_access_iterator_tag, const T>	it;
+				
+				public:
+					typedef typename it::iterator_category							iterator_category;
+					typedef const typename it::value_type							value_type;
+					typedef const typename it::difference_type						difference_type;
+					typedef const typename it::pointer								pointer;
+					typedef const typename it::reference							reference;
+
+				public:
+					const_iterator(T* ptr) : _ptr(ptr) { }
+					
+					operator iterator() const { return (iterator(this->_ptr)); }
+
+					self_type& operator++() /* prefix */
+					{
+						++this->_ptr;
+						return (*this);
+					}
+
+					self_type operator++(int) /* postfix, cannot return reference to stack memory */
+					{
+						self_type tmp = *this;
+						++(*this); /* so that if we want to change code, only change the prefix one */
+						return (tmp);
+					}
+
+					self_type& operator--() /* prefix */
+					{
+						--this->_ptr;
+						return (*this);
+					}
+
+					self_type operator--(int) /* postfix, cannot return reference to stack m */
+					{
+						self_type tmp = *this;
+						--(*this);
+						return (tmp);
+					}
+
+					/* Returns a reference to the type held, same as T& */
+					reference operator[](size_type index)
+					{
+						return (*(this->_ptr[index]));
+					}
+
+					/* Calling Foo->x becomes the same as Foo.operator->()->x  or *(Foo.operator->()x)
+						The compiler calls the operator -> as many times as needed to get a raw pointer, then dereferences it */
+					pointer operator->()
+					{
+						return (this->_ptr);
+					}
+
+					reference operator*()
+					{
+						return (*this->_ptr); /* operator* has lower precedence than ->/. and associativity is from right to left, so no need for parentheses even if we used *this->value.someOtherValue->data */
+					}
+
+					self_type operator+(difference_type n) const
+					{
+						self_type tmp = *this;
+						tmp._ptr += n;
+						return (tmp);
+					}
+
+					self_type operator+(const self_type& r) const
+					{
+						self_type tmp = *this;
+						tmp._ptr += r._ptr;
+						return (tmp);
+					}
+
+					self_type& operator+=(difference_type n)
+					{
+						this->_ptr += n;
+						return (*this);
+					}
+
+					difference_type operator-(const self_type& r) const
+					{
+						return (this->_ptr - r._ptr);
+					}
+
+					self_type operator-(difference_type n) const
+					{
+						self_type tmp = *this;
+						tmp._ptr -= n;
+						return (tmp);
+					}
+
+					self_type& operator-=(difference_type n)
+					{
+						this->_ptr -= n;
+						return (*this);
+					}
+
+					/* Relational operators */
+					friend bool operator==(const self_type& rhs, const self_type& lhs)
+					{
+						return (rhs._ptr == lhs._ptr);
+					}
+
+					friend bool operator!=(const self_type& rhs, const self_type& lhs)
+					{
+						return (!(rhs == lhs));
+					}
+
+					friend bool operator>(const self_type& rhs, const self_type& lhs)
+					{
+						return (rhs > lhs);
+					}
+
+					friend bool operator>=(const self_type& rhs, const self_type& lhs)
+					{
+						return (rhs >= lhs);
+					}
+
+					friend bool operator<(const self_type& rhs, const self_type& lhs)
+					{
+						return (rhs < lhs);
+					}
+
+					friend bool operator<=(const self_type& rhs, const self_type& lhs)
+					{
+						return (rhs <= lhs);
+					}
+
+				private:
+					T*	_ptr;
+			};
+
+			// class VectIterator
+			// {
+			// 	private:
+			// 		typedef typename ft::iterator<ft::random_access_iterator_tag, Type> iterator;
+
+			// 	public:
+			// 		typedef typename iterator::iterator_category	iterator_category;
+			// 		typedef typename iterator::value_type			value_type;
+			// 		typedef typename iterator::reference			reference;
+			// 		typedef typename iterator::pointer				pointer;
+
+			// 		typedef ptrdiff_t	difference_type;
+			// 		typedef size_t		size_type;
+
+			// 		VectIterator(pointer ptr) : _ptr(ptr) { }
+			// 		VectIterator() : _ptr(NULL) { }
+			// 		VectIterator(const VectIterator<T> &v) : _ptr(v._ptr) { }
+			// 		~VectIterator() { }
+
+			// 		VectIterator&	operator++() /* prefix */
+			// 		{
+			// 			++this->_ptr;
+			// 			return (*this);
+			// 		}
+
+			// 		VectIterator	operator++(int) /* postfix, cannot return reference to stack memory */
+			// 		{
+			// 			VectIterator tmp = *this;
+			// 			++(*this); /* so that if we want to change code, only change the prefix one */
+			// 			return (tmp);
+			// 		}
+
+			// 		VectIterator&	operator--() /* prefix */
+			// 		{
+			// 			--this->_ptr;
+			// 			return (*this);
+			// 		}
+
+			// 		VectIterator	operator--(int) /* postfix, cannot return reference to stack m */
+			// 		{
+			// 			VectIterator tmp = *this;
+			// 			--(*this);
+			// 			return (tmp);
+			// 		}
+
+			// 		/* Returns a reference to the type held, same as T& */
+			// 		reference	operator[](size_type index)
+			// 		{
+			// 			return (this->_ptr[index]);
+			// 		}
+
+			// 		/* Calling Foo->x becomes the same as Foo.operator->()->x  or *(Foo.operator->()x)
+			// 			The compiler calls the operator -> as many times as needed to get a raw pointer, then dereferences it */
+			// 		pointer	operator->()
+			// 		{
+			// 			return (this->_ptr);
+			// 		}
+
+			// 		reference	operator*()
+			// 		{
+			// 			return (*this->_ptr); /* operator* has lower precedence than ->/. and associativity is from right to left, so no need for parentheses even if we used *this->value.someOtherValue->data */
+			// 		}
+
+			// 		const_reference operator*() const
+			// 		{
+			// 			return (*this->_ptr);
+			// 		}
+
+			// 		VectIterator	operator+(difference_type n) const
+			// 		{
+			// 			VectIterator tmp = *this;
+			// 			tmp._ptr += n;
+			// 			return (tmp);
+			// 		}
+
+			// 		VectIterator	operator+(const VectIterator& r) const
+			// 		{
+			// 			VectIterator tmp = *this;
+			// 			tmp._ptr += r._ptr;
+			// 			return (tmp);
+			// 		}
+
+			// 		VectIterator&	operator+=(difference_type n)
+			// 		{
+			// 			this->_ptr += n;
+			// 			return (*this);
+			// 		}
+
+			// 		VectIterator	operator-(difference_type n) const
+			// 		{
+			// 			VectIterator tmp = *this;
+			// 			tmp._ptr -= n;
+			// 			return (tmp);
+			// 		}
+
+			// 		difference_type	operator-(const VectIterator& r) const
+			// 		{
+			// 			return (this->_ptr - r._ptr);
+			// 		}
+
+			// 		VectIterator&	operator-=(difference_type n)
+			// 		{
+			// 			this->_ptr -= n;
+			// 			return (*this);
+			// 		}
+
+			// 		VectIterator&	operator=(const VectIterator &rhs)
+			// 		{
+			// 			this->_ptr = rhs._ptr;
+			// 			return (*this);
+			// 		}
+
+			// 		/* Relational operators */
+			// 		//friend bool operator==(const VectIterator<T>& lhs, const VectIterator<T>& rhs);
+			// 		//friend bool operator!=(const VectIterator<T>& lhs, const VectIterator<T>& rhs);
+			// 		//friend bool operator>(const VectIterator<T>& lhs, const VectIterator<T>& rhs);
+			// 		//friend bool operator>=(const VectIterator<T>& lhs, const VectIterator<T>& rhs);
+			// 		//friend bool operator<(const VectIterator<T>& lhs, const VectIterator<T>& rhs);
+			// 		//friend bool operator<=(const VectIterator<T>& lhs, const VectIterator<T>& rhs);
+
+			// 		bool operator!=(const VectIterator<T>& other)
+			// 		{
+			// 			return (this->_ptr != other._ptr);
+			// 		}
+
+			// 		bool operator!=(const VectIterator<const T>& other) const
+			// 		{
+			// 			return (this->_ptr != other._ptr);
+			// 		}
+
+			// 	private:
+			// 		pointer	_ptr;
+			// };
+
 	};
 
 	/* Should be optimized, but who cares */
 	template <class T, class Alloc>
-	void swap(vector<T,Alloc>& x, vector<T,Alloc>& y)
+	void swap(ft::vector<T,Alloc>& x, ft::vector<T,Alloc>& y)
 	{
 		x.swap(y);
 	}
@@ -557,7 +816,7 @@ namespace ft
 	/* We are not forced to write template arguments since compiler template
 	   deduction does it automatically */
 	template <class T, class Alloc>
-	bool operator==(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	bool operator==(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
 	{
 		if (lhs.size() != rhs.size())
 			return (false);
@@ -565,31 +824,31 @@ namespace ft
 	}
 
 	template <class T, class Alloc>
-	bool operator!=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	bool operator!=(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
 	{
 		return (!(lhs == rhs));
 	}
 
 	template <class T, class Alloc>
-	bool operator<(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	bool operator<(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
 	{
 		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 	}
 
 	template <class T, class Alloc>
-	bool operator<=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	bool operator<=(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
 	{
 		return (lhs < rhs || lhs == rhs);
 	}
 
 	template <class T, class Alloc>
-	bool operator>(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	bool operator>(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
 	{
 		return (!(lhs <= rhs)); /* Either <= or > */
 	}
 
 	template <class T, class Alloc>
-	bool operator>=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	bool operator>=(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
 	{
 		return (!(lhs < rhs)); /* Either < or >= */
 	}
