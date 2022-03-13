@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 13-03-2022 21:09 by                                             */
+/*   Updated: 13-03-2022 23:41 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,19 @@ namespace ft
 				while (this->_size + distance > this->_capacity)
 					this->reserve(this->_capacity * 2);
 
-				for (size_type i = index; i < this->_size; ++i)
+				// From end to start because otherwise we modify the next slot we are going to copy
+				// Eg. copy 0 to 1, then copy 1 to 2 would cause 0 = 1 = 
+				if (this->_size == 0)
+					return ;
+				// 1 2 3
+
+				for (size_type i = this->_size - 1; i >= index; --i)
 				{
 					this->_alloc.construct(this->_ptr + i + distance, this->_ptr[i]); // Copy the value distance slots away
 					this->_alloc.destroy(this->_ptr + i); // Destroy the original value
 					// Repeat
+					if (i == 0) // If i == 0 and index is 0, manually break otherwise i would overflow next iteration
+						return ;
 				}
 			}
 
