@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 13-03-2022 14:07 by                                             */
+/*   Updated: 13-03-2022 18:50 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,12 +158,16 @@ namespace ft
 				return (*this);
 			}
 
-			
-
 			/* Decrement operators are the same as increment reversed */
-			difference_type operator-(const reverse_iterator& rit) const { return (rit._it - this->_it); };
+			// difference_type operator-(const reverse_iterator& rit) const { return (rit._it - this->_it); };
 
-			reverse_iterator operator-(difference_type n) const { return (reverse_iterator(this->_it.operator+(n))); };
+			// reverse_iterator operator-(difference_type n) const { return (reverse_iterator(this->_it.operator+(n))); };
+
+
+			/* Internally, the function applies the binary operator- on the base iterator and returns a reverse iterator constructed with the resulting iterator value. */
+			reverse_iterator operator-(difference_type n) const { return (reverse_iterator(this->_it + n)); }
+
+			difference_type operator-(const reverse_iterator& rit) const { return (this->base() + rit.base()); }
 
 			reverse_iterator& operator--()
 			{

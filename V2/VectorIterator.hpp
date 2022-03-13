@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 13-03-2022  by  `-'                        `-'                  */
-/*   Updated: 13-03-2022 17:49 by                                             */
+/*   Updated: 13-03-2022 18:47 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ namespace ft
 		public:
 			// Combines default constructor and assignation constructor
 			VectIterator(T* ptr = NULL) { _ptr = ptr; }
-			VectIterator(const VectIterator<T>& it) { this->_ptr = it._ptr; }
+			VectIterator(const VectIterator<T, IsConst>& it) { this->_ptr = it._ptr; }
 			~VectIterator() { }
 
 			VectIterator<T, IsConst>& operator=(const VectIterator<T, IsConst>& it) { this->_ptr = it._ptr; return (*this); }
@@ -63,7 +63,10 @@ namespace ft
 
 			/********** Relational operators **********/
 			// A + n
-			VectIterator operator+(typename it::difference_type n) const { return (VectIterator<T>(this->_ptr + n)); }
+			VectIterator<T, IsConst> operator+(typename it::difference_type n) const { return (VectIterator<T, IsConst>(this->_ptr + n)); }
+
+			// A - n
+			VectIterator<T, IsConst> operator-(typename it::difference_type n) const { return (VectIterator<T, IsConst>(this->_ptr - n)); }
 
 			// *A
 			typename it::reference operator*() const { return (*this->_ptr); }
@@ -72,25 +75,32 @@ namespace ft
 			typename it::pointer operator->() const { return (this->_ptr); }
 
 			// ++A
-			VectIterator<T>& operator++() { ++this->_ptr; return (*this); }
+			VectIterator<T, IsConst>& operator++() { ++this->_ptr; return (*this); }
 
 			// A++
-			VectIterator<T>& operator--() { --this->_ptr; return (*this); }
+			VectIterator<T, IsConst>& operator--() { --this->_ptr; return (*this); }
 
 			// --A
-			VectIterator<T> operator++(int) { VectIterator<T> tmp = *this; ++(*this); return (*this); }
+			VectIterator<T, IsConst> operator++(int) { VectIterator<T, IsConst> tmp = *this; ++(*this); return (tmp); }
 
 			// A--
-			VectIterator<T> operator--(int) { VectIterator<T> tmp = *this; --(*this); return (*this); }
+			VectIterator<T, IsConst> operator--(int) { VectIterator<T, IsConst> tmp = *this; --(*this); return (tmp); }
 
+			// A += n
+			VectIterator<T, IsConst>& operator+=(typename it::difference_type n) { this->_ptr += n; return (*this); }
+
+			// A -= n
+			VectIterator<T, IsConst>& operator-=(typename it::difference_type n) { this->_ptr -= n; return (*this); }
+			
 			// A[n]
 			typename it::reference operator[](typename it::difference_type n) { return (this->_ptr[n]); }
 
 			/********** Friend relational operators, to allow const and non-const mixed **********/
 			// Operators on possibly different (const / non-const) iterators
-			// A + B
+
+			// A - B, Uses IteRight for SNIFAE to force using operator-(difference_type) for 'begin() - 2' for instance
 			template <class IteLeft, class IteRight>
-			friend typename IteLeft::difference_type operator-(const IteLeft& lhs, const IteRight& rhs);
+			friend typename IteRight::difference_type operator-(const IteLeft& lhs, const IteRight& rhs);
 
 			// n + A
 			template <typename Type>
@@ -150,6 +160,9 @@ namespace ft
 		A <= B ✅
 		A >= B ✅
 
+		A += n
+		A -= n
+
 		A[n] ✅
 	*/
 
@@ -161,7 +174,7 @@ namespace ft
 	// Will automatically not compile if IteLeft and IteRight are not of the same type (eg. bool pointer and int pointer)
 	// Only operator- returns a difference type, trying to print it1 + it2 will faill on std
 	template <class IteLeft, class IteRight>
-	typename IteLeft::difference_type operator-(const IteLeft& lhs, const IteRight& rhs) { return (lhs._ptr - rhs._ptr); }
+	typename IteRight::difference_type operator-(const IteLeft& lhs, const IteRight& rhs) { return (lhs._ptr - rhs._ptr); }
 
 	// A == B / B == A
 	template <class IteLeft, class IteRight>
