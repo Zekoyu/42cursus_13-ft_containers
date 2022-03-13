@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 13-03-2022  by  `-'                        `-'                  */
-/*   Updated: 13-03-2022 18:07 by                                             */
+/*   Updated: 14-03-2022 00:22 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,15 @@ int main()
 	std::cout << (vit1 <= vcit2) << std::endl;
 	std::cout << (vit1 >  vcit2) << std::endl;
 	std::cout << (vit1 >= vcit2) << std::endl;
-
-	std::cout << (it1[1]) << std::endl;
 	//std::cout << *it1 << std::endl;
+
+
+	std::vector<int> test(10);
+
+	test[9] = 123;
+	std::cout << "size is " << test.size() << std::endl;
+	test.erase(test.begin() + 9);
+	std::cout << "size is " << test.size() << std::endl;
+	std::cout << test[9] << std::endl;
 
 }

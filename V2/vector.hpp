@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 13-03-2022 23:41 by                                             */
+/*   Updated: 14-03-2022 00:30 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,9 @@ namespace ft
 				return (i);
 			}
 
-			// Move elements distance away (to the right) starting at index, DOES NOT modify size
-			// Vector = 1, 2, 3, 4, 5 moveElements(2, 5) => 1, 2, -, -, -, -, -, 3, 4, 5 
-			void moveElements(size_type index, size_type distance)
+			// Move elements distance away (to the right) starting at index (included), DOES NOT modify size
+			// Vector = 1, 2, 3, 4, 5 moveElementsRight(2, 5) => 1, 2, -, -, -, -, -, 3, 4, 5 
+			void moveElementsRight(size_type index, size_type distance)
 			{
 				if (this->_capacity == 0)
 					this->reserve(1);
@@ -78,10 +78,9 @@ namespace ft
 					this->reserve(this->_capacity * 2);
 
 				// From end to start because otherwise we modify the next slot we are going to copy
-				// Eg. copy 0 to 1, then copy 1 to 2 would cause 0 = 1 = 
+				// Eg. copy 0 to 1, then copy 1 to 2 would cause 0 = 1 = 2
 				if (this->_size == 0)
 					return ;
-				// 1 2 3
 
 				for (size_type i = this->_size - 1; i >= index; --i)
 				{
@@ -90,6 +89,23 @@ namespace ft
 					// Repeat
 					if (i == 0) // If i == 0 and index is 0, manually break otherwise i would overflow next iteration
 						return ;
+				}
+			}
+
+			// Move elements distance away (to the left) starting at index (excluded), DOES NOT modify size
+			// Vector = 1, 2, 3, 4, 5 moveElementsLeft(0, 1) => 2, 3, 4, 5, -
+			void moveElementsLeft(size_type index, size_type distance)
+			{
+				// From start because otherwise we modify the next slot we are going to copy
+				// Eg. copy 2 to 1, then copy 1 to 0 would cause 2 = 1 = 0
+				if (this->_size == 0)
+					return ;
+
+				for (size_type i = index; i + distance < this->_size; ++i)
+				{
+					this->_alloc.construct(this->_ptr + i, this->_ptr[i + distance]); // Copy the value from distance slots away
+					this->_alloc.destroy(this->_ptr + i + distance); // Destroy the original value
+					// Repeat
 				}
 			}
 
@@ -200,7 +216,6 @@ namespace ft
 					return;
 				
 				pointer tmp = this->_alloc.allocate(n);
-				(void) tmp;
 				for (size_type i = 0; i < this->_size; ++i) /* Move content */
 				 	this->_alloc.construct(tmp + i, this->_ptr[i]);
 				this->_alloc.deallocate(this->_ptr, this->_capacity);
@@ -300,7 +315,7 @@ namespace ft
 				size_type index = this->distance(this->begin(), position);
 
 				// Move everything one slot to the right, starting at index
-				this->moveElements(index, 1);
+				this->moveElementsRight(index, 1);
 
 				// Set the one value at index
 				this->_alloc.construct(this->_ptr + index, val);
@@ -313,7 +328,7 @@ namespace ft
 				size_type index = this->distance(this->begin(), position);
 
 				// Same as above, except we move n instead of 1
-				this->moveElements(index, n);
+				this->moveElementsRight(index, n);
 
 				// Fill the "blank" slots
 				for (size_type i = 0; i < n; ++i)
@@ -338,7 +353,7 @@ namespace ft
 				while (firstCpy++ != last)
 					++n;
 
-				this->moveElements(index, n);
+				this->moveElementsRight(index, n);
 
 				// Fill the "blank" slots
 				for(size_type i = 0; first != last; ++i)
@@ -349,125 +364,47 @@ namespace ft
 				}
 			}
 
-
-			/* Returns an iterator pointing to first new elt to check iterator invalidion (partial or total), if return value == position, everything before position is still valid,
-			   otherwise not, if it's != all iterators are invalidated */
-			// iterator	insert(iterator position, const value_type& val)
-			// {
-			// 	size_type index = this->distance(this->begin(), position);
-
-			// 	if (this->_capacity == 0)
-			// 		this->reserve(1);
-			// 	else if (this->_size + 1 > this->_capacity)
-			// 		this->reserve(this->_capacity * 2);
-
-			// 	// Check for case where size is 0, size - 1 would overflow
-			// 	if (this->_size != 0)
-			// 	{
-			// 		for (size_type i = this->_size - 1; i >= index; --i) /* Move everything and destroy the value at index */
-			// 		{
-			// 			this->_alloc.construct(this->_ptr + i + 1, this->_ptr[i]);
-			// 			this->_alloc.destroy(this->_ptr + i);
-			// 			if (i == 0) /* Because --i would overflow since it's size_t */
-			// 				break; 
-			// 		}
-			// 	}
-			// 	this->_alloc.construct(this->_ptr + index, val);
-			// 	++this->_size;
-			// 	return (iterator(this->_ptr + index));
-			// }
-
-			// void	insert(iterator position, size_type n, const value_type& val)
-			// {
-			// 	size_type index = this->distance(this->begin(), position);
-
-			// 	if (this->_capacity == 0)
-			// 		this->reserve(1);
-			// 	while (this->_size + n > this->_capacity) /* while instead of if in case we want to add many many values */
-			// 		this->reserve(this->_capacity * 2);
-
-			// 	// Check for case where size is 0, size - 1 would overflow
-			// 	if (this->_size != 0)
-			// 	{
-			// 		for (size_type i = this->_size - 1; i >= index; --i) /* Move everything and destroy the value at index */
-			// 		{
-			// 			this->_alloc.construct(this->_ptr + i + n, this->_ptr[i]); /* Same as above except instead of moving 1 we move n to the right */
-			// 			this->_alloc.destroy(this->_ptr + i);
-			// 			if (i == 0)
-			// 				break;
-			// 		}
-			// 	}
-			// 	while (n--) /* Add n times */
-			// 	{
-			// 		this->_alloc.construct(this->_ptr + index, val);
-			// 		++this->_size;
-			// 		++index;
-			// 	}
-			// }
-
-			/* Same as above using range instead of fixed value / size */
-			// template <class InputIterator>
-  			// void insert(iterator position, InputIterator first, InputIterator last,
-			//   			typename InputIterator::value_type* pouet = NULL)
-			// {
-			// 	(void) pouet;
-
-			// 	size_type n = this->distance(first, last);
-			// 	size_type index = this->distance(this->begin(), position);
-
-			// 	if (this->_capacity == 0)
-			// 		this->reserve(1);
-			// 	while (this->_size + n > this->_capacity)
-			// 		this->reserve(this->_capacity * 2);
-					
-			// 	if (this->_size != 0)
-			// 	{
-			// 		/* Move everything, leave n unconstructed values */
-			// 		for (size_type i = this->_size - 1; i >= index; --i)
-			// 		{
-			// 			this->_alloc.construct(this->_ptr + i + n, this->_ptr[i]);
-			// 			this->_alloc.destroy(this->_ptr + i);
-			// 			if (i == 0)
-			// 				break;
-			// 		}
-			// 	}
-				
-			// 	/* Filling the "blank" spaces creating right above */
-			// 	while (first != last)
-			// 	{
-			// 		this->_alloc.construct(this->_ptr + index, *first);
-			// 		++first;
-			// 		++index;
-			// 		++this->_size;
-			// 	}
-			// }
-			
-
 			iterator erase(iterator position)
 			{
+				if (this->_size == 0)
+					return (this->end());
+					
 				size_type index = this->distance(this->begin(), position);
+
+				// Destroy the given element
+				this->_alloc.destroy(this->_ptr + index);
+
+				// Shift everything left
+				this->moveElementsLeft(index, 1);
 				
-				for (size_type i = index; i < this->_size - 1; ++i) /* Move everything to the left by 1 from index */
-				{
-					this->_alloc.destroy(this->_ptr + i);
-					this->_alloc.construct(this->_ptr + i, this->_ptr[i + 1]);
-				}
-				this->_alloc.destroy(this->_ptr + this->_size - 1); /* Since we shifted everything to the left, destroy last element */
 				--this->_size;
-				return (iterator(this->_ptr + index)); /* Since we removed element at index, returning ptr + index returns the one following the deleted element */
+				return (iterator(this->_ptr + index)); // Since we removed element at index, returning ptr + index returns the one following the deleted element
 			}
 
+			// 1 2 3 4
 			iterator erase(iterator first, iterator last)
 			{
-				size_type n = this->distance(first, last);
 				size_type index = this->distance(this->begin(), first);
-				
-				for (size_type i = index; i < this->_size - n; ++i) /* Move everything to the left by 1 from index */
+				size_type n = this->distance(first, last);
+
+				if (index >= this->_size) // past the end or equal
+					return (this->end());
+
+				if (n == 0) // iterators are the same
 				{
-					this->_alloc.destroy(this->_ptr + i);
-					this->_alloc.construct(this->_ptr + i, this->_ptr[i + n]);
+					this->erase(first);
+					return (iterator(this->_ptr + index));
 				}
-				this->_alloc.destroy(this->_ptr + this->_size - n);
+
+				/* Since we include first but not last, use strict <, only special case is when first == last
+				   because first should be included but not last, but it is handled right above in case n == 0 */
+				// As above, destroy the elements, but every one in range [first-last) instead of 1
+				for (size_type i = index; i < index + n; ++i)
+					this->_alloc.destroy(this->_ptr + i);
+
+				// Shift everything left
+				this->moveElementsLeft(index, n);
+
 				this->_size -= n;
 				return (iterator(this->_ptr + index)); /* Since we removed element at index, returning ptr + index returns the one following the deleted element */
 			}
