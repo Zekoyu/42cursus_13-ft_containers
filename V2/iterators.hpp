@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 20:42 by                                             */
+/*   Updated: 13-03-2022 14:07 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ namespace ft
 		typedef ptrdiff_t	difference_type; /* Literally the distance type (result of substraction) between 2 pointer */
 		typedef T			value_type;
 		typedef T*			pointer;
-		typedef T&			refeerence;
+		typedef T&			reference;
 		typedef ft::random_access_iterator_tag	iterator_category; /* Since it's a pointer, it should be pointing to contiguous memory, so can be accessed at random */
 	};
 
@@ -71,7 +71,7 @@ namespace ft
 		typedef ptrdiff_t	difference_type;
 		typedef T			value_type;
 		typedef T*			pointer;
-		typedef T&			refeerence;
+		typedef T&			reference;
 		typedef ft::random_access_iterator_tag	iterator_category;
 	};
 
