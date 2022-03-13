@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 13-03-2022 18:51 by                                             */
+/*   Updated: 13-03-2022 19:11 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ namespace ft
 			typedef VectIterator<T, true>	const_iterator;
 			/* if we define a non-const vector and call vector::const_iterator it = begin(), compiler has no way to know we want const version
 			   https://stackoverflow.com/questions/2844339/c-iterator-and-const-iterator-problem-for-own-container-class */
-			typedef std::reverse_iterator<iterator>	reverse_iterator;
-			typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
+			typedef ft::reverse_iterator<iterator>	reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 			/* Identical to iterator_traits<iterator>::size_type/difference_type */
 			typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
