@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 14-03-2022 00:30 by                                             */
+/*   Updated: 14-03-2022 13:07 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,8 @@ namespace ft
 
 				// From end to start because otherwise we modify the next slot we are going to copy
 				// Eg. copy 0 to 1, then copy 1 to 2 would cause 0 = 1 = 2
-				if (this->_size == 0)
+				// If distance is 0, we copy to the same slot then delete, to avoid that check first
+				if (this->_size == 0 || distance == 0)
 					return ;
 
 				for (size_type i = this->_size - 1; i >= index; --i)
@@ -98,7 +99,8 @@ namespace ft
 			{
 				// From start because otherwise we modify the next slot we are going to copy
 				// Eg. copy 2 to 1, then copy 1 to 0 would cause 2 = 1 = 0
-				if (this->_size == 0)
+				// If distance is 0, we copy to the same slot then delete, to avoid that check first
+				if (this->_size == 0 || distance == 0)
 					return ;
 
 				for (size_type i = index; i + distance < this->_size; ++i)
@@ -266,26 +268,19 @@ namespace ft
 				for (size_type i = 0; i < n; ++i)
 					this->_alloc.construct(this->_ptr + i, val);
 				this->_size = n;
-				
 			}
 
 			/* The range used is [first,last), which includes all the elements between first and last, 
-			   including the element pointed by first but not the element pointed by last 
-			   
-			   Thanks to SNIFAE
-			   3rd useless argument here just to check if InputIterator is really an iterator,
-			   could also use enable_if but didn't found a suitable condition, std::is_integral
-			   would not work with a vector of classes for instance */
+			   including the element pointed by first but not the element pointed by last  */
 			template <class InputIterator>
-			void	assign(InputIterator first, InputIterator last,
-						   typename InputIterator::value_type* pouet = NULL)
+			void	assign(InputIterator first, typename ft::enable_if<!std::numeric_limits<InputIterator>::is_integer ,InputIterator>::type last)
 			{
-				(void) pouet;
-
 				this->reserve(this->distance(first, last));
 				for (size_type i = 0; i < this->_size; ++i)
 					this->_alloc.destroy(this->_ptr + i);
-				this->_size = this->distance(first, last); /* Not at the end since we modify first */
+				
+				this->_size = this->distance(first, last); // Set distance first since we modify first after
+
 				for (size_type i = 0; first != last; ++first, ++i)
 					this->_alloc.construct(this->_ptr + i, *first);
 			}
@@ -381,7 +376,8 @@ namespace ft
 				return (iterator(this->_ptr + index)); // Since we removed element at index, returning ptr + index returns the one following the deleted element
 			}
 
-			// 1 2 3 4
+			// If first == last, then remove basically nothing
+			// 1
 			iterator erase(iterator first, iterator last)
 			{
 				size_type index = this->distance(this->begin(), first);
@@ -389,12 +385,6 @@ namespace ft
 
 				if (index >= this->_size) // past the end or equal
 					return (this->end());
-
-				if (n == 0) // iterators are the same
-				{
-					this->erase(first);
-					return (iterator(this->_ptr + index));
-				}
 
 				/* Since we include first but not last, use strict <, only special case is when first == last
 				   because first should be included but not last, but it is handled right above in case n == 0 */

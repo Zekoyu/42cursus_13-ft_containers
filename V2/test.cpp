@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 13-03-2022  by  `-'                        `-'                  */
-/*   Updated: 14-03-2022 00:22 by                                             */
+/*   Updated: 14-03-2022 12:05 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,13 @@ int main()
 	//std::cout << *it1 << std::endl;
 
 
-	std::vector<int> test(10);
+	std::vector<int> test;
+	test.push_back(1);
+	test.push_back(2);
+	test.push_back(3);
 
-	test[9] = 123;
-	std::cout << "size is " << test.size() << std::endl;
-	test.erase(test.begin() + 9);
-	std::cout << "size is " << test.size() << std::endl;
-	std::cout << test[9] << std::endl;
+	std::cout << "First elt is " << test[0] << std::endl;
+	std::cout << "erase result: " << *(test.erase(test.begin(), test.begin())) << std::endl;
+	std::cout << "First elt is " << test[0] << std::endl;
 
 }

@@ -4,7 +4,7 @@
 
 int		main(void)
 {
-	TESTED_NAMESPACE::vector<TESTED_TYPE> vct(1);
+	TESTED_NAMESPACE::vector<TESTED_TYPE> vct(7);
 	TESTED_NAMESPACE::vector<TESTED_TYPE> vct_two(4);
 	TESTED_NAMESPACE::vector<TESTED_TYPE> vct_three;
 	TESTED_NAMESPACE::vector<TESTED_TYPE> vct_four;

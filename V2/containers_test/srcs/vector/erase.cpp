@@ -3,7 +3,7 @@
 #define TESTED_TYPE std::string
 
 void	checkErase(TESTED_NAMESPACE::vector<TESTED_TYPE> const &vct,
-				   TESTED_NAMESPACE::vector<TESTED_TYPE>::const_iterator const &it)
+					TESTED_NAMESPACE::vector<TESTED_TYPE>::const_iterator const &it)
 {
 	static int i = 0;
 	std::cout << "[" << i++ << "] " << "erase: " << it - vct.begin() << std::endl;
@@ -21,7 +21,7 @@ int		main(void)
 	checkErase(vct, vct.erase(vct.begin() + 2));
 
 	checkErase(vct, vct.erase(vct.begin()));
-	checkErase(vct, vct.erase(vct.end()) - 1);
+	checkErase(vct, vct.erase(vct.end() - 1));
 
 	checkErase(vct, vct.erase(vct.begin(), vct.begin() + 3));
 	checkErase(vct, vct.erase(vct.end() - 3, vct.end() - 1));
