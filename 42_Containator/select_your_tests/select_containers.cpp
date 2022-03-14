@@ -6,7 +6,7 @@
 /*   By: llefranc <llefranc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 14:37:35 by hherin            #+#    #+#             */
-/*   Updated: 14-03-2022 11:42 by                                             */
+/*   Updated: 14-03-2022 13:15 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int main(void)
         
     testVector(arrInt, arrString);  // Comment if you don't want to test VECTOR   
    //  testList(arrInt, arrString);    // Comment if you don't want to test LIST   
-    // testStack(arrInt, arrString);   // Comment if you don't want to test STACK   
+    testStack(arrInt, arrString);   // Comment if you don't want to test STACK   
    //  testQueue(arrInt, arrString);   // Comment if you don't want to test QUEUE   
     // testMap(arrInt, arrString);     // Comment if you don't want to test MAP   
 
@@ -109,31 +109,31 @@ void    testVector(const int (&arrInt)[20], const std::string (&arrString)[20])
 // ---------------------------------------------------------------------------
 // COMMENT THE WHOLE FUNCTION IF YOU DON'T WANT TO TEST STACK.
 // ---------------------------------------------------------------------------
-// void    testStack(const int (&arrInt)[20], const std::string (&arrString)[20])
-// {
-//     //save old buf
-//     std::streambuf *coutbuf = std::cout.rdbuf();
+void    testStack(const int (&arrInt)[20], const std::string (&arrString)[20])
+{
+    //save old buf
+    std::streambuf *coutbuf = std::cout.rdbuf();
         
-//     std::ofstream stdFile("results/stack_std.txt");
-//     std::ofstream ftFile("results/stack_ft.txt");
+    std::ofstream stdFile("results/stack_std.txt");
+    std::ofstream ftFile("results/stack_ft.txt");
 
-//     //redirect std::cout to std::stack_result.txt
-//     std::cout.rdbuf(stdFile.rdbuf());
+    //redirect std::cout to std::stack_result.txt
+    std::cout.rdbuf(stdFile.rdbuf());
         
-//     /* STL TESTS */
-//     constructStackQueue<int, std::stack<int, std::list<int> >, std::list<int> >(arrInt, testNonConstStack<std::stack<int, std::list<int> > >);
-//     constructStackQueue<std::string, std::stack<std::string, std::list<std::string> >, std::list<std::string> > (arrString, testNonConstStack<std::stack<std::string, std::list<std::string> > >);
+    /* STL TESTS */
+    constructStackQueue<int, std::stack<int, std::list<int> >, std::list<int> >(arrInt, testNonConstStack<std::stack<int, std::list<int> > >);
+    constructStackQueue<std::string, std::stack<std::string, std::list<std::string> >, std::list<std::string> > (arrString, testNonConstStack<std::stack<std::string, std::list<std::string> > >);
 
-//     //redirect std::cout to ft::stack_result.txt
-//     std::cout.rdbuf(ftFile.rdbuf());
+    //redirect std::cout to ft::stack_result.txt
+    std::cout.rdbuf(ftFile.rdbuf());
         
-//     /* FT TESTS */
-//     constructStackQueue<int, ft::stack<int, std::list<int> >, std::list<int> >(arrInt, testNonConstStack<ft::stack<int, std::list<int> > >);
-//     constructStackQueue<std::string, ft::stack<std::string, std::list<std::string> >, std::list<std::string> >(arrString, testNonConstStack<ft::stack<std::string, std::list<std::string> > >);
+    /* FT TESTS */
+    constructStackQueue<int, ft::stack<int, std::list<int> >, std::list<int> >(arrInt, testNonConstStack<ft::stack<int, std::list<int> > >);
+    constructStackQueue<std::string, ft::stack<std::string, std::list<std::string> >, std::list<std::string> >(arrString, testNonConstStack<ft::stack<std::string, std::list<std::string> > >);
 
-//     //reset to standard output again
-//     std::cout.rdbuf(coutbuf);
-// }
+    //reset to standard output again
+    std::cout.rdbuf(coutbuf);
+}
 
 
 // ---------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 13-03-2022  by  `-'                        `-'                  */
-/*   Updated: 13-03-2022 19:14 by                                             */
+/*   Updated: 14-03-2022 16:12 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,38 +14,21 @@
 # define VECTORITERATOR_HPP
 
 #include "iterators.hpp"
-#include "enable_if.hpp"
-#include <iostream>
+#include "utils.hpp"
 
 namespace ft
 {
-
-	template <bool Flag, class IsTrue, class IsFalse>
-	struct choose;
-
-	template <class IsTrue, class IsFalse>
-	struct choose<true, IsTrue, IsFalse>
-	{
-		typedef IsTrue type;
-	};
-
-	template <class IsTrue, class IsFalse>
-	struct choose<false, IsTrue, IsFalse>
-	{
-		typedef IsFalse type;
-	};
-
 	/* If IsConst, types will be const, otherwise they will not, in all cases T is non-const */
 	/* https://stackoverflow.com/questions/2150192/how-to-avoid-code-duplication-implementing-const-and-non-const-iterators */
 	/* https://www.cplusplus.com/reference/iterator/RandomAccessIterator/ */
 	template <typename T, bool IsConst = false>
 	class VectIterator : public ft::iterator<
 											 ft::random_access_iterator_tag,
-											 typename choose<IsConst, const T, T>::type
+											 typename ft::chose<IsConst, const T, T>::type
 											>
 	{
 		protected:
-			typedef typename ft::iterator<ft::random_access_iterator_tag, typename choose<IsConst, const T, T>::type> it;
+			typedef typename ft::iterator<ft::random_access_iterator_tag, typename ft::chose<IsConst, const T, T>::type> it;
 			// Our pointer is always non-const, only gets returned as const in case of const iterator
 			T* _ptr;
 
@@ -160,8 +143,8 @@ namespace ft
 		A <= B ✅
 		A >= B ✅
 
-		A += n
-		A -= n
+		A += n ✅
+		A -= n ✅
 
 		A[n] ✅
 	*/

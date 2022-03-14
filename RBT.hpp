@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 14:58 by                                             */
+/*   Updated: 14-03-2022 16:37 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,17 @@ enum e_color
 template <class Type>
 struct RBNode
 {
+	typedef Type value_type;
+	
 	RBNode		*parent;
 	RBNode		*right;
 	RBNode		*left;
 
-	Type*			data;
+	Type*		data;
 	
 	e_color	color;
 
-	RBNode() : parent(nullptr), right(nullptr), left(nullptr), data(nullptr), color(RED) { }
+	RBNode() : parent(NULL), right(NULL), left(NULL), data(NULL), color(RED) { }
 };
 
 
@@ -55,12 +57,14 @@ template <class T, class Compare = std::less<T>, class Alloc = std::allocator<T>
 class RBTree
 {
 	public:
-		typedef RBNode<T>*	node_pointer;
+		typedef T			value_type;
+		typedef RBNode<T>	node;
+		typedef node*		node_pointer;
 
 	private:
-		RBNode<T>*	_root;
-		Alloc		_alloc;
-		RBNode<T>*  _end;
+		node_pointer	_root;
+		Alloc			_alloc;
+		node_pointer	_end;
 
 	private:
 
@@ -76,11 +80,11 @@ class RBTree
 
 		void deleteNode(node_pointer node) /* Non-static since T is template dependant */
 		{
-			if (node == nullptr)
+			if (node == NULL)
 				return;
 				
 			if (node == this->_root)
-				this->_root = nullptr;
+				this->_root = NULL;
 
 			this->_alloc.destroy(node->data);
 			this->_alloc.deallocate(node->data, 1);
@@ -88,7 +92,7 @@ class RBTree
 
 		// void deleteEnd()
 		// {
-		// 	if (this->_end == nullptr)
+		// 	if (this->_end == NULL)
 		// 		return;
 
 		// 	this->_alloc.destroy(this->_end->data);
@@ -117,17 +121,17 @@ class RBTree
 		*/
 		void rightRotate(node_pointer node)
 		{
-			// this->_end->parent->right = nullptr;
+			// this->_end->parent->right = NULL;
 
 			node_pointer newNode = node->left;		// new parent = X
 			/* Switch Y.left and X.right */
 			
 			node->left = newNode->right;			// Y.left = b
-			if (newNode->right != nullptr)
+			if (newNode->right != NULL)
 				newNode->right->parent = node;		// b.parent = Y (to complete Y.left = b)
 			/* Redirect old links from X to Y */
 			newNode->parent = node->parent;			// X.parent = Y.parent (since we switch X and Y)
-			if (node->parent == nullptr)				// node is the root (same as node == this->_root)
+			if (node->parent == NULL)				// node is the root (same as node == this->_root)
 				this->_root = newNode;				// root = X
 			else if (node == node->parent->right)	// Y is the right child
 				node->parent->right = newNode;		// Modify parent to point to X
@@ -158,16 +162,16 @@ class RBTree
 		*/
 		void leftRotate(node_pointer node)
 		{
-			// this->_end->parent->right = nullptr;
+			// this->_end->parent->right = NULL;
 
 			node_pointer newNode = node->right;		// new parent = X
 			/* Switch X.right and Y.left */
 			node->right = newNode->left;			// Y.left = b
-			if (newNode->left != nullptr)
+			if (newNode->left != NULL)
 				newNode->left->parent = node;		// b.parent = Y (to complete Y.left = b)
 			/* Redirect old links from X to Y */
 			newNode->parent = node->parent;			// X.parent = Y.parent (since we switch X and Y)
-			if (node->parent == nullptr)				// node is the root (same as node == this->_root)
+			if (node->parent == NULL)				// node is the root (same as node == this->_root)
 				this->_root = newNode;				// root = X
 			else if (node == node->parent->left)	// Y is the left child
 				node->parent->left = newNode;		// Modify parent to point to X
@@ -185,7 +189,7 @@ class RBTree
 		{
 			node_pointer	uncle;
 
-			// this->_end->parent->right = nullptr;
+			// this->_end->parent->right = NULL;
 			/* Start from newly inserted node all the way up, since we put parent RED each time */
 			while (k->parent->color == RED)
 			{
@@ -243,12 +247,12 @@ class RBTree
 
 		void fixDeleteViolations(node_pointer x)
 		{
-			if (x == nullptr)
+			if (x == NULL)
 				return;
 
-			// this->_end->parent->right = nullptr;
+			// this->_end->parent->right = NULL;
 				
-			node_pointer s = nullptr;
+			node_pointer s = NULL;
 
 			while (x != this->_root && x->color == BLACK)
 			{
@@ -325,7 +329,7 @@ class RBTree
 
 		void replaceNode(node_pointer node, node_pointer replacement)
 		{
-			// this->_end->parent->right = nullptr;
+			// this->_end->parent->right = NULL;
 			/* Parent now points to replacement */
 			if (node == this->_root)
 				this->_root = replacement;
@@ -335,7 +339,7 @@ class RBTree
 				node->parent->right = replacement;
 
 			/* Replacement parent now points node parent */
-			if (replacement != nullptr)
+			if (replacement != NULL)
 				replacement->parent = node->parent;
 
 			// this->setEndNode();
@@ -344,7 +348,7 @@ class RBTree
 		/* Size is size of left tree + size of right tree + 1 (parent) */
 		size_t recursiveSize(node_pointer node) const
 		{
-			if (node == nullptr)
+			if (node == NULL)
 				return (0);
 			return (recursiveSize(node->left) + recursiveSize(node->right) + 1);
 		}
@@ -352,7 +356,7 @@ class RBTree
 		/* Recursive call to clear tree, from leaves to root */
 		void recursiveClear(node_pointer node)
 		{
-			if (node == nullptr)
+			if (node == NULL)
 				return;
 			
 			recursiveClear(node->left);
@@ -366,19 +370,19 @@ class RBTree
 		//	node_pointer curr = this->_root;
 		//	node_pointer last = this->_root;
 		//	
-		//	//if (curr == nullptr)
+		//	//if (curr == NULL)
 		//	//{
 		//	//	deleteEnd();
 		//	//	return ;
 		//	//}
 //
-		//	while (inOrderNext(curr) != nullptr)
+		//	while (inOrderNext(curr) != NULL)
 		//	{
 		//		last = curr;
 		//		curr = inOrderNext(curr);
 		//	}
 //
-		//	//if (this->_end == nullptr)
+		//	//if (this->_end == NULL)
 		//	//{
 		//	//	this->_end = createNode(T());
 		//	//	this->_end->left = this->_end;
@@ -391,8 +395,9 @@ class RBTree
 	public:
 
 		/* End.left is the root, and end.right is end itself */
-		RBTree() : _root(nullptr), _end(createNode(T()))
+		RBTree() : _root(NULL), _alloc(), _end(NULL)
 		{
+			this->_end = this->createNode(T());
 			this->_end->left = this->_root;
 			this->_end->right = this->_end;
 		}
@@ -402,9 +407,9 @@ class RBTree
 		{
 			node_pointer node = createNode(val);
 
-			// this->_end->parent->right = nullptr; /* "Remove" end from the tree */
+			// this->_end->parent->right = NULL; /* "Remove" end from the tree */
 
-			if (this->_root == nullptr)
+			if (this->_root == NULL)
 			{
 				this->_root = node;
 				node->color = BLACK;
@@ -412,11 +417,11 @@ class RBTree
 			}
 
 			node_pointer	curr_node = this->_root;
-			node_pointer	parent = nullptr; /* this.roo.parent */
+			node_pointer	parent = NULL; /* this.roo.parent */
 			
 			Compare			comp;
 			
-			while (curr_node != nullptr)
+			while (curr_node != NULL)
 			{
 				parent = curr_node;
 				if (comp(*(node->data), *(curr_node->data))) /* node < curr_node */
@@ -444,23 +449,23 @@ class RBTree
 
 		void remove(node_pointer node)
 		{
-			if (node == nullptr)
+			if (node == NULL)
 				return ;
 
-			// this->_end->parent->right = nullptr; /* Remove end node from treee */
+			// this->_end->parent->right = NULL; /* Remove end node from treee */
 			
 			int originalColor = node->color;
-			node_pointer newNode = nullptr;
+			node_pointer newNode = NULL;
 			
 			/* If node is a leaf, delete it from the tree */
-			if (node->left == nullptr && node->right == nullptr)
-				replaceNode(node, nullptr);
-			else if (node->right == nullptr) /* Node has only one child (left) => replace node by it's left child */
+			if (node->left == NULL && node->right == NULL)
+				replaceNode(node, NULL);
+			else if (node->right == NULL) /* Node has only one child (left) => replace node by it's left child */
 			{
 				newNode = node->left;
 				replaceNode(node, node->left);
 			}
-			else if (node->left == nullptr) /* Node has only one child (right) */
+			else if (node->left == NULL) /* Node has only one child (right) */
 			{
 				newNode = node->right;
 				replaceNode(node, node->right);
@@ -470,7 +475,7 @@ class RBTree
 				/* Find inorder successor of node (which basically in our case is the smallest value on root right subtree).
 				   when found, it will replace the node */
 				node_pointer successor = node->right;
-				while (successor->left != nullptr)
+				while (successor->left != NULL)
 					successor = successor->left;
 
 				originalColor = successor->color;
@@ -503,7 +508,7 @@ class RBTree
 		{
 			node_pointer node = this->search(val);
 			
-			if (node != nullptr)
+			if (node != NULL)
 				this->remove(node);
 		}
 
@@ -512,16 +517,16 @@ class RBTree
 		{
 			Compare comp;
 
-			// this->_end->parent->right = nullptr;
+			// this->_end->parent->right = NULL;
 
-			if (this->_root == nullptr || (!comp(val, *(this->_root->data)) && !comp(*(this->_root->data), val)))
+			if (this->_root == NULL || (!comp(val, *(this->_root->data)) && !comp(*(this->_root->data), val)))
 				return (this->_root);
 
 
 			node_pointer curr = this->_root;
 
 			/* While not NULL and not equal */
-			while (curr != nullptr && !(!comp(val, *(curr->data)) && !comp(*(curr->data), val)))
+			while (curr != NULL && !(!comp(val, *(curr->data)) && !comp(*(curr->data), val)))
 			{
 				if (comp(val, *(curr->data)))
 				{
@@ -541,7 +546,7 @@ class RBTree
 
 		// void printTree(const std::string& prefix, node_pointer node, bool isLeft = false) const
 		// {
-		// 	if( node != nullptr )
+		// 	if( node != NULL )
 		// 	{
 		// 		std::cout << prefix;
 
@@ -560,8 +565,8 @@ class RBTree
 
 		size_t size() const
 		{
-			if (this->_end != nullptr)
-				return (recursiveSize(this->_root) - 1);
+			//if (this->_end != NULL)
+			//	return (recursiveSize(this->_root) - 1);
 			return (recursiveSize(this->_root));
 		}
 
@@ -569,10 +574,10 @@ class RBTree
 		node_pointer first() const
 		{
 			node_pointer curr = this->_root;
-			// this->_end->parent->right = nullptr;
+			// this->_end->parent->right = NULL;
 
-			if (curr == nullptr)
-				return (nullptr);
+			if (curr == NULL)
+				return (NULL);
 
 			while (curr->left)
 				curr = curr->left;
@@ -585,10 +590,10 @@ class RBTree
 		node_pointer last() const
 		{
 			node_pointer curr = this->_root;
-			// this->_end->parent->right = nullptr;
+			// this->_end->parent->right = NULL;
 
-			if (curr == nullptr)
-				return (nullptr);
+			if (curr == NULL)
+				return (NULL);
 
 			while (curr->right)
 				curr = curr->right;
@@ -600,24 +605,24 @@ class RBTree
 		void clear()
 		{
 			recursiveClear(this->_root);
-			this->_root = nullptr;
-			this->_end->parent = nullptr;
+			this->_root = NULL;
+			this->_end->parent = NULL;
 		}
 
-		static node_pointer inOrderNext(node_pointer node)
+		static node_pointer inorderNext(node_pointer node)
 		{
-			if (node == nullptr)
-				return (nullptr);
+			if (node == NULL)
+				return (NULL);
 			
 			/* If there is right child, travel to it (which means now every node > base_node),
 			   then go to the most-left we can (lowest value bigger than node basically) */
-			if (node->right != nullptr)
+			if (node->right != NULL)
 			{
 				node = node->right;
 				while (node->left)
 				{
 					if (node->left == node) /* END */
-						return (nullptr);
+						return (NULL);
 					node = node->left;
 				}
 			}
@@ -625,7 +630,7 @@ class RBTree
 			{
 				/* Node is the furthest right in the subtree, go up all parents until we find one that is the left-child,
 				   the next inorder-one is that node's parent (NULL if node is the last one already) */
-				while (node->parent != nullptr && node == node->parent->right)
+				while (node->parent != NULL && node == node->parent->right)
 					node = node->parent;
 				node = node->parent;
 			}
@@ -634,14 +639,14 @@ class RBTree
 		}
 
 		/* Basically a mirror of inOrderNext */
-		static node_pointer inOrderPrev(node_pointer node)
+		static node_pointer inorderPrev(node_pointer node)
 		{
-			if (node == nullptr)
-				return (nullptr);
+			if (node == NULL)
+				return (NULL);
 
 			/* If there is right left, travel to it (which means now every node < base_node),
 			   then go to the most-right we can (biggest value lower than node basically) */
-			if (node->left != nullptr)
+			if (node->left != NULL)
 			{
 				node = node->left;
 				while (node->right)
@@ -651,7 +656,7 @@ class RBTree
 			{
 				/* Node is the furthest left in the subtree, go up all parents until we find one that is the right-child,
 				   the next inorder-one is that node's parent (NULL if node is the last one already) */
-				while (node->parent != nullptr && node == node->parent->left)
+				while (node->parent != NULL && node == node->parent->left)
 					node = node->parent;
 				node = node->parent;
 			}

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 12-03-2022 14:59 by                                             */
+/*   Updated: 14-03-2022 18:52 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "pairs.hpp"
 #include "iterators.hpp"
 #include "RBT.hpp"
+#include "MapIterator.hpp"
 
 #include <memory>
 #include <functional>
@@ -26,14 +27,19 @@ namespace ft
 	template < class Key,                                     			// map::key_type
 			   class T,                                       			// map::mapped_type
 			   class Compare = std::less<Key>,                   		// map::key_compare
-			   class Alloc = std::allocator<ft::pair<const Key,T> >	>	// map::allocator_type
+			   class Alloc = std::allocator<ft::pair<Key,T> >	>	// map::allocator_type
 	class map
 	{
+		private:
+			typedef RBTree<pair<Key, T>, Compare, Alloc>	tree_type;
+			typedef typename tree_type::node_pointer		node_pointer;
+			typedef typename tree_type::node				node_type;
+			
 		public:
-			template <class Map>
-			class MapIterator;
+			//template <class Map>
+			//class MapIterator;
 
-			class ValueCompare;
+			struct ValueCompare;
 
 			typedef Key								key_type;
 			typedef T								mapped_type;
@@ -48,23 +54,52 @@ namespace ft
 			typedef typename allocator_type::const_pointer		const_pointer;
 		
 			/* When dereferencing iterator we access a std::pair<Key, T>, just like vector access T */
-			typedef MapIterator< map<Key, T, Compare, Alloc> >				iterator;
-			typedef MapIterator< map<const Key, const T, Compare, Alloc> >	const_iterator;
+			typedef MapIterator<value_type, node_type, false>	iterator;
+			typedef MapIterator<value_type, node_type, true>	const_iterator;
+			
+			//typedef MapIterator< map<Key, T, Compare, Alloc> >				iterator;
+			//typedef MapIterator< map<const Key, const T, Compare, Alloc> >	const_iterator;
 			typedef ft::reverse_iterator<iterator>							reverse_iterator;
 			typedef ft::reverse_iterator<const_iterator>					const_reverse_iterator;
 
 			/* Identical to iterator_traits<iterator>::size_type/difference_type */
 			typedef typename ft::iterator_traits<iterator>::difference_type	difference_type;
 			typedef size_t													size_type;
-	
-		private:
-			typedef typename RBTree<value_type, Compare, Alloc>::node_pointer	node_pointer;
+
 		
-			allocator_type						_alloc;
-			RBTree<value_type, value_compare>	_tree;
-			Compare								_comp;
+			key_compare									_comp;
+			allocator_type								_alloc;	
+			RBTree<value_type, value_compare, Alloc>	_tree;
 
 		public:
+		
+			// Default constructor / empty
+			explicit map(const key_compare& comp = key_compare(),
+			              const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc) { }
+
+			// Range constructor
+			template <class InputIterator>
+			map(InputIterator first, InputIterator last,
+			     const key_compare& comp = key_compare(),
+				 const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc)
+			{
+				while (first != last)
+				{
+					this->_tree.insert(*first);
+					++first;
+				}
+			}
+
+			// Copy constructor
+			map(const map& x)
+			{
+				this->_alloc = x._alloc;
+				this->_comp = x._comp;
+
+				for (map::iterator it = x.begin(); it != x.end(); ++it)
+					this->_tree.insert(*it);
+			}
+	   
 			/* Iterators */
 			iterator		begin()
 			{
@@ -81,8 +116,8 @@ namespace ft
 				return (iterator(this->_tree.first()));
 			}
 
-			iterator		end() { return (iterator(this->_tree.end())); }
-			const_iterator	end() const { return (const_iterator(this->_tree.end())); }
+			iterator		end() { return (iterator(/*this->_tree.end()*/NULL)); }
+			const_iterator	end() const { return (const_iterator(/*this->_tree.end()*/NULL)); }
 
 			reverse_iterator		rbegin() { return (ft::reverse_iterator<iterator>(this->end())); }
 			const_reverse_iterator	rbegin() const { return (ft::reverse_iterator<const_iterator>(this->end())); }
@@ -101,7 +136,7 @@ namespace ft
 			{
 				node_pointer alreadyExists = this->_tree.search(val);
 
-				if (alreadyExists != nullptr) /* Value already in tree */
+				if (alreadyExists != NULL) /* Value already in tree */
 					return (ft::make_pair(iterator(alreadyExists), false));
 				
 				this->_tree.insert(val);
@@ -134,7 +169,7 @@ namespace ft
 				size_type return_val = 0;
 				value_type  tmp_pair(k, mapped_type()); /* Create a temporary to make a pair, easier to find */
 
-				if (this->_tree.search(tmp_pair) != nullptr)
+				if (this->_tree.search(tmp_pair) != NULL)
 				{
 					this->_tree.remove(tmp_pair);
 					return_val = 1;
@@ -142,7 +177,7 @@ namespace ft
 				return (return_val);
 			}
 
-			void erase (iterator first, iterator last)
+			void erase(iterator first, iterator last)
 			{
 				while (first != last)
 					this->_tree.remove(*first++);
@@ -175,18 +210,17 @@ namespace ft
 			key_compare key_comp() const { return (key_comp()); }
 
 			/* Compare using value (pair) instead of key */
-			class ValueCompare
+			struct ValueCompare
 			{
-				public:
-					/* Work like: 'ValueCompare comp; comp(pouet, pouet) == true' */
-					bool operator()(value_type lhs, value_type rhs)
-					{
-						Compare comp;
-						return (comp(lhs.first, rhs.first));
-					}
+				/* Work like: 'ValueCompare comp; comp(pouet, pouet) == true' */
+				bool operator()(value_type lhs, value_type rhs)
+				{
+					Compare comp;
+					return (comp(lhs.first, rhs.first));
+				}
 			};
 
-			value_compare value_comp() const { return (ValueCompare()); }
+			value_compare value_comp() const { return (this->_comp); }
 
 			/* Operations */
 			iterator find(const key_type& k)
@@ -194,7 +228,7 @@ namespace ft
 				value_type  tmp_pair(k, mapped_type());
 
 				node_pointer value = this->_tree.search(tmp_pair);
-				if (value == nullptr)
+				if (value == NULL)
 					return (this->end());
 				
 				return (iterator(value));
@@ -205,7 +239,7 @@ namespace ft
 				value_type  tmp_pair(k, mapped_type());
 
 				node_pointer value = this->_tree.search(tmp_pair);
-				if (value == nullptr)
+				if (value == NULL)
 					return (this->end());
 				
 				return (const_iterator(value));
@@ -216,7 +250,7 @@ namespace ft
 			{
 				value_type tmp_pair(k, mapped_type());
 
-				if (this->_tree.search(tmp_pair) != nullptr)
+				if (this->_tree.search(tmp_pair) != NULL)
 					return (1);
 				return (0);
 			}
@@ -225,12 +259,12 @@ namespace ft
 			   (which most likely is k if it exists, otherwise the nearest upper value) */
 			iterator lower_bound(const key_type& k)
 			{
-				node_pointer curr = this->_tree.getRoot();
+				node_pointer curr = this->_tree.first();
 				
-				while (curr != nullptr && !_comp(curr->data->first, k))
-					curr = this->_tree.inOrderNext(curr);
+				while (curr != NULL && _comp(curr->data->first, k))
+					curr = tree_type::inorderNext(curr);
 				
-				if (curr == nullptr)
+				if (curr == NULL)
 					return (this->end());
 
 				return (iterator(curr));
@@ -238,12 +272,12 @@ namespace ft
 
 			const_iterator lower_bound(const key_type& k) const
 			{
-				node_pointer curr = this->_tree.getRoot();
+				node_pointer curr = this->_tree.first();
 				
-				while (curr != nullptr && !_comp(curr->data->first, k))
-					curr = this->_tree.inOrderNext(curr);
+				while (curr != NULL && _comp(curr->data->first, k))
+					curr = tree_type::inorderNext(curr);
 				
-				if (curr == nullptr)
+				if (curr == NULL)
 					return (this->end());
 
 				return (const_iterator(curr));
@@ -251,24 +285,37 @@ namespace ft
 
 			iterator upper_bound(const key_type& k)
 			{
-				node_pointer curr = this->_tree.getRoot();
+				node_pointer curr = this->_tree.first();
 
-				while (curr != nullptr && _comp(k, curr->data->first))
-					curr = this->_tree.inOrderNext(curr);
+				// value > key
 				
-				if (curr == nullptr)
+				// 2 > 2
+				// 2 > 1
+				// !1 < 2
+
+				// value > key == key !< value && (key != value)
+				while (curr != NULL && 
+				!_comp(k, curr->data->first) &&
+				(!_comp(k, curr->data->first) && !_comp(curr->data->first, k)))
+					curr = tree_type::inorderNext(curr);
+				
+				if (curr == NULL)
 					return (iterator(this->end()));
+				return (iterator(curr));
 			}
 
 			const_iterator upper_bound(const key_type& k) const
 			{
-				node_pointer curr = this->_tree.getRoot();
+				node_pointer curr = this->_tree.first();
 
-				while (curr != nullptr && _comp(k, curr->data->first))
-					curr = this->_tree.inOrderNext(curr);
+				while (curr != NULL && 
+				!_comp(k, curr->data->first) &&
+				(!_comp(k, curr->data->first) && !_comp(curr->data->first, k)))
+					curr = tree_type::inorderNext(curr);
 				
-				if (curr == nullptr)
+				if (curr == NULL)
 					return (const_iterator(this->end()));
+				return (const_iterator(curr));
 			}
 
 			/* Returns the bound of a range that includes all the elements which have a key equivalent to k
@@ -286,120 +333,120 @@ namespace ft
 			/* Allocator */
 			allocator_type get_allocator() const { return (Alloc()); }
 
-			template <typename Node>
-			class MapIterator
-			{
-				private:
-					typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>	iterator;
-					typedef typename RBTree<value_type, Compare>::node_pointer					node_pointer;
-					typedef RBTree<value_type, Compare, Alloc>									tree;
+			// template <typename Node>
+			// class MapIterator
+			// {
+			// 	private:
+			// 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, value_type>	iterator;
+			// 		typedef typename RBTree<value_type, Compare>::node_pointer					node_pointer;
+			// 		typedef RBTree<value_type, Compare, Alloc>									tree;
 
-					/* end.left is root, end.right is end */
-					static bool isEndNode(node_pointer node)
-					{
-						return (node == nullptr || node->right == node);
-					}
+			// 		/* end.left is root, end.right is end */
+			// 		static bool isEndNode(node_pointer node)
+			// 		{
+			// 			return (node == NULL || node->right == node);
+			// 		}
 
-					node_pointer findRoot(node_pointer node)
-					{
-						if (node == nullptr)
-							return (nullptr);
+			// 		node_pointer findRoot(node_pointer node)
+			// 		{
+			// 			if (node == NULL)
+			// 				return (NULL);
 
-						if (isEndNode(node))
-							return (node->left);
+			// 			if (isEndNode(node))
+			// 				return (node->left);
 
-						if (node->parent == nullptr) /* Node IS the root */
-							return (node);
+			// 			if (node->parent == NULL) /* Node IS the root */
+			// 				return (node);
 
-						while (node->parent != nullptr)
-							node = node->parent;
+			// 			while (node->parent != NULL)
+			// 				node = node->parent;
 						
-						return (node);
-					}
+			// 			return (node);
+			// 		}
 
-					node_pointer findLast(node_pointer root)
-					{
-						if (root == nullptr)
-							return (nullptr);
-
-
-						while (tree::inOrderNext(root) != nullptr)
-							root = tree::inOrderNext(root);
-
-						return (root);
-					}
+			// 		node_pointer findLast(node_pointer root)
+			// 		{
+			// 			if (root == NULL)
+			// 				return (NULL);
 
 
-				public:
-					typedef typename iterator::iterator_category	iterator_category;
-					typedef typename iterator::value_type			value_type;
-					typedef typename iterator::reference			reference;
-					typedef typename iterator::pointer				pointer;
+			// 			while (tree::inorderNext(root) != NULL)
+			// 				root = tree::inorderNext(root);
 
-					typedef ptrdiff_t	difference_type;
-					typedef size_t		size_type;
+			// 			return (root);
+			// 		}
 
-					MapIterator(node_pointer node) : _node(node), _root(this->findRoot(_node)) { }
-					MapIterator() : _node(nullptr), _root(this->findRoot(_node)) { }
-					MapIterator(const MapIterator& m) : _node(m._node), _root(this->findRoot(_node)) { }
-					~MapIterator() { }
 
-					MapIterator& operator=(const MapIterator& m)
-					{
-						this->_node = m._node;
-						return (*this);
-					}
+			// 	public:
+			// 		typedef typename iterator::iterator_category	iterator_category;
+			// 		typedef typename iterator::value_type			value_type;
+			// 		typedef typename iterator::reference			reference;
+			// 		typedef typename iterator::pointer				pointer;
 
-					reference operator*() { return (*this->_node->data); }
+			// 		typedef ptrdiff_t	difference_type;
+			// 		typedef size_t		size_type;
 
-					const_reference operator*() const { return (*this->_node->data); }
+			// 		MapIterator(node_pointer node) : _node(node), _root(this->findRoot(_node)) { }
+			// 		MapIterator() : _node(NULL), _root(this->findRoot(_node)) { }
+			// 		MapIterator(const MapIterator& m) : _node(m._node), _root(this->findRoot(_node)) { }
+			// 		~MapIterator() { }
 
-					pointer operator->() { return (this->_node->data); }
+			// 		MapIterator& operator=(const MapIterator& m)
+			// 		{
+			// 			this->_node = m._node;
+			// 			return (*this);
+			// 		}
 
-					/* If we are past-the end, save the last element and set to null, then if we want to go back, node = last */
-					MapIterator& operator++()
-					{
-						this->_node = tree::inOrderNext(this->_node);
-						return (*this);
-					}
+			// 		reference operator*() { return (*this->_node->data); }
 
-					MapIterator operator++(int)
-					{
-						MapIterator tmp = *this; /* Calls copy constructor, smart C++ */
-						++(*this);
-						return (tmp);
-					}
+			// 		const_reference operator*() const { return (*this->_node->data); }
 
-					MapIterator& operator--()
-					{
-						if (this->_node == nullptr)
-							this->_node = this->findLast(this->_root);
-						else
-							this->_node = tree::inOrderPrev(this->_node);
-						return (*this);
-					}
+			// 		pointer operator->() { return (this->_node->data); }
 
-					MapIterator operator--(int)
-					{
-						MapIterator tmp = *this;
-						--(*this);
-						return (tmp);
-					}
+			// 		/* If we are past-the end, save the last element and set to null, then if we want to go back, node = last */
+			// 		MapIterator& operator++()
+			// 		{
+			// 			this->_node = tree::inorderNext(this->_node);
+			// 			return (*this);
+			// 		}
 
-					/* Check if either both nodes are equal, or if it's on the end node */
-					friend bool operator==(const MapIterator& lhs, const MapIterator& rhs)
-					{
-						if (isEndNode(lhs._node) || isEndNode(rhs._node))
-							return (isEndNode(lhs._node) && isEndNode(rhs._node));
+			// 		MapIterator operator++(int)
+			// 		{
+			// 			MapIterator tmp = *this; /* Calls copy constructor, smart C++ */
+			// 			++(*this);
+			// 			return (tmp);
+			// 		}
 
-						return (lhs._node == rhs._node);
-					}
-					friend bool operator!=(const MapIterator& lhs, const MapIterator& rhs) { return (!(lhs == rhs)); }
+			// 		MapIterator& operator--()
+			// 		{
+			// 			if (this->_node == NULL)
+			// 				this->_node = this->findLast(this->_root);
+			// 			else
+			// 				this->_node = tree::inorderPrev(this->_node);
+			// 			return (*this);
+			// 		}
 
-				private:
-					node_pointer _node;
-					node_pointer _root;
-			};
+			// 		MapIterator operator--(int)
+			// 		{
+			// 			MapIterator tmp = *this;
+			// 			--(*this);
+			// 			return (tmp);
+			// 		}
+
+			// 		/* Check if either both nodes are equal, or if it's on the end node */
+			// 		friend bool operator==(const MapIterator& lhs, const MapIterator& rhs)
+			// 		{
+			// 			if (isEndNode(lhs._node) || isEndNode(rhs._node))
+			// 				return (isEndNode(lhs._node) && isEndNode(rhs._node));
+
+			// 			return (lhs._node == rhs._node);
+			// 		}
+			// 		friend bool operator!=(const MapIterator& lhs, const MapIterator& rhs) { return (!(lhs == rhs)); }
+
+			// 	private:
+			// 		node_pointer _node;
+			// 		node_pointer _root;
+			// };
 
 
 	};
