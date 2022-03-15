@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 07-03-2022  by  `-'                        `-'                  */
-/*   Updated: 14-03-2022 16:37 by                                             */
+/*   Updated: 15-03-2022 19:00 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,19 +90,8 @@ class RBTree
 			this->_alloc.deallocate(node->data, 1);
 		}
 
-		// void deleteEnd()
-		// {
-		// 	if (this->_end == NULL)
-		// 		return;
-
-		// 	this->_alloc.destroy(this->_end->data);
-		// 	this->_alloc.deallocate(this->_end->data, 1);
-		// }
-
-
 		/* See https://algorithmtutor.com/Data-Structures/Tree/Red-Black-Trees/ */
 		/* https://github.com/Bibeknam/algorithmtutorprograms/blob/master/data-structures/red-black-trees/RedBlackTree.cpp */
-
 		/* Rotate node n right, makes it become the child and it's left child the parent 
 		   
 		   rightRotate(Y) does:
@@ -398,8 +387,8 @@ class RBTree
 		RBTree() : _root(NULL), _alloc(), _end(NULL)
 		{
 			this->_end = this->createNode(T());
-			this->_end->left = this->_root;
-			this->_end->right = this->_end;
+			this->_end->left = this->first();
+			this->_end->right = this->last();
 		}
 
 		/* Insert as in any Binary Search Tree, then fix the RBT violations if any */

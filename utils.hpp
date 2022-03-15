@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 14-03-2022  by  `-'                        `-'                  */
-/*   Updated: 14-03-2022 13:23 by                                             */
+/*   Updated: 14-03-2022 23:27 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,16 @@ namespace ft
 {
 
 	template <bool Flag, class IsTrue, class IsFalse>
-	struct chose;
+	struct choose;
 
 	template <class IsTrue, class IsFalse>
-	struct chose<true, IsTrue, IsFalse>
+	struct choose<true, IsTrue, IsFalse>
 	{
 		typedef IsTrue type;
 	};
 
 	template <class IsTrue, class IsFalse>
-	struct chose<false, IsTrue, IsFalse>
+	struct choose<false, IsTrue, IsFalse>
 	{
 		typedef IsFalse type;
 	};

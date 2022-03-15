@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 13-03-2022  by  `-'                        `-'                  */
-/*   Updated: 14-03-2022 16:12 by                                             */
+/*   Updated: 14-03-2022 23:27 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@ namespace ft
 	template <typename T, bool IsConst = false>
 	class VectIterator : public ft::iterator<
 											 ft::random_access_iterator_tag,
-											 typename ft::chose<IsConst, const T, T>::type
+											 typename ft::choose<IsConst, const T, T>::type
 											>
 	{
 		protected:
-			typedef typename ft::iterator<ft::random_access_iterator_tag, typename ft::chose<IsConst, const T, T>::type> it;
+			typedef typename ft::iterator<ft::random_access_iterator_tag, typename ft::choose<IsConst, const T, T>::type> it;
 			// Our pointer is always non-const, only gets returned as const in case of const iterator
 			T* _ptr;
 
