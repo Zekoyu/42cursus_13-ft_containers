@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 19:38 by                                             */
+/*   Updated: 15-03-2022 20:34 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,10 @@ namespace ft
 				node(const node& n) : parent(n.parent), left(n.left), right(n.right), data(n.data), color(n.color) { }
 			};
 
-		private:
 			typedef node* node_pointer;
+
+		private:
+			
 			typedef std::allocator<node> node_allocator_type;
 
 			allocator_type		_alloc; // To allocate T
@@ -355,7 +357,8 @@ namespace ft
 				this->deleteNode(node);
 			}
 
-			node_pointer inorderSuccessor(node_pointer node)
+			template <class Node>
+			static node_pointer inorderSuccessor(Node* node)
 			{
 				if (node == NULL)
 					return (NULL);
@@ -380,7 +383,8 @@ namespace ft
 			}
 
 			// Basically a mirror of inorderSuccessor
-			node_pointer inorderPredecessor(node_pointer node)
+			template <class Node>
+			static node_pointer inorderPredecessor(Node* node)
 			{
 				if (node == NULL)
 					return (NULL);
@@ -543,6 +547,9 @@ namespace ft
 			size_t size() const { return (this->recursiveSize(this->_root)); }
 
 			void clear() { this->recursiveClear(this->_root); this->_root = NULL }
+
+			// Dummy end for iterators
+			node_pointer end() { return (this->_dummyEnd); }
 
 	};
 

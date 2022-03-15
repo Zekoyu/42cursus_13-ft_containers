@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 13-03-2022  by  `-'                        `-'                  */
-/*   Updated: 14-03-2022 23:27 by                                             */
+/*   Updated: 15-03-2022 20:32 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ namespace ft
 
 		public:
 			// Combines default constructor and assignation constructor
-			VectIterator(T* ptr = NULL) { _ptr = ptr; }
-			VectIterator(const VectIterator<T, IsConst>& it) { this->_ptr = it._ptr; }
+			VectIterator(T* ptr = NULL) : _ptr(ptr) { }
+			VectIterator(const VectIterator<T, IsConst>& it) : _ptr(it._ptr) { }
 			~VectIterator() { }
 
 			VectIterator<T, IsConst>& operator=(const VectIterator<T, IsConst>& it) { this->_ptr = it._ptr; return (*this); }
@@ -45,6 +45,7 @@ namespace ft
 
 
 			/********** Relational operators **********/
+			
 			// A + n
 			VectIterator<T, IsConst> operator+(typename it::difference_type n) const { return (VectIterator<T, IsConst>(this->_ptr + n)); }
 
@@ -54,16 +55,16 @@ namespace ft
 			// *A
 			typename it::reference operator*() const { return (*this->_ptr); }
 
-			// A->m (When can this be used ?? Idk, didn't found)
+			// A->m (When can this be used ?? Idk, on map can be used for it->first and it->second)
 			typename it::pointer operator->() const { return (this->_ptr); }
 
 			// ++A
 			VectIterator<T, IsConst>& operator++() { ++this->_ptr; return (*this); }
 
-			// A++
+			// --A
 			VectIterator<T, IsConst>& operator--() { --this->_ptr; return (*this); }
 
-			// --A
+			// A++
 			VectIterator<T, IsConst> operator++(int) { VectIterator<T, IsConst> tmp = *this; ++(*this); return (tmp); }
 
 			// A--
@@ -79,6 +80,7 @@ namespace ft
 			typename it::reference operator[](typename it::difference_type n) { return (this->_ptr[n]); }
 
 			/********** Friend relational operators, to allow const and non-const mixed **********/
+
 			// Operators on possibly different (const / non-const) iterators
 
 			// A - B, Uses IteRight for SNIFAE to force using operator-(difference_type) for 'begin() - 2' for instance
@@ -89,11 +91,11 @@ namespace ft
 			template <typename Type>
 			friend VectIterator<Type> operator+(typename VectIterator<Type>::difference_type n, const VectIterator<Type>& rhs);
 
-			// A == B
+			// A == B / B == A
 			template <class IteLeft, class IteRight>
 			friend bool operator==(const IteLeft& lhs, const IteRight& rhs);
 
-			// A != B
+			// A != B / B != A
 			template <class IteLeft, class IteRight>
 			friend bool operator!=(const IteLeft& lhs, const IteRight& rhs);
 
