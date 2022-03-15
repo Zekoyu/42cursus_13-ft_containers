@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 20:46 by                                             */
+/*   Updated: 15-03-2022 22:09 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,25 +24,25 @@ namespace ft
 	template <class Tree, bool IsConst = false>
 	class TreeIterator : public ft::iterator<
 											 ft::bidirectional_iterator_tag,
-											 typename ft::choose<IsConst, const Tree::value_type, Tree::value_type>::type
+											 typename ft::choose<IsConst, const typename Tree::value_type, typename Tree::value_type>::type
 											>
 	{
 		protected:
-			typedef typename ft::iterator<ft::bidirectional_iterator_tag, typename ft::chose<IsConst, const Tree::value_type, Tree::value_type>::type> it;
+			typedef typename ft::iterator<ft::bidirectional_iterator_tag, typename ft::choose<IsConst, const typename Tree::value_type, typename Tree::value_type>::type> it;
 
 			//Tree::node_pointer  _end;
-			Tree::node_pointer	_node;
-			Tree::node_pointer	_knownEnd;
+			typename Tree::node_pointer	_node;
+			typename Tree::node_pointer	_knownEnd;
 
 		public:
-			TreeIterator(Tree::node_pointer node = NULL, Tree::node_pointer knownEnd = NULL) : _node(node), _knownEnd(knownEnd) { }
+			TreeIterator(typename Tree::node_pointer node = NULL, typename Tree::node_pointer knownEnd = NULL) : _node(node), _knownEnd(knownEnd) { }
 			TreeIterator(const TreeIterator<Tree, IsConst>& it) : _node(it._node), _knownEnd(it._knownEnd) { }
 			~TreeIterator() { }
 
 			TreeIterator<Tree, IsConst>& operator=(const TreeIterator<Tree, IsConst>& it) { this->_node = it._node; return (*this); }
 
 			// Allow conversion from non-const to const, but not the other way around
-			operator TreeIterator<Tree, true>() { return (TreeIterator<T, true>(this->_node)); }
+			operator TreeIterator<Tree, true>() { return (TreeIterator<Tree, true>(this->_node)); }
 
 			/********** Relational operators **********/
 
@@ -53,7 +53,7 @@ namespace ft
 			typename it::pointer operator->() const { return (&(this->_node.data)); }
 
 			// ++A
-			VectIterator<T, IsConst>& operator++()
+			TreeIterator<Tree, IsConst>& operator++()
 			{
 				if (this->_node != NULL)
 					this->_knownEnd = this->_node;
@@ -63,9 +63,9 @@ namespace ft
 
 			// --A
 			// If we are at the end, go back to the last known end (if NULL it means tree is empty)
-			VectIterator<T, IsConst>& operator--()
+			TreeIterator<Tree, IsConst>& operator--()
 			{
-				if (this->_node = NULL)
+				if (this->_node == NULL)
 					this->_node = this->_knownEnd;
 				else
 					this->_node = Tree::inorderPredecessor(this->_node);
@@ -73,10 +73,10 @@ namespace ft
 			}
 
 			// A++
-			VectIterator<T, IsConst> operator++(int) { VectIterator<T, IsConst> tmp = *this; ++(*this); return (tmp); }
+			TreeIterator<Tree, IsConst> operator++(int) { TreeIterator<Tree, IsConst> tmp = *this; ++(*this); return (tmp); }
 
 			// A--
-			VectIterator<T, IsConst> operator--(int) { VectIterator<T, IsConst> tmp = *this; --(*this); return (tmp); }
+			TreeIterator<Tree, IsConst> operator--(int) { TreeIterator<Tree, IsConst> tmp = *this; --(*this); return (tmp); }
 
 			/********** Friend relational operators, to allow const and non-const mixed **********/
 
@@ -112,10 +112,10 @@ namespace ft
 	*/
 
 	template <class IteLeft, class IteRight>
-	friend bool operator!=(const IteLeft& lhs, const IteRight& rhs) { return (lhs._node == rhs._node); }
+	bool operator==(const IteLeft& lhs, const IteRight& rhs) { return (lhs._node == rhs._node); }
 
 	template <class IteLeft, class IteRight>
-	friend bool operator!=(const IteLeft& lhs, const IteRight& rhs) { return (lhs._node != rhs._node); }
+	bool operator!=(const IteLeft& lhs, const IteRight& rhs) { return (lhs._node != rhs._node); }
 
 }
 

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 14-03-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 20:54 by                                             */
+/*   Updated: 15-03-2022 21:07 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,11 @@ namespace ft
 
 	// Default, T and U are different
 	template <class T, class U>
-	struct is_same { typedef value false; };
+	struct is_same { static const bool value = false; };
 
 	// Specialization, T and T are the same
 	template<class T>
-	struct is_same<T, T> { typedef value true; };
+	struct is_same<T, T> { static const bool value = true; };
 
 }
 

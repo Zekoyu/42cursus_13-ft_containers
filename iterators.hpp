@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 21:00 by                                             */
+/*   Updated: 15-03-2022 22:24 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,8 +97,7 @@ namespace ft
 	class reverse_iterator
 	{
 		public:
-			// Only do the typedef if iterator_category is random_access, otherwise use SNIFAE to use the other implementation
-			ft::enable_if<ft::is_same<Iterator::iterator_category, ft::random_access_iterator_tag>::value, Iterator>::type	iterator_type;
+			typedef Iterator iterator_type;
 			typedef typename ft::iterator_traits<Iterator>::iterator_category	iterator_category;
 			typedef typename ft::iterator_traits<Iterator>::value_type			value_type;
 			typedef typename ft::iterator_traits<Iterator>::difference_type		difference_type;
@@ -115,6 +114,7 @@ namespace ft
 			/* For a reverse iterator r constructed from an iterator i, the relationship &*r == &*(i-1) is always true (as long as r is dereferenceable);
 			   thus a reverse iterator constructed from a one-past-the-end iterator dereferences to the last element in a sequence,
 			   and a reverse iterator constructed from the begin iterator point to the element before it (which is the past-the-end element in the reversed range) */
+			
 			explicit reverse_iterator(iterator_type it) : _it(it) { }
 
 			template <class Iter>
@@ -127,8 +127,15 @@ namespace ft
 			// Internally, the function decreases a copy of its base iterator and returns the result of dereferencing it.
 			reference operator*() const { iterator_type tmp = this->_it; --tmp; return (*tmp); }
 
+			// Return an iterator, enable_if for random iterator version
+			template <typename Iter = reverse_iterator>
+			typename ft::enable_if<ft::is_same<Iter::iterator_category, ft::random_access_iterator_tag>::value, Iter>::type
+			operator+(difference_type n) const { return (reverse_iterator(this->_it.operator-(n))); }
 
-			reverse_iterator operator+(difference_type n) const { return (reverse_iterator(this->_it.operator-(n))); }
+			// Return an iterator, enable_if for bidirectional iterator version
+			template <typename Iter = reverse_iterator>
+			typename ft::enable_if<ft::is_same<Iter::iterator_category, ft::bidirectional_iterator_tag>::value, Iter>::type
+			operator+(difference_type n) const { return (reverse_iterator(this->_it.operator-(n))); }
 
 			reverse_iterator& operator++() { --this->_it; return (*this); }
 
@@ -151,55 +158,6 @@ namespace ft
 			// Internally, the function accesses the proper element of its base iterator, returning the same as: base()[-n-1].
 			reference operator[](difference_type n) const { return (this->base()[-n-1]); }
 	};
-
-	// Bidirectional version
-	template <class Iterator>
-	class reverse_iterator
-	{
-		public:
-			ft::enable_if<ft::is_same<Iterator::iterator_category, ft::bidirectional_iterator_tag>::value, Iterator>::type	iterator_type;
-			typedef typename ft::iterator_traits<Iterator>::iterator_category	iterator_category;
-			typedef typename ft::iterator_traits<Iterator>::value_type			value_type;
-			typedef typename ft::iterator_traits<Iterator>::difference_type		difference_type;
-			typedef typename ft::iterator_traits<Iterator>::pointer				pointer;
-			typedef typename ft::iterator_traits<Iterator>::reference			reference;
-
-		private:
-			iterator_type _it;
-
-		public:
-			/********** Constructors **********/
-			reverse_iterator() : _it() { }
-
-			/* For a reverse iterator r constructed from an iterator i, the relationship &*r == &*(i-1) is always true (as long as r is dereferenceable);
-			   thus a reverse iterator constructed from a one-past-the-end iterator dereferences to the last element in a sequence,
-			   and a reverse iterator constructed from the begin iterator point to the element before it (which is the past-the-end element in the reversed range) */
-			explicit reverse_iterator(iterator_type it) : _it(it) { }
-
-			template <class Iter>
-			reverse_iterator (const reverse_iterator<Iter>& rev_it) : _it(rev_it.base()) { }
-
-			/********** Member functions **********/
-			// _it will be copied since we don't return by reference
-			iterator_type base() const { return (_it); }
-
-			// Internally, the function decreases a copy of its base iterator and returns the result of dereferencing it.
-			reference operator*() const { iterator_type tmp = this->_it; --tmp; return (*tmp); }
-
-
-			reverse_iterator& operator++() { --this->_it; return (*this); }
-
-			reverse_iterator operator++(int) { reverse_iterator tmp = *this; ++(*this); return (tmp); }
-
-
-			reverse_iterator& operator--() { ++this->_it; return (*this); }
-
-			reverse_iterator operator--(int) { reverse_iterator tmp = *this; --(*this); return (tmp); }
-
-			// Internally, the function calls operator* and returns its address, as if implemented as:
-			pointer operator->() const { return (&(this->operator*())); }
-	};
-
 	// Relational operators, see https://www.cplusplus.com/reference/iterator/reverse_iterator/operators/
 	template<class IteLeft, class IteRight>
 	bool operator==(const ft::reverse_iterator<IteLeft>& lhs, const ft::reverse_iterator<IteRight>& rhs)
@@ -210,6 +168,22 @@ namespace ft
 	{ return (lhs.base() != rhs.base()); }
 
 
+	// Same, only used with random access
+	template<class IteLeft, class IteRight>
+	bool operator<(const ft::reverse_iterator<IteLeft>& lhs, const ft::reverse_iterator<IteRight>& rhs)
+	{ return (lhs.base() > rhs.base()); }
+
+	template<class IteLeft, class IteRight>
+	bool operator<=(const ft::reverse_iterator<IteLeft>& lhs, const ft::reverse_iterator<IteRight>& rhs)
+	{ return (lhs.base() >= rhs.base()); }
+
+	template<class IteLeft, class IteRight>
+	bool operator>(const ft::reverse_iterator<IteLeft>& lhs, const ft::reverse_iterator<IteRight>& rhs)
+	{ return (lhs.base() < rhs.base()); }
+
+	template<class IteLeft, class IteRight>
+	bool operator>=(const ft::reverse_iterator<IteLeft>& lhs, const ft::reverse_iterator<IteRight>& rhs)
+	{ return (lhs.base() <= rhs.base()); }
 
 
 	// Operator+ returns a reverse_iterator
