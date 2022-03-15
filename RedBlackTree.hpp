@@ -6,14 +6,14 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 20:34 by                                             */
+/*   Updated: 15-03-2022 20:47 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REDBLACKTREE_HPP
 # define REDBLACKTREE_HPP
 
-#include "iterators.hpp"
+#include "TreeIterator.hpp"
 
 #include <memory>
 #include <functional>
@@ -27,6 +27,9 @@ namespace ft
 	template <class T, class Compare = std::less<T>, class Allocator = std::allocator<T> >
 	class RedBlackTree
 	{
+		private:
+			typedef RedBlackTree<T, Compare, Allocator> self_type;
+
 		public:
 			typedef T											value_type;
 			typedef Allocator									allocator_type;
@@ -35,6 +38,12 @@ namespace ft
 			typedef typename allocator_type::const_reference	const_reference;
 			typedef typename allocator_type::pointer			pointer;
 			typedef typename allocator_type::const_pointer		const_pointer;
+
+			typedef TreeIterator<self_type, false>	iterator;
+			typedef TreeIterator<self_type, true>	const_iterator;
+
+			typedef ft::reverse_iterator<iterator>			reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 			typedef ptrdiff_t	difference_type;
 			typedef size_t		size_type;

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 20:44 by                                             */
+/*   Updated: 15-03-2022 20:46 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ namespace ft
 											>
 	{
 		protected:
-			typedef Tree tree_type;
 			typedef typename ft::iterator<ft::bidirectional_iterator_tag, typename ft::chose<IsConst, const Tree::value_type, Tree::value_type>::type> it;
 
 			//Tree::node_pointer  _end;
@@ -58,7 +57,7 @@ namespace ft
 			{
 				if (this->_node != NULL)
 					this->_knownEnd = this->_node;
-				this->_node = tree::inorderSuccessor(this->_node);
+				this->_node = Tree::inorderSuccessor(this->_node);
 				return (*this);
 			}
 
@@ -69,7 +68,7 @@ namespace ft
 				if (this->_node = NULL)
 					this->_node = this->_knownEnd;
 				else
-					this->_node = tree::inorderPredecessor(this->_node);
+					this->_node = Tree::inorderPredecessor(this->_node);
 				reutrn (*this);
 			}
 
