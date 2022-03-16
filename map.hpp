@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 16-03-2022  by  `-'                        `-'                  */
-/*   Updated: 16-03-2022 15:42 by                                             */
+/*   Updated: 16-03-2022 16:22 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,22 @@ namespace ft
 			allocator_type	_alloc;
 			tree_type		_tree;
 
+			// Pretty easy but I'm smartn't so this won't have my monkey brain
+			bool isInf(const value_type& lhs, const value_type& rhs) const
+			{ return (this->_comp(lhs, rhs)); }
+
+			bool isInfOrEqual(const value_type& lhs, const value_type& rhs) const
+			{ return (this->isInf(lhs, rhs) || this->isEq(lhs, rhs)); }
+
+			bool isSup(const value_type& lhs, const value_type& rhs) const
+			{ return (!this->isInf(lhs, rhs) && !this->isEq(lhs, rhs)); }
+
+			bool isSupOrEqual(const value_type& lhs, const value_type& rhs) const
+			{ return (this->isSup(lhs, rhs) || this->isEq(lhs, rhs)); }
+
+			bool isEq(const value_type& lhs, const value_type& rhs) const
+			{ return (!this->_comp(lhs, rhs) && !this->_comp(rhs, lhs)); }
+
 		public:
 			// Default constructor / empty
 			explicit map(const key_compare& comp = key_compare(),
@@ -134,6 +150,109 @@ namespace ft
 				while (first != last)
 					this->_tree.insert(*first++);
 			}
+
+			
+			size_type erase(const key_type& k)
+			{
+				size_type return_val = 0;
+				// Create a temporary to make it easier to find k
+				value_type  tmp_pair(k, mapped_type());
+
+				if (this->_tree.search(tmp_pair) != NULL)
+				{
+					this->_tree.remove(tmp_pair);
+					return_val = 1;
+				}
+				return (return_val);
+			}
+			
+			void erase(iterator position)
+			{
+				this->_tree.remove(*position);
+			}
+
+			void erase(iterator first, iterator last)
+			{
+				while (first != last)
+					this->_tree.remove(*first++);
+			}
+
+
+			void swap(map& x)
+			{
+				tree_type& tmp_tree = this->_tree;
+				key_compare& tmp_comp = this->_comp;
+				allocator_type& tmp_alloc = this->_alloc;
+
+				this->_tree = x._tree;
+				this->_comp = x._comp;
+				this->_alloc = x._alloc;
+
+				x._tree = tmp_tree;
+				x._comp = tmp_comp;
+				x._alloc = tmp_alloc;
+			}
+
+			void clear() { this->_tree.clear(); }
+
+			/********** Element accesses **********/
+			// Returns a reference to the mapped value,
+			// it's either the value found corresponding to the key, or the newly inserted one in the other case
+			// Retrieve the iterator returned by insert, then return a reference to the mapped_type (second in pair)
+			mapped_type& operator[](const key_type& k)
+			{ return (*(this->insert(ft::make_pair(k, mapped_type())).first)).second }
+			
+			/********** Observers **********/
+			key_compare key_comp() const { return (key_comp()); }
+
+			// Will create a copy since it's not returned by reference
+			value_compare value_comp() const { return (this->_comp); }
+
+			/********** Operations **********/
+			iterator find(const key_type& k)
+			{
+				// Create a temporary to make it easier to find k
+				value_type  tmp_pair(k, mapped_type());
+
+				node_pointer value = this->_tree.search(tmp_pair);
+				if (value == NULL)
+					return (this->end());
+				
+				return (iterator(value));
+			}
+
+			const_iterator find(const key_type& k) const
+			{
+				// Create a temporary to make it easier to find k
+				value_type  tmp_pair(k, mapped_type());
+
+				node_pointer value = this->_tree.search(tmp_pair);
+				if (value == NULL)
+					return (this->end());
+				
+				return (const_iterator(value));
+			}
+
+			// Returns the count of key in the tree, in map it's always 0 or 1
+			size_type count(const key_type& k) const
+			{
+				value_type tmp_pair(k, mapped_type());
+
+				if (this->_tree.search(tmp_pair) != NULL)
+					return (1);
+				return (0);
+			}
+
+			// Returns an iterator pointing to the first element in the container whose key 
+			// is not considered to go before k (i.e., either it is equivalent or goes after).
+			iterator lower_bound(const key_type& k)
+			{
+				node_pointer curr = this->_tree.first();
+				
+				while (curr != NULL && isInf(curr->data.first, k))
+					curr == tree_type::inorderNext(curr);
+			}
+
 	};
 }
 
