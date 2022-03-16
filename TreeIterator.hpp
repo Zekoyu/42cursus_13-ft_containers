@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 22:09 by                                             */
+/*   Updated: 16-03-2022 15:18 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,10 @@ namespace ft
 			/********** Relational operators **********/
 
 			// *A
-			typename it::reference operator*() const { return (this->_node.data); }
+			typename it::reference operator*() const { return (this->_node->data); }
 
 			// A->m, eg. 'it->first' and 'it->second' for map
-			typename it::pointer operator->() const { return (&(this->_node.data)); }
+			typename it::pointer operator->() const { return (&(this->_node->data)); }
 
 			// ++A
 			TreeIterator<Tree, IsConst>& operator++()
@@ -69,7 +69,7 @@ namespace ft
 					this->_node = this->_knownEnd;
 				else
 					this->_node = Tree::inorderPredecessor(this->_node);
-				reutrn (*this);
+				return (*this);
 			}
 
 			// A++

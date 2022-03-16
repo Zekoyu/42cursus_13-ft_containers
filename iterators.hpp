@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 22:24 by                                             */
+/*   Updated: 16-03-2022 13:05 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,15 +127,8 @@ namespace ft
 			// Internally, the function decreases a copy of its base iterator and returns the result of dereferencing it.
 			reference operator*() const { iterator_type tmp = this->_it; --tmp; return (*tmp); }
 
-			// Return an iterator, enable_if for random iterator version
-			template <typename Iter = reverse_iterator>
-			typename ft::enable_if<ft::is_same<Iter::iterator_category, ft::random_access_iterator_tag>::value, Iter>::type
-			operator+(difference_type n) const { return (reverse_iterator(this->_it.operator-(n))); }
 
-			// Return an iterator, enable_if for bidirectional iterator version
-			template <typename Iter = reverse_iterator>
-			typename ft::enable_if<ft::is_same<Iter::iterator_category, ft::bidirectional_iterator_tag>::value, Iter>::type
-			operator+(difference_type n) const { return (reverse_iterator(this->_it.operator-(n))); }
+			reverse_iterator operator+(difference_type n) const { return (reverse_iterator(this->_it.operator-(n))); }
 
 			reverse_iterator& operator++() { --this->_it; return (*this); }
 

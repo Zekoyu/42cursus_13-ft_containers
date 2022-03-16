@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 20:47 by                                             */
+/*   Updated: 16-03-2022 15:41 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <functional>
+#include <iostream>
 
 #define BLACK 0
 #define RED 1
@@ -62,7 +63,7 @@ namespace ft
 				bool color;
 
 				node() : parent(NULL), left(NULL), right(NULL), data(), color(RED) { }
-				node(reference val) : parent(NULL, left(NULL), right(NULL), data(val), color(RED) { }
+				node(reference val) : parent(NULL), left(NULL), right(NULL), data(val), color(RED) { }
 				node(const node& n) : parent(n.parent), left(n.left), right(n.right), data(n.data), color(n.color) { }
 			};
 
@@ -81,7 +82,7 @@ namespace ft
 			
 
 			// Not static since it's type dependant
-			node_pointer createNode(const value_Type& value = value_Type()) const
+			node_pointer createNode(const value_type& value = value_type())
 			{
 				// Allocate a node but don't call constructor, so that we can construct T with T's alllocator
 				node_pointer newNode = this->_nodeAlloc.allocate(1);
@@ -336,7 +337,7 @@ namespace ft
 				// Make node parent point to replace
 				if (node == this->_root)
 					this->_root = replace;
-				else if (node = node->parent->left)
+				else if (node == node->parent->left)
 					node->parent->left = replace;
 				else
 					node->parent->right = replace;
@@ -365,6 +366,33 @@ namespace ft
 
 				this->deleteNode(node);
 			}
+
+			// Pretty easy but I'm smartn't so this won't have my monkey brain
+			bool isInf(const value_type& lhs, const value_type& rhs) const
+			{ return (this->_comp(lhs, rhs)); }
+
+			bool isInfOrEqual(const value_type& lhs, const value_type& rhs) const
+			{ return (this->isInf(lhs, rhs) || this->isEq(lhs, rhs)); }
+
+			bool isSup(const value_type& lhs, const value_type& rhs) const
+			{ return (!this->isInf(lhs, rhs) && !this->isEq(lhs, rhs)); }
+
+			bool isSupOrEqual(const value_type& lhs, const value_type& rhs) const
+			{ return (this->isSup(lhs, rhs) || this->isEq(lhs, rhs)); }
+
+			bool isEq(const value_type& lhs, const value_type& rhs) const
+			{ return (!this->_comp(lhs, rhs) && !this->_comp(rhs, lhs)); }
+
+		public:
+			RedBlackTree(const data_compare& comp = data_compare(),
+			    		 const allocator_type& alloc = allocator_type())
+			: _alloc(alloc), _nodeAlloc(), _comp(comp), _root(NULL), _dummyEnd(NULL)
+			{
+				this->_dummyEnd = this->createNode();
+			}
+
+			~RedBlackTree()
+			{ this->clear(); this->deleteNode(this->_dummyEnd); }
 
 			template <class Node>
 			static node_pointer inorderSuccessor(Node* node)
@@ -417,44 +445,16 @@ namespace ft
 				return (node);
 			}
 
-
-			// Pretty easy but I'm smartn't so this won't have my monkey brain
-			bool isInf(const value_type& lhs, const value_type& rhs) const
-			{ return (this->_comp(lhs, rhs)); }
-
-			bool isInfOrEqual(const value_Type& lhs, const value_type& rhs) const
-			{ return (this->isInf(lhs, rhs) || this->isEq(lhs, rhs)); }
-
-			bool isSup(const value_type& lhs, const value_type& rhs) const
-			{ return (!this->isInferior(lhs, rhs) && !this->isEqual(lhs, rhs)); }
-
-			bool isSupOrEqual(const value_Type& lhs, const value_type& rhs) const
-			{ return (this->isSup(lhs, rhs) || this->isEq(lhs, rhs)); }
-
-			bool isEq(const value_type& lhs, const value_type& rhs) const
-			{ return (!this->_comp(lhs, rhs) && !this->_comp(rhs, lhs)); }
-
-		public:
-			RedBlackTree(const data_compare& comp = data_compare(),
-			       const allocator_type& alloc = allocator_type())
-				   : _comp(comp), _alloc(alloc), _nodeAlloc(), _root(NULL), _dummyEnd(NULL)
-			{
-				this->_dumyEnd = this->createNode();
-			}
-
-			~RedBlackTree()
-			{ this->clear; this->deleteNode(this->_dummyEnd); }
-
 			// Returns true if value was inserted, false if some was already there
 			bool insert(const value_type& val)
 			{
 				node_pointer node = this->createNode(val);
-
+				
 				if (this->_root == NULL)
 				{
 					node->color = BLACK;
 					this->_root = node;
-					return;
+					return (true);
 				}
 
 				node_pointer curr = this->_root;
@@ -464,9 +464,9 @@ namespace ft
 				{
 					parent = curr;
 					if (isInf(node->data, curr->data))
-						node = node->left;
+						curr = curr->left;
 					else if (isSup(node->data, curr->data))
-						node = node->right;
+						curr = curr->right;
 					else // Same value already present
 						return (false);
 				}
@@ -532,9 +532,9 @@ namespace ft
 					this->fixDeleteViolations(newNode);
 			}
 
-			void remove(const valule_type& val) { this->remove(this->search(val)); }			
+			void remove(const value_type& val) { this->remove(this->search(val)); }			
 
-			node_pointer search(const value_Type& val) const
+			node_pointer search(const value_type& val) const
 			{
 				if (this->_root == NULL || (this->isEq(val, this->_root->data)))
 					return (this->_root);
@@ -555,11 +555,61 @@ namespace ft
 
 			size_t size() const { return (this->recursiveSize(this->_root)); }
 
-			void clear() { this->recursiveClear(this->_root); this->_root = NULL }
+			void clear() { this->recursiveClear(this->_root); this->_root = NULL; }
 
-			// Dummy end for iterators
-			node_pointer end() { return (this->_dummyEnd); }
+			node_pointer first() const
+			{
+				node_pointer curr = this->_root;
 
+				while (curr != NULL && curr->left)
+					curr = curr->left;
+				return (curr);
+			}
+
+			node_pointer last() const
+			{
+				node_pointer curr = this->_root;
+
+				while (curr != NULL && curr->right)
+					curr = curr->right;
+				return (curr); 
+			}
+
+			iterator begin()
+			{
+				node_pointer val = this->first();
+
+				if (val == NULL)
+					return (this->end());
+				return (iterator(val, this->last()));
+			}		
+
+			const_iterator begin() const
+			{
+				node_pointer val = this->first();
+
+				if (val == NULL)
+					return (this->end());
+				return (const_iterator(val, this->last()));
+			}
+
+			iterator		end() { return (iterator(NULL, this->last())); }
+			const_iterator	end() const { return (const_iterator(NULL, this->last())); }
+
+			reverse_iterator		rbegin() { return (reverse_iterator(this->end())); }
+			const_reverse_iterator	rbegin() const { return (const_reverse_iterator(this->end())); }
+
+			reverse_iterator		rend() { return (reverse_iterator(this->begin())); }
+			const_reverse_iterator	rend() const { return (const_reverse_iterator(this->begin())); }
+
+			self_type& operator=(const self_type& tree)
+			{
+				for (node_pointer curr = tree.first(); curr != tree.last();
+					 curr = self_type::inorderSuccessor(curr))
+				{
+					this->insert(this->createNode(curr->data));
+				}
+			}
 	};
 
 }
