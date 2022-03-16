@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 16-03-2022 15:41 by                                             */
+/*   Updated: 16-03-2022 23:45 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -610,6 +610,23 @@ namespace ft
 					this->insert(this->createNode(curr->data));
 				}
 			}
+
+		void printTree(const std::string& prefix, node_pointer node, bool isLeft = false) const
+		{
+			if( node != NULL )
+			{
+				std::cout << prefix;
+
+				std::cout << (isLeft ? "├──" : "└──" );
+
+				// print the value of the node
+				std::cout << (node->color == RED ? "R" : "B") <<  node->data.first << std::endl;
+
+				// enter the next tree level - left and right branch
+				printTree( prefix + (isLeft ? "│   " : "    "), node->left, true);
+				printTree( prefix + (isLeft ? "│   " : "    "), node->right, false);
+			}
+		}
 	};
 
 }

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 16-03-2022  by  `-'                        `-'                  */
-/*   Updated: 16-03-2022 16:22 by                                             */
+/*   Updated: 16-03-2022 23:47 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,19 +72,19 @@ namespace ft
 			tree_type		_tree;
 
 			// Pretty easy but I'm smartn't so this won't have my monkey brain
-			bool isInf(const value_type& lhs, const value_type& rhs) const
+			bool isInf(const key_type& lhs, const key_type& rhs) const
 			{ return (this->_comp(lhs, rhs)); }
 
-			bool isInfOrEqual(const value_type& lhs, const value_type& rhs) const
+			bool isInfOrEqual(const key_type& lhs, const key_type& rhs) const
 			{ return (this->isInf(lhs, rhs) || this->isEq(lhs, rhs)); }
 
-			bool isSup(const value_type& lhs, const value_type& rhs) const
+			bool isSup(const key_type& lhs, const key_type& rhs) const
 			{ return (!this->isInf(lhs, rhs) && !this->isEq(lhs, rhs)); }
 
-			bool isSupOrEqual(const value_type& lhs, const value_type& rhs) const
+			bool isSupOrEqual(const key_type& lhs, const key_type& rhs) const
 			{ return (this->isSup(lhs, rhs) || this->isEq(lhs, rhs)); }
 
-			bool isEq(const value_type& lhs, const value_type& rhs) const
+			bool isEq(const key_type& lhs, const key_type& rhs) const
 			{ return (!this->_comp(lhs, rhs) && !this->_comp(rhs, lhs)); }
 
 		public:
@@ -131,9 +131,11 @@ namespace ft
 			/********** Modifiers **********/
 
 			// tree.insert returns true if added, false if already present
+			// So just add the value anyway, and then search for it since map has unique keys
 			ft::pair<iterator, bool> insert(const value_type& val)
 			{
-				return (ft::make_pair(iterator(this->_tree.search(val)), this->_tree.insert(val)));
+				bool inserted = this->_tree.insert(val);
+				return (ft::make_pair(iterator(this->_tree.search(val)), inserted));
 			}
 
 			// Should use position for optimization, but meh
@@ -173,8 +175,29 @@ namespace ft
 
 			void erase(iterator first, iterator last)
 			{
+				iterator tmp;
 				while (first != last)
-					this->_tree.remove(*first++);
+				{
+					std::cout << std::endl;
+					std::cout << "Removing " << first->first << std::endl;
+					tmp = first;
+					++first;
+					std::cout << "Tmp is " << tmp->first << " and first is " << first->first << std::endl;
+					if (tmp->first == 'd' && first->first == 'a')
+					{
+						std::cout << "\n\n TREE when removing D:\n";
+						std::cout << "Root = " << this->_tree.getRoot()->data.first << std::endl;
+						std::cout << "Root left = " << this->_tree.getRoot()->left->data.first << std::endl;
+						std::cout << "Root right = " << this->_tree.getRoot()->right->data.first << std::endl;
+						//this->_tree.printTree("", this->_tree.getRoot());
+						return;
+					}
+					this->_tree.remove(*tmp);
+					std::cout << std::endl;
+					//std::cout << "\n\n TREE:\n";
+					//this->_tree.printTree("", this->_tree.getRoot());
+				//	this->_tree.remove(*first);
+				}
 			}
 
 
@@ -200,7 +223,7 @@ namespace ft
 			// it's either the value found corresponding to the key, or the newly inserted one in the other case
 			// Retrieve the iterator returned by insert, then return a reference to the mapped_type (second in pair)
 			mapped_type& operator[](const key_type& k)
-			{ return (*(this->insert(ft::make_pair(k, mapped_type())).first)).second }
+			{ return ((this->insert(ft::make_pair(k, mapped_type())).first)->second); }
 			
 			/********** Observers **********/
 			key_compare key_comp() const { return (key_comp()); }
@@ -214,11 +237,11 @@ namespace ft
 				// Create a temporary to make it easier to find k
 				value_type  tmp_pair(k, mapped_type());
 
-				node_pointer value = this->_tree.search(tmp_pair);
+				typename tree_type::node_pointer value = this->_tree.search(tmp_pair);
 				if (value == NULL)
 					return (this->end());
 				
-				return (iterator(value));
+				return (iterator(value, this->_tree.last()));
 			}
 
 			const_iterator find(const key_type& k) const
@@ -226,11 +249,11 @@ namespace ft
 				// Create a temporary to make it easier to find k
 				value_type  tmp_pair(k, mapped_type());
 
-				node_pointer value = this->_tree.search(tmp_pair);
+				typename tree_type::node_pointer value = this->_tree.search(tmp_pair);
 				if (value == NULL)
 					return (this->end());
 				
-				return (const_iterator(value));
+				return (const_iterator(value, this->_tree.last()));
 			}
 
 			// Returns the count of key in the tree, in map it's always 0 or 1
@@ -247,11 +270,56 @@ namespace ft
 			// is not considered to go before k (i.e., either it is equivalent or goes after).
 			iterator lower_bound(const key_type& k)
 			{
-				node_pointer curr = this->_tree.first();
+				typename tree_type::node_pointer curr = this->_tree.first();
 				
-				while (curr != NULL && isInf(curr->data.first, k))
-					curr == tree_type::inorderNext(curr);
+				while (curr != NULL && this->isInf(curr->data.first, k))
+					curr = tree_type::inorderSuccessor(curr);
+
+				if (curr == NULL)
+					return (this->end());
+
+				return (iterator(curr, this->_tree.last()));
 			}
+
+			const_iterator lower_bound(const key_type& k) const
+			{
+				typename tree_type::node_pointer curr = this->_tree.first();
+				
+				while (curr != NULL && this->isInf(curr->data.first, k))
+					curr = tree_type::inorderSuccessor(curr);
+
+				if (curr == NULL)
+					return (this->end());
+
+				return (const_iterator(curr, this->_tree.last()));
+			}
+
+			iterator upper_bound(const key_type& k)
+			{
+				typename tree_type::node_pointer curr = this->_tree.first();
+				
+				while (curr != NULL && !this->isInf(k, curr->data.first))
+					curr = tree_type::inorderSuccessor(curr);
+
+				if (curr == NULL)
+					return (this->end());
+
+				return (iterator(curr, this->_tree.last()));
+			}
+
+			const_iterator upper_bound(const key_type& k) const
+			{
+				typename tree_type::node_pointer curr = this->_tree.first();
+				
+				while (curr != NULL && !this->isInf(k, curr->data.first))
+					curr = tree_type::inorderSuccessor(curr);
+
+				if (curr == NULL)
+					return (this->end());
+
+				return (const_iterator(curr, this->_tree.last()));
+			}
+			
 
 	};
 }
