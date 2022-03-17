@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 17-03-2022 17:24 by                                             */
+/*   Updated: 17-03-2022 22:37 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ namespace ft
 				while (curr != NULL && curr->right)
 					curr = curr->right;
 				
-				if (curr != NULL)
+				if (curr != NULL && curr->right != this->_dummyEnd)
 					curr->right = this->_dummyEnd;
 				//else
 				//	this->_root = this->_dummyEnd;
@@ -502,8 +502,6 @@ namespace ft
 					return (true);
 				}
 
-				
-
 				node_pointer curr = this->_root;
 				node_pointer parent = NULL;
 
@@ -659,7 +657,7 @@ namespace ft
 				return (const_iterator(val));
 			}
 
-			iterator		end() { return (iterator(this->_dummyEnd)); }
+			iterator		end() {return (iterator(this->_dummyEnd)); }
 			const_iterator	end() const { return (const_iterator(this->_dummyEnd)); }
 
 			reverse_iterator		rbegin() { return (reverse_iterator(this->end())); }
@@ -670,6 +668,7 @@ namespace ft
 
 			self_type& operator=(const self_type& tree)
 			{
+				this->clear();
 				this->_alloc = tree._alloc;
 				this->_nodeAlloc = tree._nodeAlloc;
 				this->_comp = tree._comp;
