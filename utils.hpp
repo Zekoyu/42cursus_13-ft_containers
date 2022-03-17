@@ -6,12 +6,13 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 14-03-2022  by  `-'                        `-'                  */
-/*   Updated: 15-03-2022 21:07 by                                             */
+/*   Updated: 17-03-2022 17:18 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILS_HPP
-# define UTILS_HPP
+// FT_UTILS instead of UTILS because otherwise 42 Containator thinks utils is already defined
+#ifndef FT_UTILS_HPP
+# define FT_UTILS_HPP
 
 namespace ft
 {

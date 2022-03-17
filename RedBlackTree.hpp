@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 17-03-2022 16:39 by                                             */
+/*   Updated: 17-03-2022 17:24 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -431,6 +431,7 @@ namespace ft
 			~RedBlackTree()
 			{
 				this->clear();
+
 				this->deleteNode(this->_dummyEnd);
 			}
 
@@ -613,7 +614,14 @@ namespace ft
 
 			size_t size() const { return (this->recursiveSize(this->_root)); }
 
-			void clear() { this->recursiveClear(this->_root); this->_root = NULL; }
+			void clear() {
+				this->recursiveClear(this->_root);
+				
+				// Set parent to null in case we refill the tree after clear
+				this->_dummyEnd->parent = NULL;
+
+				this->_root = NULL;
+			}
 
 			node_pointer first() const
 			{

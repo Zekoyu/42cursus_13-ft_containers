@@ -6,7 +6,7 @@
 /*   By: llefranc <llefranc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 14:37:35 by hherin            #+#    #+#             */
-/*   Updated: 17-03-2022 16:44 by                                             */
+/*   Updated: 17-03-2022 17:29 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,132 +36,69 @@ int main(void)
     // CHOOSE HERE WHICH CONTAINERS YOU WANT TO TEST. YOU HAVE ALSO TO COMMENT
     // THE WHOLE FUNCTION BELOW.
         
-    testVector(arrInt, arrString);  // Comment if you don't want to test VECTOR   
-   //  testList(arrInt, arrString);    // Comment if you don't want to test LIST   
-    testStack(arrInt, arrString);   // Comment if you don't want to test STACK   
-   //  testQueue(arrInt, arrString);   // Comment if you don't want to test QUEUE   
+    // testVector(arrInt, arrString);  // Comment if you don't want to test VECTOR   
+   // testStack(arrInt, arrString);   // Comment if you don't want to test STACK   
     testMap(arrInt, arrString);     // Comment if you don't want to test MAP   
 
     // ---------------------------------------------------------------------------
 }
 
 
-// ---------------------------------------------------------------------------
-// COMMENT THE WHOLE FUNCTION IF YOU DON'T WANT TO TEST VECTOR.
-// ---------------------------------------------------------------------------
-void    testVector(const int (&arrInt)[20], const std::string (&arrString)[20])
-{
-    //save old buf
-    std::streambuf *coutbuf = std::cout.rdbuf();
-        
-    std::ofstream stdFile("results/vector_std.txt");
-    std::ofstream ftFile("results/vector_ft.txt");
-
-    //redirect std::cout to std::vector_result.txt
-    std::cout.rdbuf(stdFile.rdbuf());
-        
-    /* STL TESTS */
-    constructVectorList<int, std::vector<int> >(arrInt, testNotConstVec<std::vector<int> >, testConstVec<const std::vector<int> >);
-    constructVectorList<std::string, std::vector<std::string> >(arrString, testNotConstVec<std::vector<std::string> >, testConstVec<const std::vector<std::string> >);
-        
-    //redirect std::cout to ft::vector_result.txt
-    std::cout.rdbuf(ftFile.rdbuf());
-        
-    /* FT TESTS */
-    constructVectorList<int, ft::vector<int> >(arrInt, testNotConstVec<ft::vector<int> >, testConstVec<const ft::vector<int> >);
-    constructVectorList<std::string, ft::vector<std::string> >(arrString, testNotConstVec<ft::vector<std::string> >, testConstVec<const ft::vector<std::string> >);
-
-    //reset to standard output again
-    std::cout.rdbuf(coutbuf);
-}
-
-
-// ---------------------------------------------------------------------------
-// COMMENT THE WHOLE FUNCTION IF YOU DON'T WANT TO TEST LIST.
-// ---------------------------------------------------------------------------
-// void    testList(const int (&arrInt)[20], const std::string (&arrString)[20])
+// // ---------------------------------------------------------------------------
+// // COMMENT THE WHOLE FUNCTION IF YOU DON'T WANT TO TEST VECTOR.
+// // ---------------------------------------------------------------------------
+// void    testVector(const int (&arrInt)[20], const std::string (&arrString)[20])
 // {
-//  //save old buf
+//     //save old buf
 //     std::streambuf *coutbuf = std::cout.rdbuf();
         
-//     std::ofstream stdFile("results/list_std.txt");
-//     std::ofstream ftFile("results/list_ft.txt");
+//     std::ofstream stdFile("results/vector_std.txt");
+//     std::ofstream ftFile("results/vector_ft.txt");
 
-//  //redirect std::cout to std::vector_result.txt
+//     //redirect std::cout to std::vector_result.txt
 //     std::cout.rdbuf(stdFile.rdbuf());
         
-//  /* STL TESTS */
-//     constructVectorList<int, std::list<int> >(arrInt, testNotConstList<std::list<int> >, testConstList<const std::list<int> >);
-//     constructVectorList<std::string, std::list<std::string> >(arrString, testNotConstList<std::list<std::string> >, testConstList<const std::list<std::string> >);
-
-//  //redirect std::cout to ft::list_result.txt
+//     /* STL TESTS */
+//     constructVectorList<int, std::vector<int> >(arrInt, testNotConstVec<std::vector<int> >, testConstVec<const std::vector<int> >);
+//     constructVectorList<std::string, std::vector<std::string> >(arrString, testNotConstVec<std::vector<std::string> >, testConstVec<const std::vector<std::string> >);
+        
+//     //redirect std::cout to ft::vector_result.txt
 //     std::cout.rdbuf(ftFile.rdbuf());
         
-//  /* FT TESTS */
-//     constructVectorList<int, ft::list<int> >(arrInt, testNotConstList<ft::list<int> >, testConstList<const ft::list<int> >);
-//     constructVectorList<std::string, ft::list<std::string> >(arrString, testNotConstList<ft::list<std::string> >, testConstList<const ft::list<std::string> >);
+//     /* FT TESTS */
+//     constructVectorList<int, ft::vector<int> >(arrInt, testNotConstVec<ft::vector<int> >, testConstVec<const ft::vector<int> >);
+//     constructVectorList<std::string, ft::vector<std::string> >(arrString, testNotConstVec<ft::vector<std::string> >, testConstVec<const ft::vector<std::string> >);
 
-//  //reset to standard output again
+//     //reset to standard output again
 //     std::cout.rdbuf(coutbuf);
 // }
 
-
-// ---------------------------------------------------------------------------
-// COMMENT THE WHOLE FUNCTION IF YOU DON'T WANT TO TEST STACK.
-// ---------------------------------------------------------------------------
-void    testStack(const int (&arrInt)[20], const std::string (&arrString)[20])
-{
-    //save old buf
-    std::streambuf *coutbuf = std::cout.rdbuf();
-        
-    std::ofstream stdFile("results/stack_std.txt");
-    std::ofstream ftFile("results/stack_ft.txt");
-
-    //redirect std::cout to std::stack_result.txt
-    std::cout.rdbuf(stdFile.rdbuf());
-        
-    /* STL TESTS */
-    constructStackQueue<int, std::stack<int, std::list<int> >, std::list<int> >(arrInt, testNonConstStack<std::stack<int, std::list<int> > >);
-    constructStackQueue<std::string, std::stack<std::string, std::list<std::string> >, std::list<std::string> > (arrString, testNonConstStack<std::stack<std::string, std::list<std::string> > >);
-
-    //redirect std::cout to ft::stack_result.txt
-    std::cout.rdbuf(ftFile.rdbuf());
-        
-    /* FT TESTS */
-    constructStackQueue<int, ft::stack<int, std::list<int> >, std::list<int> >(arrInt, testNonConstStack<ft::stack<int, std::list<int> > >);
-    constructStackQueue<std::string, ft::stack<std::string, std::list<std::string> >, std::list<std::string> >(arrString, testNonConstStack<ft::stack<std::string, std::list<std::string> > >);
-
-    //reset to standard output again
-    std::cout.rdbuf(coutbuf);
-}
-
-
-// ---------------------------------------------------------------------------
-// COMMENT THE WHOLE FUNCTION IF YOU DON'T WANT TO TEST QUEUE.
-// ---------------------------------------------------------------------------
-// void    testQueue(const int (&arrInt)[20], const std::string (&arrString)[20])
+// // ---------------------------------------------------------------------------
+// // COMMENT THE WHOLE FUNCTION IF YOU DON'T WANT TO TEST STACK.
+// // ---------------------------------------------------------------------------
+// void    testStack(const int (&arrInt)[20], const std::string (&arrString)[20])
 // {
-//  //save old buf
+//     //save old buf
 //     std::streambuf *coutbuf = std::cout.rdbuf();
         
-//     std::ofstream stdFile("results/queue_std.txt");
-//     std::ofstream ftFile("results/queue_ft.txt");
-        
-//  //redirect std::cout to std::queue_result.txt
+//     std::ofstream stdFile("results/stack_std.txt");
+//     std::ofstream ftFile("results/stack_ft.txt");
+
+//     //redirect std::cout to std::stack_result.txt
 //     std::cout.rdbuf(stdFile.rdbuf());
         
-//  /* STL TESTS */
-//     constructStackQueue<int, std::queue<int, std::list<int> >, std::list<int> >(arrInt, testNonConstQueue<std::queue<int, std::list<int> > >);
-//     constructStackQueue<std::string, std::queue<std::string, std::list<std::string> >, std::list<std::string> > (arrString, testNonConstQueue<std::queue<std::string, std::list<std::string> > >);
-    
-//  //redirect std::cout to ft::queue_result.txt
+//     /* STL TESTS */
+//     constructStackQueue<int, std::stack<int, std::list<int> >, std::list<int> >(arrInt, testNonConstStack<std::stack<int, std::list<int> > >);
+//     constructStackQueue<std::string, std::stack<std::string, std::list<std::string> >, std::list<std::string> > (arrString, testNonConstStack<std::stack<std::string, std::list<std::string> > >);
+
+//     //redirect std::cout to ft::stack_result.txt
 //     std::cout.rdbuf(ftFile.rdbuf());
         
-//  /* FT TESTS */
-//     constructStackQueue<int, ft::queue<int, std::list<int> >, std::list<int> >(arrInt, testNonConstQueue<ft::queue<int, std::list<int> > >);
-//     constructStackQueue<std::string, ft::queue<std::string, std::list<std::string> >, std::list<std::string> >(arrString, testNonConstQueue<ft::queue<std::string, std::list<std::string> > >);
+//     /* FT TESTS */
+//     constructStackQueue<int, ft::stack<int, std::list<int> >, std::list<int> >(arrInt, testNonConstStack<ft::stack<int, std::list<int> > >);
+//     constructStackQueue<std::string, ft::stack<std::string, std::list<std::string> >, std::list<std::string> >(arrString, testNonConstStack<ft::stack<std::string, std::list<std::string> > >);
 
-//  //reset to standard output again
+//     //reset to standard output again
 //     std::cout.rdbuf(coutbuf);
 // }
 

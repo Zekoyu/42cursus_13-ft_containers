@@ -15,27 +15,11 @@ else
     echo "${BLUE}Try again${NC}";
 fi
 
-echo "~ Test diff output from std::list and your work ~";
-if diff results/list_ft.txt results/list_std.txt > /dev/null;then
-    echo "${BLUE}No differences${NC}";
-else 
-	diff results/list_ft.txt results/list_std.txt > results/list_diff.txt
-    echo "${BLUE}Try again${NC}";
-fi
-
 echo "~ Test diff output from std::stack and your work ~";
 if diff results/stack_ft.txt results/stack_std.txt > /dev/null;then
     echo "${BLUE}No differences${NC}";
 else 
 	diff results/stack_ft.txt results/stack_std.txt > results/stack_diff.txt
-    echo "${BLUE}Try again${NC}";
-fi
-
-echo "~ Test diff output from std::queue and your work ~";
-if diff results/queue_ft.txt results/queue_std.txt > /dev/null;then
-    echo "${BLUE}No differences${NC}";
-else 
-	diff results/queue_ft.txt results/queue_std.txt > results/queue_diff.txt
     echo "${BLUE}Try again${NC}";
 fi
 
