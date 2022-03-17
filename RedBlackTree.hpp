@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 17-03-2022 16:18 by                                             */
+/*   Updated: 17-03-2022 16:39 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -491,14 +491,17 @@ namespace ft
 			{
 				node_pointer node = this->createNode(val);
 				
+				this->vanishEndNode();
+				
 				if (this->_root == NULL)
 				{
 					node->color = BLACK;
 					this->_root = node;
+					this->setEndNodeAtTheEnd();
 					return (true);
 				}
 
-				this->vanishEndNode();
+				
 
 				node_pointer curr = this->_root;
 				node_pointer parent = NULL;
@@ -585,13 +588,12 @@ namespace ft
 
 			node_pointer search(const value_type& val) const
 			{
-				
 				if (this->_root == NULL || (this->isEq(val, this->_root->data)))
 					return (this->_root);
 
 				node_pointer curr = this->_root;
 
-				while (curr != NULL && curr != this->_dummyEnd && !this->isEq(val, curr->data))
+				while (curr != NULL && !this->isEq(val, curr->data))
 				{
 					if (isInf(val, curr->data))
 						curr = curr->left;
@@ -599,10 +601,15 @@ namespace ft
 						curr = curr->right;
 				}
 
+				if (curr == this->_dummyEnd)
+					return (NULL);
+
 				return (curr); // Either a isEq(ual) node or NULL
 			}
 
-			node_pointer getRoot() const { return (this->_root); }
+			const node_pointer getRoot() const { return (this->_root); }
+
+			const node_pointer getDummyEnd() const { return (this->_dummyEnd); }
 
 			size_t size() const { return (this->recursiveSize(this->_root)); }
 

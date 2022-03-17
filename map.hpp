@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 16-03-2022  by  `-'                        `-'                  */
-/*   Updated: 17-03-2022 16:18 by                                             */
+/*   Updated: 17-03-2022 16:39 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,7 +206,7 @@ namespace ft
 
 				x._comp = tmp_comp;
 				x._alloc = tmp_alloc;
-				
+
 				this->_tree.swap(x._tree);
 			}
 
@@ -269,7 +269,7 @@ namespace ft
 				while (curr != NULL && this->isInf(curr->data.first, k))
 					curr = tree_type::inorderSuccessor(curr);
 
-				if (curr == NULL || curr->color == END_NODE_COLOR)
+				if (curr == NULL || curr == this->_tree.getDummyEnd())
 					return (this->end());
 
 				return (iterator(curr));
@@ -282,7 +282,7 @@ namespace ft
 				while (curr != NULL && this->isInf(curr->data.first, k))
 					curr = tree_type::inorderSuccessor(curr);
 
-				if (curr == NULL || curr->color == END_NODE_COLOR)
+				if (curr == NULL || curr == this->_tree.getDummyEnd())
 					return (this->end());
 
 				return (const_iterator(curr));
@@ -295,7 +295,7 @@ namespace ft
 				while (curr != NULL && !this->isInf(k, curr->data.first))
 					curr = tree_type::inorderSuccessor(curr);
 
-				if (curr == NULL || curr->color == END_NODE_COLOR)
+				if (curr == NULL || curr == this->_tree.getDummyEnd())
 					return (this->end());
 
 				return (iterator(curr));
@@ -308,7 +308,7 @@ namespace ft
 				while (curr != NULL && !this->isInf(k, curr->data.first))
 					curr = tree_type::inorderSuccessor(curr);
 
-				if (curr == NULL || curr->color == END_NODE_COLOR)
+				if (curr == NULL || curr == this->_tree.getDummyEnd())
 					return (this->end());
 
 				return (const_iterator(curr));
