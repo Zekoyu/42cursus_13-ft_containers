@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 17-03-2022 16:37 by                                             */
+/*   Updated: 17-03-2022 17:01 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,15 @@ namespace ft
 
 			/********** Friend relational operators, to allow const and non-const mixed **********/
 
+			// Only takes TreeIterator as argument, so we don't have redefitions / conflicts when including multiple iterators
+			// files with iterators, there is a redefinition from vector iterator
 			// A == B / B == A
-			template <class IteLeft, class IteRight>
-			friend bool operator==(const IteLeft& lhs, const IteRight& rhs);
+			template <class LTree, bool LIsConst, class RTree, bool RIsConst>
+			friend bool operator==(const TreeIterator<LTree, LIsConst>& lhs, const TreeIterator<RTree, RIsConst>& rhs);
 
 			// A != B / B != A
-			template <class IteLeft, class IteRight>
-			friend bool operator!=(const IteLeft& lhs, const IteRight& rhs);
+			template <class LTree, bool LIsConst, class RTree, bool RIsConst>
+			friend bool operator!=(const TreeIterator<LTree, LIsConst>& lhs, const TreeIterator<RTree, RIsConst>& rhs);
 
 	};
 
@@ -110,11 +112,13 @@ namespace ft
 		*A-- ✅
 	*/
 
-	template <class IteLeft, class IteRight>
-	bool operator==(const IteLeft& lhs, const IteRight& rhs) { return (lhs._node == rhs._node); }
+	template <class LTree, bool LIsConst, class RTree, bool RIsConst>
+	bool operator==(const TreeIterator<LTree, LIsConst>& lhs, const TreeIterator<RTree, RIsConst>& rhs)
+	{ return (lhs._node == rhs._node); }
 
-	template <class IteLeft, class IteRight>
-	bool operator!=(const IteLeft& lhs, const IteRight& rhs) { return (lhs._node != rhs._node); }
+	template <class LTree, bool LIsConst, class RTree, bool RIsConst>
+	bool operator!=(const TreeIterator<LTree, LIsConst>& lhs, const TreeIterator<RTree, RIsConst>& rhs)
+	{ return (lhs._node != rhs._node); }
 
 }
 

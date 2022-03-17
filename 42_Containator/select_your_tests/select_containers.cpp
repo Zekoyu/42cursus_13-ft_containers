@@ -6,7 +6,7 @@
 /*   By: llefranc <llefranc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 14:37:35 by hherin            #+#    #+#             */
-/*   Updated: 14-03-2022 13:15 by                                             */
+/*   Updated: 17-03-2022 16:44 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int main(void)
    //  testList(arrInt, arrString);    // Comment if you don't want to test LIST   
     testStack(arrInt, arrString);   // Comment if you don't want to test STACK   
    //  testQueue(arrInt, arrString);   // Comment if you don't want to test QUEUE   
-    // testMap(arrInt, arrString);     // Comment if you don't want to test MAP   
+    testMap(arrInt, arrString);     // Comment if you don't want to test MAP   
 
     // ---------------------------------------------------------------------------
 }
@@ -169,31 +169,31 @@ void    testStack(const int (&arrInt)[20], const std::string (&arrString)[20])
 // ---------------------------------------------------------------------------
 // COMMENT THE WHOLE FUNCTION IF YOU DON'T WANT TO TEST MAP.
 // ---------------------------------------------------------------------------
-// void    testMap(const int (&arrInt)[20], const std::string (&arrString)[20])
-// {
-//  //save old buf
-//     std::streambuf *coutbuf = std::cout.rdbuf();
+void    testMap(const int (&arrInt)[20], const std::string (&arrString)[20])
+{
+ //save old buf
+    std::streambuf *coutbuf = std::cout.rdbuf();
         
-//     std::ofstream stdFile("results/map_std.txt");
-//     std::ofstream ftFile("results/map_ft.txt");
+    std::ofstream stdFile("results/map_std.txt");
+    std::ofstream ftFile("results/map_ft.txt");
         
-//  //redirect std::cout to ft::map_result.txt
-//     std::cout.rdbuf(stdFile.rdbuf());
-//  /* STL TESTS */
-//     constructMap<int, std::string, std::map<int, std::string>, std::pair<int, std::string> >
-//         (arrInt, arrString, testNotConstMap<std::map<int, std::string> >, testConstMap<const std::map<int, std::string> >);
-//     constructMap<std::string, int, std::map<std::string, int>, std::pair<std::string, int> >
-//         (arrString, arrInt, testNotConstMap<std::map<std::string, int> >, testConstMap<const std::map<std::string, int> >);
+ //redirect std::cout to ft::map_result.txt
+    std::cout.rdbuf(stdFile.rdbuf());
+ /* STL TESTS */
+    constructMap<int, std::string, std::map<int, std::string>, std::pair<int, std::string> >
+        (arrInt, arrString, testNotConstMap<std::map<int, std::string> >, testConstMap<const std::map<int, std::string> >);
+    constructMap<std::string, int, std::map<std::string, int>, std::pair<std::string, int> >
+        (arrString, arrInt, testNotConstMap<std::map<std::string, int> >, testConstMap<const std::map<std::string, int> >);
 
-//  //redirect std::cout to std::map_result.txt
-//     std::cout.rdbuf(ftFile.rdbuf());
+ //redirect std::cout to std::map_result.txt
+    std::cout.rdbuf(ftFile.rdbuf());
         
-//  /* FT TESTS */
-//     constructMap<int, std::string, ft::map<int, std::string>, ft::pair<int, std::string> >
-//         (arrInt, arrString, testNotConstMap<ft::map<int, std::string> >, testConstMap<const ft::map<int, std::string> >);
-//     constructMap<std::string, int, ft::map<std::string, int>, ft::pair<std::string, int> >
-//         (arrString, arrInt, testNotConstMap<ft::map<std::string, int> >, testConstMap<const ft::map<std::string, int> >);
+ /* FT TESTS */
+    constructMap<int, std::string, ft::map<int, std::string>, ft::pair<int, std::string> >
+        (arrInt, arrString, testNotConstMap<ft::map<int, std::string> >, testConstMap<const ft::map<int, std::string> >);
+    constructMap<std::string, int, ft::map<std::string, int>, ft::pair<std::string, int> >
+        (arrString, arrInt, testNotConstMap<ft::map<std::string, int> >, testConstMap<const ft::map<std::string, int> >);
 
-//  //reset to standard output again
-//     std::cout.rdbuf(coutbuf);
-// }
+ //reset to standard output again
+    std::cout.rdbuf(coutbuf);
+}

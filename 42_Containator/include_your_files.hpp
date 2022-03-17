@@ -6,7 +6,7 @@
 /*   By: llefranc <llefranc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/08 11:23:23 by llefranc          #+#    #+#             */
-/*   Updated: 14-03-2022 13:16 by                                             */
+/*   Updated: 17-03-2022 16:44 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 // #include "../42_ft_containers/list.hpp"     // Comment if you don't want to test LIST
  #include "../stack.hpp"    // Comment if you don't want to test STACK
 // #include "../42_ft_containers/queue.hpp"    // Comment if you don't want to test QUEUE
-// #include "../42_ft_containers/map.hpp"      // Comment if you don't want to test MAP
+#include "../map.hpp"      // Comment if you don't want to test MAP
 
 // ---------------------------------------------------------------------------
 
