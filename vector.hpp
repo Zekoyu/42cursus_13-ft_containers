@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 14-03-2022 15:09 by                                             */
+/*   Updated: 17-03-2022 13:54 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -431,9 +431,7 @@ namespace ft
 	/* Should be optimized, but who cares */
 	template <class T, class Alloc>
 	void swap(ft::vector<T,Alloc>& x, ft::vector<T,Alloc>& y)
-	{
-		x.swap(y);
-	}
+	{ x.swap(y); }
 
 	/* We are not forced to write template arguments since compiler template
 	   deduction does it automatically */
@@ -447,33 +445,23 @@ namespace ft
 
 	template <class T, class Alloc>
 	bool operator!=(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
-	{
-		return (!(lhs == rhs));
-	}
+	{ return (!(lhs == rhs)); }
 
 	template <class T, class Alloc>
 	bool operator<(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
-	{
-		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
-	}
+	{ return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())); }
 
 	template <class T, class Alloc>
 	bool operator<=(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
-	{
-		return (lhs < rhs || lhs == rhs);
-	}
+	{ return (lhs < rhs || lhs == rhs); }
 
 	template <class T, class Alloc>
 	bool operator>(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
-	{
-		return (!(lhs <= rhs)); /* Either <= or > */
-	}
+	{ return (!(lhs <= rhs)); } // Either <= or >
 
 	template <class T, class Alloc>
 	bool operator>=(const ft::vector<T,Alloc>& lhs, const ft::vector<T,Alloc>& rhs)
-	{
-		return (!(lhs < rhs)); /* Either < or >= */
-	}
+	{ return (!(lhs < rhs)); } // Either < or >=
 
 }
 

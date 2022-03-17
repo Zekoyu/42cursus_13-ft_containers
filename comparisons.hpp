@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 05-03-2022  by  `-'                        `-'                  */
-/*   Updated: 04-03-2022 14:31 by                                             */
+/*   Updated: 17-03-2022 13:58 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,15 @@
 
 namespace ft
 {
-	/* Ranges are almost always [first, last), which means first included, last excluded */
-	/* "Default" version simply uses operator != */
+	// Ranges are almost always [first, last), which means first included, last excluded
+	// "Default" version simply uses operator ==, typically only required operators are == and < for any comparisons
 	template <class InputIterator1, class InputIterator2>
 	bool equal(InputIterator1 first1, InputIterator1 last1,
 			   InputIterator2 first2)
 	{
 		while (first1 != last1)
 		{
-			if (*first1 != *first2)
+			if (!(*first1 == *first2))
 				return (false);
 			++first1;
 			++first2;

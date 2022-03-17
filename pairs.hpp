@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 06-03-2022  by  `-'                        `-'                  */
-/*   Updated: 11-03-2022 16:49 by                                             */
+/*   Updated: 17-03-2022 14:16 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,9 @@ namespace ft
 	template <class T1, class T2>
 	bool operator==(const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
 	{
+		//std::cout << "lhs = (" << lhs.first << ", " << lhs.second << "), rhs = (" << rhs.first << ", " << rhs.second << ")\n";
+		//std::cout << "Is equal ? " << (lhs.first == rhs.first && lhs.second == rhs.second);
+		//std::cout << std::endl << std::endl;
 		return (lhs.first == rhs.first && lhs.second == rhs.second);
 	}
 

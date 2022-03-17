@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 16-03-2022  by  `-'                        `-'                  */
-/*   Updated: 17-03-2022 13:35 by                                             */
+/*   Updated: 17-03-2022 14:35 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MAP_HPP
 
 #include "pairs.hpp"
+#include "comparisons.hpp"
 #include "RedBlackTree.hpp"
 
 #include <functional>
@@ -198,9 +199,9 @@ namespace ft
 
 			void swap(map& x)
 			{
-				tree_type& tmp_tree = this->_tree;
-				key_compare& tmp_comp = this->_comp;
-				allocator_type& tmp_alloc = this->_alloc;
+				tree_type tmp_tree = this->_tree;
+				key_compare tmp_comp = this->_comp;
+				allocator_type tmp_alloc = this->_alloc;
 
 				this->_tree = x._tree;
 				this->_comp = x._comp;
@@ -226,7 +227,7 @@ namespace ft
 			// Will create a copy since it's not returned by reference
 			value_compare value_comp() const { return (ValueCompare()); }
 
-			/********** Operations **********/
+			/********** Lookup / Operations **********/
 			iterator find(const key_type& k)
 			{
 				// Create a temporary to make it easier to find k
@@ -329,6 +330,45 @@ namespace ft
 			// Will copy since it doesn't return by reference
 			allocator_type get_allocator() const { return (this->_alloc); }
 	};
+
+	/********** Non-member overloads **********/
+	template <class Key, class T, class Compare, class Alloc>
+	void swap(ft::map<Key, T, Compare, Alloc>& x, ft::map<Key, T, Compare, Alloc>& y)
+	{ x.swap(y); }
+
+	// Notice that none of these operations take into consideration the internal comparison object of either container,
+	// but compare the elements (of type value_type) directly.
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator==(const ft::map<Key, T, Compare, Alloc>& lhs,
+					const ft::map<Key, T, Compare, Alloc>& rhs)
+	{
+		if (lhs.size() != rhs.size())
+			return (false);
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator!=(const ft::map<Key, T, Compare, Alloc>& lhs,
+					const ft::map<Key, T, Compare, Alloc>& rhs)
+	{ return (!(lhs == rhs)); }
+
+	// https://www.cplusplus.com/reference/map/map/operators/
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<(const ft::map<Key, T, Compare, Alloc>& lhs, const ft::map<Key, T, Compare, Alloc>& rhs)
+	{ return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())); }
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<=(const ft::map<Key, T, Compare, Alloc>& lhs, const ft::map<Key, T, Compare, Alloc>& rhs)
+	{ return (!(rhs < lhs)); }
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>(const ft::map<Key, T, Compare, Alloc>& lhs, const ft::map<Key, T, Compare, Alloc>& rhs)
+	{ return (rhs < lhs); } // Either <= or >
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>=(const ft::map<Key, T, Compare, Alloc>& lhs, const ft::map<Key, T, Compare, Alloc>& rhs)
+	{ return (!(lhs < rhs)); } // Either < or >=
+
 }
 
 #endif
