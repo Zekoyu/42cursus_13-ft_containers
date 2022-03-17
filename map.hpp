@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 16-03-2022  by  `-'                        `-'                  */
-/*   Updated: 16-03-2022 23:47 by                                             */
+/*   Updated: 17-03-2022 13:35 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "pairs.hpp"
 #include "RedBlackTree.hpp"
-#include <iostream>
+
 #include <functional>
 #include <memory>
 
@@ -110,6 +110,16 @@ namespace ft
 			// Copy constructor, deep copy tree
 			map(const map& x) : _comp(x._comp), _alloc(x._alloc), _tree(x._tree) { }
 
+			// Assignation operator
+			map& operator=(const map& x)
+			{
+				this->_comp = x._comp;
+				this->_alloc = x._alloc;
+				this->_tree = x._tree;
+				
+				return (*this);
+			}
+
 			/********** Iterators **********/
 			iterator		begin() { return (this->_tree.begin()); }
 			const_iterator	begin() const { return (this->_tree.begin()); }
@@ -126,7 +136,7 @@ namespace ft
 			/********** Capacity **********/
 			bool empty() const { return (this->_tree.size() == 0); }
 			size_type size() const { return (this->_tree.size()); }
-			size_type max_size() const { return (this->_alloc.max_size()); }
+			size_type max_size() const { return (this->_tree.max_size()); }
 
 			/********** Modifiers **********/
 
@@ -173,30 +183,15 @@ namespace ft
 				this->_tree.remove(*position);
 			}
 
+			// Since iterator being erased is invalidated on remove, first save next node
 			void erase(iterator first, iterator last)
 			{
 				iterator tmp;
 				while (first != last)
 				{
-					std::cout << std::endl;
-					std::cout << "Removing " << first->first << std::endl;
 					tmp = first;
 					++first;
-					std::cout << "Tmp is " << tmp->first << " and first is " << first->first << std::endl;
-					if (tmp->first == 'd' && first->first == 'a')
-					{
-						std::cout << "\n\n TREE when removing D:\n";
-						std::cout << "Root = " << this->_tree.getRoot()->data.first << std::endl;
-						std::cout << "Root left = " << this->_tree.getRoot()->left->data.first << std::endl;
-						std::cout << "Root right = " << this->_tree.getRoot()->right->data.first << std::endl;
-						//this->_tree.printTree("", this->_tree.getRoot());
-						return;
-					}
 					this->_tree.remove(*tmp);
-					std::cout << std::endl;
-					//std::cout << "\n\n TREE:\n";
-					//this->_tree.printTree("", this->_tree.getRoot());
-				//	this->_tree.remove(*first);
 				}
 			}
 
@@ -226,10 +221,10 @@ namespace ft
 			{ return ((this->insert(ft::make_pair(k, mapped_type())).first)->second); }
 			
 			/********** Observers **********/
-			key_compare key_comp() const { return (key_comp()); }
+			key_compare key_comp() const { return (this->_comp); }
 
 			// Will create a copy since it's not returned by reference
-			value_compare value_comp() const { return (this->_comp); }
+			value_compare value_comp() const { return (ValueCompare()); }
 
 			/********** Operations **********/
 			iterator find(const key_type& k)
@@ -320,7 +315,19 @@ namespace ft
 				return (const_iterator(curr, this->_tree.last()));
 			}
 			
+			// Returns a range that includes all elements with a key == k
+			// Since map has unique keys, the range is at most 1 long
+			/* The function returns a pair, whose member pair::first is the lower bound of the range (the same as lower_bound),
+			   and pair::second is the upper bound (the same as upper_bound). */
+			ft::pair<iterator, iterator> equal_range(const key_type& k)
+			{ return (ft::make_pair(this->lower_bound(k), this->upper_bound(k))); }
 
+			ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const
+			{ return (ft::make_pair(this->lower_bound(k), this->upper_bound(k))); }
+	
+			/********** Allocator **********/
+			// Will copy since it doesn't return by reference
+			allocator_type get_allocator() const { return (this->_alloc); }
 	};
 }
 

@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 16-03-2022 23:21 by                                             */
+/*   Updated: 17-03-2022 10:46 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,28 +60,33 @@ int main()
 	ft::map<char,int>::iterator itlow,itup;
 
 
-	mymap['a']=20;
-	mymap['b']=40;
-	mymap['c']=60;
-	mymap['d']=80;
-	mymap['e']=100;
-
-	// mymap['b']=40;
-	// mymap['e']=100;
-	// mymap['d']=80;
-	// mymap['c']=60;
 	// mymap['a']=20;
+	// mymap['b']=40;
+	// mymap['c']=60;
+	// mymap['d']=80;
+	// mymap['e']=100;
+
+	mymap['b']=40;
+	mymap['e']=100;
+	mymap['d']=80;
+	mymap['c']=60;
+	mymap['a']=20;
 
 	itlow=mymap.lower_bound ('b');  // itlow points to b
 	itup=mymap.upper_bound ('d');   // itup points to e (not d!)
 
 	mymap.erase(itlow,itup);        // erases [itlow,itup)
 
-	std::cout << "== ? " << (mymap.begin() == mymap.end()) << std::endl;
+	//while (1);
+
+	//std::cout << "== ? " << (mymap.begin() == mymap.end()) << std::endl;
 	// print content:
 	for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 		std::cout << it->first << " => " << it->second << std::endl;
 
-
+	std::cout << "--end is " << (--(mymap.end()))->first << std::endl;
+	std::cout << "begin is " << (mymap.begin())->first << std::endl;
+	std::cout << "++begin is " << (++(mymap.begin()))->first << std::endl;
+	std::cout << "++(++begin) == end ? " << (++(++(mymap.begin())) == mymap.end()) << std::endl;
 }
 

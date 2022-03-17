@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 16-03-2022 23:45 by                                             */
+/*   Updated: 17-03-2022 13:37 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -391,9 +391,18 @@ namespace ft
 				this->_dummyEnd = this->createNode();
 			}
 
+			RedBlackTree(const self_type& tree)
+			: _alloc(tree._alloc), _nodeAlloc(tree._nodeAlloc), _comp(tree._comp), _root(NULL), _dummyEnd(NULL)
+			{
+				this->_dummyEnd = this->createNode();
+				for (const_iterator it = tree.begin(); it != tree.end(); ++it)
+				{ this->insert(*it); }
+			}
+
 			~RedBlackTree()
 			{ this->clear(); this->deleteNode(this->_dummyEnd); }
 
+			// https://stackoverflow.com/questions/3381867/iterating-over-a-map/3382702#3382702
 			template <class Node>
 			static node_pointer inorderSuccessor(Node* node)
 			{
@@ -404,7 +413,7 @@ namespace ft
 				if (node->right != NULL)
 				{
 					node = node->right;
-					while (node->left)
+					while (node->left != NULL)
 						node = node->left;
 				}
 				else
@@ -430,14 +439,14 @@ namespace ft
 				if (node->left != NULL)
 				{
 					node = node->left;
-					while (node->right)
+					while (node->right != NULL)
 						node = node->right;
 				}
 				else
 				{
 					// In this case the node is on the furthest left of it's subtree
-					// go up until we find a node that is a right child, predecessor is this node's parent
-					while (node->parent != NULL && node == node->parent->right)
+					// go up until we find a node that is a left child, predecessor is this node's parent
+					while (node->parent != NULL && node == node->parent->left)
 						node = node->parent;
 					node = node->parent;
 				}
@@ -513,12 +522,16 @@ namespace ft
 					node_pointer successor = this->inorderSuccessor(node);
 					originalColor = successor->color;
 					newNode = successor->right;
-
-					if (successor->parent != node)
+					if (successor->parent == node)
+					{
+						//if (newNode != NULL)
+						//	newNode->parent = successor;
+					}
+					else
 					{
 						replaceNode(successor, successor->right);
 						successor->right = node->right;
-						successor->right->parent = node->right;
+						successor->right->parent = successor;
 					}
 
 					replaceNode(node, successor);
@@ -604,29 +617,21 @@ namespace ft
 
 			self_type& operator=(const self_type& tree)
 			{
-				for (node_pointer curr = tree.first(); curr != tree.last();
-					 curr = self_type::inorderSuccessor(curr))
-				{
-					this->insert(this->createNode(curr->data));
-				}
+				this->_alloc = tree._alloc;
+				this->_nodeAlloc = tree._nodeAlloc;
+				this->_comp = tree._comp;
+
+				this->_root = NULL;
+				this->_dummyEnd = this->createNode();
+	
+				for (const_iterator it = tree.begin(); it != tree.end(); ++it)
+				{ this->insert(*it); }
+				
+				return (*this);
 			}
 
-		void printTree(const std::string& prefix, node_pointer node, bool isLeft = false) const
-		{
-			if( node != NULL )
-			{
-				std::cout << prefix;
+			size_type max_size() const { return (this->_nodeAlloc.max_size()); }
 
-				std::cout << (isLeft ? "├──" : "└──" );
-
-				// print the value of the node
-				std::cout << (node->color == RED ? "R" : "B") <<  node->data.first << std::endl;
-
-				// enter the next tree level - left and right branch
-				printTree( prefix + (isLeft ? "│   " : "    "), node->left, true);
-				printTree( prefix + (isLeft ? "│   " : "    "), node->right, false);
-			}
-		}
 	};
 
 }
