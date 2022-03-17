@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 17-03-2022 13:37 by                                             */
+/*   Updated: 17-03-2022 16:18 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,35 @@ namespace ft
 				newNode->color = RED;
 
 				return (newNode);
+			}
+
+			void createEndNode()
+			{
+				this->_dummyEnd = this->createNode();
+				this->_dummyEnd->color = END_NODE_COLOR;
+			}
+
+			// Set the end node at the end of the tree
+			void setEndNodeAtTheEnd()
+			{
+				node_pointer curr = this->_root;
+
+				while (curr != NULL && curr->right)
+					curr = curr->right;
+				
+				if (curr != NULL)
+					curr->right = this->_dummyEnd;
+				//else
+				//	this->_root = this->_dummyEnd;
+				this->_dummyEnd->parent = curr;
+			}
+
+			// When seraching / inserting, hide the node from the tree
+			void vanishEndNode()
+			{
+				if (this->_dummyEnd->parent != NULL)
+					this->_dummyEnd->parent->right = NULL;
+				this->_dummyEnd->parent = NULL;
 			}
 
 			void deleteNode(node_pointer node)
@@ -350,7 +379,7 @@ namespace ft
 			// Size is the size of left tree + 1 (Parent) + size of right tree
 			size_type recursiveSize(node_pointer node) const
 			{
-				if (node == NULL)
+				if (node == NULL || node == this->_dummyEnd)
 					return (0);
 				return (recursiveSize(node->left) + 1 + recursiveSize(node->right));
 			}
@@ -358,7 +387,7 @@ namespace ft
 			// Clears the tree from left to right, from leaves to root
 			void recursiveClear(node_pointer node)
 			{
-				if (node == NULL)
+				if (node == NULL || node == this->_dummyEnd)
 					return;
 
 				recursiveClear(node->left);
@@ -388,19 +417,22 @@ namespace ft
 			    		 const allocator_type& alloc = allocator_type())
 			: _alloc(alloc), _nodeAlloc(), _comp(comp), _root(NULL), _dummyEnd(NULL)
 			{
-				this->_dummyEnd = this->createNode();
+				this->createEndNode();
 			}
 
 			RedBlackTree(const self_type& tree)
 			: _alloc(tree._alloc), _nodeAlloc(tree._nodeAlloc), _comp(tree._comp), _root(NULL), _dummyEnd(NULL)
 			{
-				this->_dummyEnd = this->createNode();
+				this->createEndNode();
 				for (const_iterator it = tree.begin(); it != tree.end(); ++it)
-				{ this->insert(*it); }
+					this->insert(*it);
 			}
 
 			~RedBlackTree()
-			{ this->clear(); this->deleteNode(this->_dummyEnd); }
+			{
+				this->clear();
+				this->deleteNode(this->_dummyEnd);
+			}
 
 			// https://stackoverflow.com/questions/3381867/iterating-over-a-map/3382702#3382702
 			template <class Node>
@@ -450,7 +482,7 @@ namespace ft
 						node = node->parent;
 					node = node->parent;
 				}
-
+				
 				return (node);
 			}
 
@@ -466,6 +498,8 @@ namespace ft
 					return (true);
 				}
 
+				this->vanishEndNode();
+
 				node_pointer curr = this->_root;
 				node_pointer parent = NULL;
 
@@ -477,9 +511,11 @@ namespace ft
 					else if (isSup(node->data, curr->data))
 						curr = curr->right;
 					else // Same value already present
+					{
+						this->setEndNodeAtTheEnd();
 						return (false);
+					}
 				}
-
 				node->parent = parent;
 				if (isInf(node->data, parent->data))
 					parent->left = node;
@@ -487,7 +523,8 @@ namespace ft
 					parent->right = node;
 
 				this->fixInsertionViolations(node);
-
+				
+				this->setEndNodeAtTheEnd();
 				return (true);
 			}
 
@@ -495,6 +532,8 @@ namespace ft
 			{
 				if (node == NULL)
 					return;
+
+				this->vanishEndNode();
 
 				int originalColor = node->color;
 				node_pointer newNode = NULL;
@@ -522,12 +561,7 @@ namespace ft
 					node_pointer successor = this->inorderSuccessor(node);
 					originalColor = successor->color;
 					newNode = successor->right;
-					if (successor->parent == node)
-					{
-						//if (newNode != NULL)
-						//	newNode->parent = successor;
-					}
-					else
+					if (successor->parent != node)
 					{
 						replaceNode(successor, successor->right);
 						successor->right = node->right;
@@ -543,24 +577,28 @@ namespace ft
 				this->deleteNode(node);
 				if (originalColor == BLACK)
 					this->fixDeleteViolations(newNode);
+				
+				this->setEndNodeAtTheEnd();
 			}
 
 			void remove(const value_type& val) { this->remove(this->search(val)); }			
 
 			node_pointer search(const value_type& val) const
 			{
+				
 				if (this->_root == NULL || (this->isEq(val, this->_root->data)))
 					return (this->_root);
 
 				node_pointer curr = this->_root;
 
-				while (curr != NULL && !this->isEq(val, curr->data))
+				while (curr != NULL && curr != this->_dummyEnd && !this->isEq(val, curr->data))
 				{
 					if (isInf(val, curr->data))
 						curr = curr->left;
 					else
 						curr = curr->right;
 				}
+
 				return (curr); // Either a isEq(ual) node or NULL
 			}
 
@@ -583,7 +621,7 @@ namespace ft
 			{
 				node_pointer curr = this->_root;
 
-				while (curr != NULL && curr->right)
+				while (curr != NULL && curr->right && curr->right != this->_dummyEnd)
 					curr = curr->right;
 				return (curr); 
 			}
@@ -594,7 +632,7 @@ namespace ft
 
 				if (val == NULL)
 					return (this->end());
-				return (iterator(val, this->last()));
+				return (iterator(val));
 			}		
 
 			const_iterator begin() const
@@ -603,11 +641,11 @@ namespace ft
 
 				if (val == NULL)
 					return (this->end());
-				return (const_iterator(val, this->last()));
+				return (const_iterator(val));
 			}
 
-			iterator		end() { return (iterator(NULL, this->last())); }
-			const_iterator	end() const { return (const_iterator(NULL, this->last())); }
+			iterator		end() { return (iterator(this->_dummyEnd)); }
+			const_iterator	end() const { return (const_iterator(this->_dummyEnd)); }
 
 			reverse_iterator		rbegin() { return (reverse_iterator(this->end())); }
 			const_reverse_iterator	rbegin() const { return (const_reverse_iterator(this->end())); }
@@ -622,12 +660,35 @@ namespace ft
 				this->_comp = tree._comp;
 
 				this->_root = NULL;
-				this->_dummyEnd = this->createNode();
+				this->createEndNode();
 	
 				for (const_iterator it = tree.begin(); it != tree.end(); ++it)
-				{ this->insert(*it); }
+					this->insert(*it);
+
+				this->setEndNodeAtTheEnd();
 				
 				return (*this);
+			}
+
+			void swap(self_type& x)
+			{
+				node_pointer tmp_root = this->_root;
+				node_pointer tmp_dummyEnd = this->_dummyEnd;
+				node_allocator_type tmp_nodeAlloc = this->_nodeAlloc;
+				allocator_type tmp_alloc = this->_alloc;
+				data_compare tmp_comp = this->_comp;
+
+				this->_root = x._root;
+				this->_dummyEnd = x._dummyEnd;
+				this->_nodeAlloc = x._nodeAlloc;
+				this->_alloc = x._alloc;
+				this->_comp = x._comp;
+
+				x._root = tmp_root;
+				x._dummyEnd = tmp_dummyEnd;
+				x._nodeAlloc = tmp_nodeAlloc;
+				x._alloc = tmp_alloc;
+				x._comp = tmp_comp;
 			}
 
 			size_type max_size() const { return (this->_nodeAlloc.max_size()); }

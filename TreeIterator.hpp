@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 15-03-2022  by  `-'                        `-'                  */
-/*   Updated: 17-03-2022 13:19 by                                             */
+/*   Updated: 17-03-2022 15:10 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 #include "utils.hpp"
 #include "iterators.hpp"
+
+#define END_NODE_COLOR 2
 
 namespace ft
 {
@@ -32,11 +34,10 @@ namespace ft
 
 			//Tree::node_pointer  _end;
 			typename Tree::node_pointer	_node;
-			typename Tree::node_pointer	_knownEnd;
 
 		public:
-			TreeIterator(typename Tree::node_pointer node = NULL, typename Tree::node_pointer knownEnd = NULL) : _node(node), _knownEnd(knownEnd) { }
-			TreeIterator(const TreeIterator<Tree, IsConst>& it) : _node(it._node), _knownEnd(it._knownEnd) { }
+			TreeIterator(typename Tree::node_pointer node = NULL) : _node(node) { }
+			TreeIterator(const TreeIterator<Tree, IsConst>& it) : _node(it._node) { }
 			~TreeIterator() { }
 
 			TreeIterator<Tree, IsConst>& operator=(const TreeIterator<Tree, IsConst>& it) { this->_node = it._node; return (*this); }
@@ -55,20 +56,18 @@ namespace ft
 			// ++A
 			TreeIterator<Tree, IsConst>& operator++()
 			{
-				if (this->_node != NULL)
-					this->_knownEnd = this->_node;
+				if (this->_node->color == END_NODE_COLOR)
+					return (*this);
 				this->_node = Tree::inorderSuccessor(this->_node);
 				return (*this);
 			}
 
 			// --A
-			// If we are at the end, go back to the last known end (if NULL it means tree is empty)
 			TreeIterator<Tree, IsConst>& operator--()
 			{
-				if (this->_node == NULL)
-					this->_node = this->_knownEnd;
-				else
-					this->_node = Tree::inorderPredecessor(this->_node);
+				if (Tree::inorderPredecessor(this->_node) == NULL)
+					return (*this);
+				this->_node = Tree::inorderPredecessor(this->_node);
 				return (*this);
 			}
 

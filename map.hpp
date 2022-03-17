@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 16-03-2022  by  `-'                        `-'                  */
-/*   Updated: 17-03-2022 14:35 by                                             */
+/*   Updated: 17-03-2022 16:18 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,20 +196,18 @@ namespace ft
 				}
 			}
 
-
 			void swap(map& x)
 			{
-				tree_type tmp_tree = this->_tree;
 				key_compare tmp_comp = this->_comp;
 				allocator_type tmp_alloc = this->_alloc;
 
-				this->_tree = x._tree;
 				this->_comp = x._comp;
 				this->_alloc = x._alloc;
 
-				x._tree = tmp_tree;
 				x._comp = tmp_comp;
 				x._alloc = tmp_alloc;
+				
+				this->_tree.swap(x._tree);
 			}
 
 			void clear() { this->_tree.clear(); }
@@ -237,7 +235,7 @@ namespace ft
 				if (value == NULL)
 					return (this->end());
 				
-				return (iterator(value, this->_tree.last()));
+				return (iterator(value));
 			}
 
 			const_iterator find(const key_type& k) const
@@ -249,7 +247,7 @@ namespace ft
 				if (value == NULL)
 					return (this->end());
 				
-				return (const_iterator(value, this->_tree.last()));
+				return (const_iterator(value));
 			}
 
 			// Returns the count of key in the tree, in map it's always 0 or 1
@@ -271,10 +269,10 @@ namespace ft
 				while (curr != NULL && this->isInf(curr->data.first, k))
 					curr = tree_type::inorderSuccessor(curr);
 
-				if (curr == NULL)
+				if (curr == NULL || curr->color == END_NODE_COLOR)
 					return (this->end());
 
-				return (iterator(curr, this->_tree.last()));
+				return (iterator(curr));
 			}
 
 			const_iterator lower_bound(const key_type& k) const
@@ -284,10 +282,10 @@ namespace ft
 				while (curr != NULL && this->isInf(curr->data.first, k))
 					curr = tree_type::inorderSuccessor(curr);
 
-				if (curr == NULL)
+				if (curr == NULL || curr->color == END_NODE_COLOR)
 					return (this->end());
 
-				return (const_iterator(curr, this->_tree.last()));
+				return (const_iterator(curr));
 			}
 
 			iterator upper_bound(const key_type& k)
@@ -297,10 +295,10 @@ namespace ft
 				while (curr != NULL && !this->isInf(k, curr->data.first))
 					curr = tree_type::inorderSuccessor(curr);
 
-				if (curr == NULL)
+				if (curr == NULL || curr->color == END_NODE_COLOR)
 					return (this->end());
 
-				return (iterator(curr, this->_tree.last()));
+				return (iterator(curr));
 			}
 
 			const_iterator upper_bound(const key_type& k) const
@@ -310,10 +308,10 @@ namespace ft
 				while (curr != NULL && !this->isInf(k, curr->data.first))
 					curr = tree_type::inorderSuccessor(curr);
 
-				if (curr == NULL)
+				if (curr == NULL || curr->color == END_NODE_COLOR)
 					return (this->end());
 
-				return (const_iterator(curr, this->_tree.last()));
+				return (const_iterator(curr));
 			}
 			
 			// Returns a range that includes all elements with a key == k

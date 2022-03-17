@@ -6,7 +6,7 @@
 /*   By:             )/   )   )  /  /    (  |   )/   )   ) /   )(   )(    )   */
 /*                  '/   /   (`.'  /      `-'-''/   /   (.'`--'`-`-'  `--':   */
 /*   Created: 28-02-2022  by  `-'                        `-'                  */
-/*   Updated: 16-03-2022 13:05 by                                             */
+/*   Updated: 17-03-2022 14:48 by                                             */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "utils.hpp"
 #include "enable_if.hpp"
 
+#include <iostream>
 #include <cstddef>
 
 namespace ft
@@ -127,7 +128,10 @@ namespace ft
 			// Internally, the function decreases a copy of its base iterator and returns the result of dereferencing it.
 			reference operator*() const { iterator_type tmp = this->_it; --tmp; return (*tmp); }
 
-
+			// Internally, the function calls operator* and returns its address, as if implemented as:
+			pointer operator->() const { return (&(this->operator*())); }
+			
+			
 			reverse_iterator operator+(difference_type n) const { return (reverse_iterator(this->_it.operator-(n))); }
 
 			reverse_iterator& operator++() { --this->_it; return (*this); }
@@ -144,9 +148,6 @@ namespace ft
 			reverse_iterator operator--(int) { reverse_iterator tmp = *this; --(*this); return (tmp); }
 
 			reverse_iterator& operator-=(difference_type n) { this->_it += n; return (*this); }
-
-			// Internally, the function calls operator* and returns its address, as if implemented as:
-			pointer operator->() const { return (&(this->operator*())); }
 
 			// Internally, the function accesses the proper element of its base iterator, returning the same as: base()[-n-1].
 			reference operator[](difference_type n) const { return (this->base()[-n-1]); }
